@@ -6,7 +6,10 @@ import { join } from 'path';
 
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
+import { HealthController } from './health/health.controller';
 import formatGraphqlError from './exception/exception.formatter';
+import { TerminusModule } from '@nestjs/terminus';
+import { AppGraphQLModule } from './graphql/graphql.module';
 
 @Module({
   imports: [
@@ -20,16 +23,9 @@ import formatGraphqlError from './exception/exception.formatter';
         PORT: Joi.number(),
       }),
     }),
-    GraphQLModule.forRoot({
-      useGlobalPrefix: true,
-      typePaths: ['./**/*.graphql'],
-      definitions: {
-        path: join(process.cwd(), 'src/schema/graphql.schema.ts'),
-      },
-      formatError: formatGraphqlError,
-    }),
+    AppGraphQLModule,
     DatabaseModule,
-    UserModule,
+    UserModule
   ],
   controllers: [],
   providers: [],

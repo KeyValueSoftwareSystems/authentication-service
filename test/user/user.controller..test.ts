@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { User } from '../src/schema/graphql.schema';
 import { INestApplication } from '@nestjs/common';
+import UserService from '../../src/user/user.service';
+import Substitute from '@fluffy-spoon/substitute';
+import User from '../../src/user/user.entity';
+import { UserResolver } from '../../src/user/user.resolver';
+import { AppGraphQLModule } from '../../src/graphql/graphql.module';
 
 const users: User[] = [
   {
@@ -16,12 +19,15 @@ const users: User[] = [
 
 const gql = '/graphql';
 
+let userService = Substitute.for<UserService>();
+
 describe('User Module (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppGraphQLModule],
+      providers: [UserResolver, {provide: 'UserService', useValue: userService}]
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -35,6 +41,7 @@ describe('User Module (e2e)', () => {
   describe(gql, () => {
     describe('users', () => {
       it('should get the user array', () => {
+        userService.getAllUsers().returns(Promise.resolve(users))
         return request(app.getHttpServer())
           .post(gql)
           .send({ query: '{getUsers {id email firstName lastName active }}' })
