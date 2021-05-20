@@ -6,7 +6,7 @@ import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import User from '../../src/user/user.entity';
 import { UserResolver } from '../../src/user/user.resolver';
 import { AppGraphQLModule } from '../../src/graphql/graphql.module';
-import { NewUserInput } from 'src/schema/graphql.schema';
+import { NewUserInput, UpdateUserInput } from '../../src/schema/graphql.schema';
 
 const users: User[] = [
   {
@@ -77,8 +77,9 @@ describe('User Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
         };
+        const obj = Object.create(null);
         userService
-          .createUser(Arg.any())
+          .createUser(Object.assign(obj, input))
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
@@ -92,16 +93,17 @@ describe('User Module', () => {
           });
       });
 
-
-
       it('should update a user', () => {
-        const input: NewUserInput = {
-          email: 'user@test.com',
+        const input: UpdateUserInput = {
           firstName: 'Test1',
           lastName: 'Test2',
         };
+        const obj = Object.create(null);
         userService
-          .updateUser("ae032b1b-cc3c-4e44-9197-276ca877a7f8", Arg.any())
+          .updateUser(
+            'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+            Object.assign(obj, input),
+          )
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
@@ -122,7 +124,7 @@ describe('User Module', () => {
           lastName: 'Test2',
         };
         userService
-          .deleteUser("ae032b1b-cc3c-4e44-9197-276ca877a7f8")
+          .deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)

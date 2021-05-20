@@ -6,6 +6,7 @@ import { join } from 'path';
 @Module({
   imports: [
     GraphQLModule.forRoot({
+      playground: true,
       useGlobalPrefix: true,
       typePaths: ['./**/*.graphql'],
       definitions: {

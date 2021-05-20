@@ -46,26 +46,25 @@ describe('test UserService', () => {
 
   it('should get a user by id', async () => {
     userRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { where: { active: true } })
+      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8', {
+        where: { active: true },
+      })
       .returns(Promise.resolve(users[0]));
-    const resp = await userService.getUserById('ae032b1b-cc3c-4e44-9197-276ca877a7f8');
+    const resp = await userService.getUserById(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    );
     expect(resp).toEqual(users[0]);
   });
 
   it('should create a user', async () => {
     const input: NewUserInput = {
-        email: 'user@test.com',
-        firstName: 'Test1',
-        lastName: 'Test2',
-      };
-    userRepository
-      .create(input)
-      .returns(users[0]);
+      email: 'user@test.com',
+      firstName: 'Test1',
+      lastName: 'Test2',
+    };
+    userRepository.create(input).returns(users[0]);
 
-    userRepository
-      .save(users[0])
-      .returns(Promise.resolve(users[0]));
-    
+    userRepository.save(users[0]).returns(Promise.resolve(users[0]));
 
     const resp = await userService.createUser(input);
     expect(resp).toEqual(users[0]);
@@ -73,10 +72,10 @@ describe('test UserService', () => {
 
   it('should update a user', async () => {
     const input: NewUserInput = {
-        email: 'user@test.com',
-        firstName: 'Test1',
-        lastName: 'Test2',
-      };
+      email: 'user@test.com',
+      firstName: 'Test1',
+      lastName: 'Test2',
+    };
     userRepository
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
       .returns(Promise.resolve(Arg.any()));
@@ -84,18 +83,22 @@ describe('test UserService', () => {
     userRepository
       .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .returns(Promise.resolve(users[0]));
-    
 
-    const resp = await userService.updateUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input);
+    const resp = await userService.updateUser(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      input,
+    );
     expect(resp).toEqual(users[0]);
   });
 
   it('should delete a user', async () => {
     userRepository
-      .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', {active: false})
-      .resolves(Arg.any()); 
+      .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
+      .resolves(Arg.any());
 
-    const resp = await userService.deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8');
+    const resp = await userService.deleteUser(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    );
     expect(resp).toEqual(users[0]);
-  })
+  });
 });
