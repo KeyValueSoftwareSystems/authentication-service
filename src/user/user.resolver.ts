@@ -1,7 +1,10 @@
+import { UsePipes } from '@nestjs/common';
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { NewUserInput, UpdateUserInput, User } from '../schema/graphql.schema';
 import UserService from './user.service';
+import ValidationPipe from '../validation/validation.pipe';
+import * as UserSchema from './user.validation.schema';
 
 @Resolver('User')
 export class UserResolver {
@@ -18,6 +21,7 @@ export class UserResolver {
   }
 
   @Mutation()
+  @UsePipes(new ValidationPipe(UserSchema.CreateUserSchema))
   async createUser(@Args('input') userInput: NewUserInput): Promise<User> {
     return this.userService.createUser(userInput);
   }
@@ -25,7 +29,8 @@ export class UserResolver {
   @Mutation()
   async updateUser(
     @Args('id', ParseUUIDPipe) id: string,
-    @Args('input') userInput: UpdateUserInput,
+    @Args('input', new ValidationPipe(UserSchema.UpdateUserSchema))
+    userInput: UpdateUserInput,
   ): Promise<User> {
     return this.userService.updateUser(id, userInput);
   }

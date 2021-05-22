@@ -3,15 +3,16 @@ import {
   Catch,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { GqlExceptionFilter } from '@nestjs/graphql';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Catch()
 export class CustomExceptionsFilter implements GqlExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
-    Logger.error(exception);
+    const logger = LoggerService.getInstance(CustomExceptionsFilter.name);
+    logger.error(exception);
     const contextType = host.getType();
     const statusCode =
       exception instanceof HttpException
