@@ -17,12 +17,10 @@ Rename env.sample to .env and enter all the values
 Rename docker.env.sample to docker.env and enter all the values
 
 # development
-$ npm run start
+* update .env POSTGRES_HOST=postgres
+$ docker-compose up
 
-# watch mode
-$ npm run start:dev
-
-# production mode
+# production
 $ npm run start:prod
 ```
 
