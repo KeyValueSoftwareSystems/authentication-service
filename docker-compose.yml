@@ -1,31 +1,51 @@
-version: "3"
+version: '3.8'
 services:
+  auth:
+    container_name: auth-service
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '${PORT}:${PORT}'
+    command: npm run start:dev
+    env_file:
+      - .env
+    networks:
+      - authnet
+    depends_on:
+      - postgres
+
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:12
+    expose:
+      - '${POSTGRES_PORT}'
     ports:
-    - "5432:5432"
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
     volumes:
-    - /data/postgres:/data/postgres
+      - /data/postgres:/data/postgres
     env_file:
-    - docker.env
+      - docker.env
     networks:
-    - postgres
- 
+      - authnet
+
   pgadmin:
     links:
-    - postgres:postgres
+      - postgres:postgres
     container_name: pgadmin
     image: dpage/pgadmin4
     ports:
-    - "8080:80"
+      - '8080:80'
     volumes:
-    - /data/pgadmin:/root/.pgadmin
+      - /data/pgadmin:/root/.pgadmin
     env_file:
-    - docker.env
+      - docker.env
     networks:
-    - postgres
- 
+      - authnet
+
 networks:
-  postgres:
+  authnet:
     driver: bridge
