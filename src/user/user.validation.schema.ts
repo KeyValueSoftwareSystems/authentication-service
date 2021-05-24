@@ -7,7 +7,7 @@ export const CreateUserSchema = Joi.object({
   firstName: Joi.string().required(),
   middleName: Joi.string(),
   lastName: Joi.string().required(),
-  groups: Joi.array()
+  groups: Joi.array(),
 }).options({ abortEarly: false });
 
 export const UpdateUserSchema = Joi.object({

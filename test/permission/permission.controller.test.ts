@@ -3,17 +3,25 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppGraphQLModule } from '../../src/graphql/graphql.module';
 import * as request from 'supertest';
-import { NewPermissionInput, UpdatePermissionInput } from '../../src/schema/graphql.schema';
+import {
+  NewPermissionInput,
+  UpdatePermissionInput,
+} from '../../src/schema/graphql.schema';
 import { PermissionService } from '../../src/permission/permission.service';
 import Permission from '../../src/permission/permission.entity';
 import { PermissionResolver } from '../../src/permission/permission.resolver';
 
 const gql = '/graphql';
 
-const permissions: Permission[] = [{ id: "2b33268a-7ff5-4cac-a87a-6bfc4430d34c", name: "Customers", active: true}]
+const permissions: Permission[] = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    active: true,
+  },
+];
 const permissionService = Substitute.for<PermissionService>();
 describe('Permission Module', () => {
-
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -32,10 +40,12 @@ describe('Permission Module', () => {
   afterAll(async () => {
     await app.close();
   });
-  describe("gql", () => {
+  describe('gql', () => {
     describe('permissions', () => {
       it('should get the permissions', () => {
-        permissionService.getAllPermissions().returns(Promise.resolve(permissions));
+        permissionService
+          .getAllPermissions()
+          .returns(Promise.resolve(permissions));
         return request(app.getHttpServer())
           .post(gql)
           .send({ query: '{getPermissions {id name active }}' })
@@ -62,11 +72,10 @@ describe('Permission Module', () => {
       });
 
       it('should create a permission', () => {
-
         const input: NewPermissionInput = {
-          name: 'Test1'
+          name: 'Test1',
         };
-        let obj = Object.create(null);        
+        const obj = Object.create(null);
         permissionService
           .createPermission(Object.assign(obj, input))
           .returns(Promise.resolve(permissions[0]));
@@ -84,11 +93,14 @@ describe('Permission Module', () => {
 
       it('should update a permission', () => {
         const input: UpdatePermissionInput = {
-          name: 'Test1'
+          name: 'Test1',
         };
-        let obj = Object.create(null);   
+        const obj = Object.create(null);
         permissionService
-          .updatePermission("ae032b1b-cc3c-4e44-9197-276ca877a7f8", Object.assign(obj, input))
+          .updatePermission(
+            'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+            Object.assign(obj, input),
+          )
           .returns(Promise.resolve(permissions[0]));
         return request(app.getHttpServer())
           .post(gql)

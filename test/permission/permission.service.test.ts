@@ -2,7 +2,10 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
-import { NewPermissionInput, UpdatePermissionInput } from '../../src/schema/graphql.schema';
+import {
+  NewPermissionInput,
+  UpdatePermissionInput,
+} from '../../src/schema/graphql.schema';
 import { PermissionService } from '../../src/permission/permission.service';
 import Permission from '../../src/permission/permission.entity';
 
@@ -59,7 +62,9 @@ describe('test Permission service', () => {
     };
     permissionRepository.create(input).returns(permissions[0]);
 
-    permissionRepository.save(permissions[0]).returns(Promise.resolve(permissions[0]));
+    permissionRepository
+      .save(permissions[0])
+      .returns(Promise.resolve(permissions[0]));
 
     const resp = await permissionService.createPermission(input);
     expect(resp).toEqual(permissions[0]);

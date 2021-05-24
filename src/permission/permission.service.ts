@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NewPermissionInput, UpdatePermissionInput } from 'src/schema/graphql.schema';
+import {
+  NewPermissionInput,
+  UpdatePermissionInput,
+} from 'src/schema/graphql.schema';
 import { Repository } from 'typeorm';
 import { PermissionNotFoundException } from './permission.exception';
 import Permission from './permission.entity';
 import { LoggerService } from '../logger/logger.service';
 
-
 @Injectable()
 export class PermissionService {
   constructor(
     @InjectRepository(Permission)
-    private permissionsRepository: Repository<Permission>
+    private permissionsRepository: Repository<Permission>,
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
@@ -30,14 +32,19 @@ export class PermissionService {
 
   async createPermission(permission: NewPermissionInput): Promise<Permission> {
     const newPermission = await this.permissionsRepository.create(permission);
-    const savedPermission = await this.permissionsRepository.save(newPermission);
-    console.log("permission save response")
-    console.log(savedPermission)
-    console.log(newPermission)
+    const savedPermission = await this.permissionsRepository.save(
+      newPermission,
+    );
+    console.log('permission save response');
+    console.log(savedPermission);
+    console.log(newPermission);
     return savedPermission;
   }
 
-  async updatePermission(id: string, permission: UpdatePermissionInput): Promise<Permission> {
+  async updatePermission(
+    id: string,
+    permission: UpdatePermissionInput,
+  ): Promise<Permission> {
     await this.permissionsRepository.update(id, permission);
     const updatedPermission = await this.permissionsRepository.findOne(id);
     if (updatedPermission) {

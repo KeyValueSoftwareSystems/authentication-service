@@ -14,9 +14,8 @@ class Group {
   public active!: boolean;
 
   @Field((type) => [Permission], { nullable: true })
-  @ManyToMany((type) => Permission, permission => permission.id)
+  @ManyToMany((type) => Permission, (permission) => permission.id)
   public permissions?: Permission[];
-  
 }
 
 export default Group;

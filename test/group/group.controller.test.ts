@@ -6,14 +6,22 @@ import Group from '../../src/group/group.entity';
 import { GroupService } from '../../src/group/group.service';
 import { GroupResolver } from '../../src/group/group.resolver';
 import * as request from 'supertest';
-import { NewGroupInput, UpdateGroupInput } from '../../src/schema/graphql.schema';
+import {
+  NewGroupInput,
+  UpdateGroupInput,
+} from '../../src/schema/graphql.schema';
 
 const gql = '/graphql';
 
-const groups: Group[] = [{ id: "2b33268a-7ff5-4cac-a87a-6bfc4430d34c", name: "Customers", active: true}]
+const groups: Group[] = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    active: true,
+  },
+];
 const groupService = Substitute.for<GroupService>();
 describe('Group Module', () => {
-
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -62,11 +70,10 @@ describe('Group Module', () => {
       });
 
       it('should create a group', () => {
-
         const input: NewGroupInput = {
-          name: 'Test1'
+          name: 'Test1',
         };
-        let obj = Object.create(null);        
+        const obj = Object.create(null);
         groupService
           .createGroup(Object.assign(obj, input))
           .returns(Promise.resolve(groups[0]));
@@ -84,11 +91,14 @@ describe('Group Module', () => {
 
       it('should update a group', () => {
         const input: UpdateGroupInput = {
-          name: 'Test1'
+          name: 'Test1',
         };
-        let obj = Object.create(null);   
+        const obj = Object.create(null);
         groupService
-          .updateGroup("ae032b1b-cc3c-4e44-9197-276ca877a7f8", Object.assign(obj, input))
+          .updateGroup(
+            'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+            Object.assign(obj, input),
+          )
           .returns(Promise.resolve(groups[0]));
         return request(app.getHttpServer())
           .post(gql)
@@ -104,10 +114,10 @@ describe('Group Module', () => {
 
       it('should delete a group', () => {
         const input: NewGroupInput = {
-          name: 'Test1'
+          name: 'Test1',
         };
         groupService
-          .deleteGroup("ae032b1b-cc3c-4e44-9197-276ca877a7f8")
+          .deleteGroup('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(groups[0]));
         return request(app.getHttpServer())
           .post(gql)

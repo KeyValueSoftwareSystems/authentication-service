@@ -24,7 +24,7 @@ import { PermissionModule } from './permission/permission.module';
     DatabaseModule,
     UserModule,
     GroupModule,
-    PermissionModule
+    PermissionModule,
   ],
   controllers: [],
   providers: [],

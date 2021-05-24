@@ -1,6 +1,13 @@
 import { Field } from '@nestjs/graphql';
 import { type } from 'node:os';
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import Group from '../group/group.entity';
 import Permission from '../permission/permission.entity';
 
@@ -24,12 +31,15 @@ class User {
   @Column({ default: true })
   public active!: boolean;
 
-  @ManyToMany(type => Group)
+  @ManyToMany((type) => Group)
   @JoinTable()
   public groups?: Group[];
 
-  @ManyToMany(type => Permission, permission => permission.id, { onUpdate: 'CASCADE', onDelete: 'CASCADE'})
-  @JoinTable({name: "user_permissions_permission"})
+  @ManyToMany((type) => Permission, (permission) => permission.id, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({ name: 'user_permissions_permission' })
   permissions?: Permission[];
 }
 

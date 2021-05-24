@@ -13,5 +13,3 @@ class Permission {
 }
 
 export default Permission;
-
-

@@ -72,13 +72,12 @@ describe('User Module', () => {
       });
 
       it('should create a user', () => {
-
         const input: NewUserInput = {
           email: 'user@test.com',
           firstName: 'Test1',
           lastName: 'Test2',
         };
-        let obj = Object.create(null);        
+        const obj = Object.create(null);
         userService
           .createUser(Object.assign(obj, input))
           .returns(Promise.resolve(users[0]));
@@ -99,9 +98,12 @@ describe('User Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
         };
-        let obj = Object.create(null);   
+        const obj = Object.create(null);
         userService
-          .updateUser("ae032b1b-cc3c-4e44-9197-276ca877a7f8", Object.assign(obj, input))
+          .updateUser(
+            'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+            Object.assign(obj, input),
+          )
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
@@ -122,7 +124,7 @@ describe('User Module', () => {
           lastName: 'Test2',
         };
         userService
-          .deleteUser("ae032b1b-cc3c-4e44-9197-276ca877a7f8")
+          .deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
