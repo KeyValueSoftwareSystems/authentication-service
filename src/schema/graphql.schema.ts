@@ -1,3 +1,4 @@
+
 /*
  * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -20,9 +21,28 @@ export interface UpdateUserInput {
     active?: boolean;
 }
 
+export interface UserSignupInput {
+    email?: string;
+    phone?: string;
+    password: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+}
+
+export interface UserLoginInput {
+    username?: string;
+    password?: string;
+}
+
+export interface UserPasswordInput {
+    currentPassword?: string;
+    newPassword?: string;
+}
+
 export interface User {
     id: string;
-    email: string;
+    email?: string;
     firstName: string;
     middleName?: string;
     lastName: string;
@@ -32,10 +52,26 @@ export interface User {
 export interface IQuery {
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
+    me(): UserSignupResponse | Promise<UserSignupResponse>;
 }
 
 export interface IMutation {
-    createUser(input?: NewUserInput): User | Promise<User>;
     updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
     deleteUser(id: string): User | Promise<User>;
+    login(input?: UserLoginInput): TokenResponse | Promise<TokenResponse>;
+    signup(input?: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    changePassword(input?: UserPasswordInput): User | Promise<User>;
+}
+
+export interface TokenResponse {
+    expiresInSeconds?: number;
+    token?: string;
+}
+
+export interface UserSignupResponse {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    middleName?: string;
+    lastName?: string;
 }

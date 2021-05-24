@@ -1,0 +1,41 @@
+type Mutation {
+    login(input: UserLoginInput): TokenResponse
+    signup(input: UserSignupInput): UserSignupResponse
+    changePassword(input: UserPasswordInput): User
+}
+
+type Query {
+    me: UserSignupResponse
+}
+
+input UserSignupInput {
+  email: String
+  phone: String
+  password: String!
+  firstName: String!
+  middleName: String
+  lastName: String!
+}
+
+input UserLoginInput {
+    username: String
+    password: String
+}
+
+type TokenResponse {
+  expiresInSeconds: Int,
+  token: String
+}
+
+type UserSignupResponse {
+  email: String
+  phone: String
+  firstName: String
+  middleName: String
+  lastName: String
+}
+
+input UserPasswordInput {
+  currentPassword: String
+  newPassword: String
+}

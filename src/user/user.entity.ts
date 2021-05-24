@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import UserAuthDetails from 'src/userauth/userauth.entity';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 class User {
@@ -19,6 +20,9 @@ class User {
 
   @Column({ default: true })
   public active!: boolean;
+
+  @OneToOne(() => UserAuthDetails, (userAuthDetails) => userAuthDetails.user)
+  userAuthDetails!: UserAuthDetails;
 }
 
 export default User;

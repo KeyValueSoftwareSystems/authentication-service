@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { AppGraphQLModule } from './graphql/graphql.module';
+import { UserauthModule } from './userauth/userauth.module';
 
 @Module({
   imports: [
@@ -16,11 +17,13 @@ import { AppGraphQLModule } from './graphql/graphql.module';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
         PORT: Joi.number(),
+        JWT_SECRET: Joi.string().required().min(10),
       }),
     }),
     AppGraphQLModule,
     DatabaseModule,
     UserModule,
+    UserauthModule,
   ],
   controllers: [],
   providers: [],
