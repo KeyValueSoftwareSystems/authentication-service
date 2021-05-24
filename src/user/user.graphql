@@ -5,6 +5,7 @@ type User {
   middleName: String
   lastName: String!
   active: Boolean!
+  groups: [Group]
 }
 
 input NewUserInput {
@@ -12,12 +13,24 @@ input NewUserInput {
   firstName: String!
   middleName: String
   lastName: String!
+  groups: [ID!]
 }
 
 input UpdateUserInput {
   firstName: String
   middleName: String
   lastName: String
+  active: Boolean
+  groups: [ID!]
+}
+
+input UpdateUserPermissionInput {
+  permissions: [ID!]!
+}
+
+type UserPermissions {
+  id: ID!,
+  name: String!,
   active: Boolean
 }
 
@@ -30,4 +43,5 @@ type Mutation {
   createUser(input: NewUserInput): User
   updateUser(id: ID!, input: UpdateUserInput): User
   deleteUser(id: ID!): User
+  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput): [UserPermissions]
 }

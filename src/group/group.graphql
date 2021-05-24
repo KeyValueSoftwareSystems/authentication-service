@@ -1,0 +1,25 @@
+type Group {
+  id: ID!
+  name: String!
+  active: Boolean!
+}
+
+input NewGroupInput {
+  name: String!
+}
+
+input UpdateGroupInput {
+  name: String!
+  active: Boolean
+}
+
+type Query {
+  getGroups: [Group]!
+  getGroup(id: ID!): Group
+}
+
+type Mutation {
+  createGroup(input: NewGroupInput): Group
+  updateGroup(id: ID!, input: UpdateGroupInput): Group
+  deleteGroup(id: ID!): Group
+}

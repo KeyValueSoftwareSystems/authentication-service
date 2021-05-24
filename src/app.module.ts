@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { AppGraphQLModule } from './graphql/graphql.module';
+import { GroupModule } from './group/group.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AppGraphQLModule } from './graphql/graphql.module';
     AppGraphQLModule,
     DatabaseModule,
     UserModule,
+    GroupModule,
+    PermissionModule
   ],
   controllers: [],
   providers: [],
