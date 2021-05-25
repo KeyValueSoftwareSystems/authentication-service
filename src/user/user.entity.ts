@@ -6,8 +6,8 @@ class User {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ unique: true })
-  public email!: string;
+  @Column({ nullable: true })
+  public email?: string;
 
   @Column()
   public firstName!: string;

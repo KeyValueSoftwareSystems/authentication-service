@@ -14,10 +14,10 @@ class UserAuthDetails {
   public id!: string;
 
   @Column({ nullable: true })
-  public email!: string;
+  public email?: string;
 
   @Column({ nullable: true })
-  public phone!: string;
+  public phone?: string;
 
   @Column({ nullable: false })
   public password!: string;

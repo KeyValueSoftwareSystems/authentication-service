@@ -1,5 +1,5 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
-import { Args, Context, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { TokenResponse, UserSignupResponse } from 'src/schema/graphql.schema';
 import User from 'src/user/user.entity';
 import ValidationPipe from 'src/validation/validation.pipe';
@@ -25,13 +25,6 @@ export class UserauthResolver {
   @UsePipes(new ValidationPipe(UserSignupInputSchema))
   async userSignup(@Args('input') request: any): Promise<UserSignupResponse> {
     return this.userauthService.userSignup(request);
-  }
-
-  //TODO: Remove sample method for validating auth service
-  @Query('me')
-  @UseGuards(new AuthGaurd())
-  async me(@Context('user') user: any) {
-    return this.userauthService.getUserDetailsByEmailOrPhone(user.username);
   }
 
   @Mutation('changePassword')

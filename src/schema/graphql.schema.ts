@@ -8,7 +8,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export interface NewUserInput {
-    email: string;
+    email?: string;
     firstName: string;
     middleName?: string;
     lastName: string;
@@ -31,13 +31,13 @@ export interface UserSignupInput {
 }
 
 export interface UserLoginInput {
-    username?: string;
-    password?: string;
+    username: string;
+    password: string;
 }
 
 export interface UserPasswordInput {
-    currentPassword?: string;
-    newPassword?: string;
+    currentPassword: string;
+    newPassword: string;
 }
 
 export interface User {
@@ -52,26 +52,25 @@ export interface User {
 export interface IQuery {
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
-    me(): UserSignupResponse | Promise<UserSignupResponse>;
 }
 
 export interface IMutation {
     updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
     deleteUser(id: string): User | Promise<User>;
-    login(input?: UserLoginInput): TokenResponse | Promise<TokenResponse>;
-    signup(input?: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
-    changePassword(input?: UserPasswordInput): User | Promise<User>;
+    login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
+    signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    changePassword(input: UserPasswordInput): User | Promise<User>;
 }
 
 export interface TokenResponse {
-    expiresInSeconds?: number;
-    token?: string;
+    expiresInSeconds: number;
+    token: string;
 }
 
 export interface UserSignupResponse {
     email?: string;
     phone?: string;
-    firstName?: string;
+    firstName: string;
     middleName?: string;
-    lastName?: string;
+    lastName: string;
 }

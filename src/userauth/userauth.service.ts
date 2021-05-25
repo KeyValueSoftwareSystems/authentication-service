@@ -33,6 +33,26 @@ export class UserauthService {
     email?: string | undefined,
     phone?: string | undefined,
   ): Promise<UserAuthDetails | undefined> {
+    let query = this.userAuthRepository
+      .createQueryBuilder('user_authorization_details')
+      .innerJoinAndSelect('user_authorization_details.user', 'user');
+
+    if (email) {
+      query = query.where('user_authorization_details.email = :email', {
+        email: `${email}`,
+      });
+    } else if (phone) {
+      query = query.where('user_authorization_details.phone = :phone', {
+        phone: `${phone}`,
+      });
+    }
+    return query.getOne();
+  }
+
+  async getUserDetailsByUsername(
+    email?: string | undefined,
+    phone?: string | undefined,
+  ): Promise<UserAuthDetails | undefined> {
     const nullCheckedEmail = email ? email : null;
     const nullCheckedPhone = phone ? phone : null;
 
@@ -54,7 +74,7 @@ export class UserauthService {
     }
 
     const userFromInput = new User();
-    userFromInput.email = userDetails.email || '';
+    userFromInput.email = userDetails.email;
     userFromInput.firstName = userDetails.firstName;
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
@@ -79,7 +99,7 @@ export class UserauthService {
   async userLogin(userDetails: UserLoginInput): Promise<TokenResponse> {
     const userRecord:
       | UserAuthDetails
-      | undefined = await this.getUserDetailsByEmailOrPhone(
+      | undefined = await this.getUserDetailsByUsername(
       userDetails.username,
       userDetails.username,
     );
@@ -89,7 +109,6 @@ export class UserauthService {
       const plainTextPassword = userDetails.password as string;
       if (isPasswordValid(plainTextPassword, hashedPassword)) {
         const tokenData = createToken(userRecord);
-        console.log(tokenData);
         return tokenData;
       }
       throw new UnauthorizedException({
@@ -102,7 +121,7 @@ export class UserauthService {
   async updatePassword(username: string, passwordDetails: any): Promise<User> {
     const userRecord:
       | UserAuthDetails
-      | undefined = await this.getUserDetailsByEmailOrPhone(username, username);
+      | undefined = await this.getUserDetailsByUsername(username, username);
 
     if (userRecord && userRecord.user.active) {
       if (
