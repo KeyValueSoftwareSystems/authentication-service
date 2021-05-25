@@ -7,6 +7,7 @@ import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import formatGraphqlError from './exception/exception.formatter';
+import { GoogleModule } from './google/google.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import formatGraphqlError from './exception/exception.formatter';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
         PORT: Joi.number(),
+        GOOGLE_CLIENT_ID: Joi.string(),
       }),
     }),
     GraphQLModule.forRoot({
@@ -30,6 +32,7 @@ import formatGraphqlError from './exception/exception.formatter';
     }),
     DatabaseModule,
     UserModule,
+    GoogleModule,
   ],
   controllers: [],
   providers: [],
