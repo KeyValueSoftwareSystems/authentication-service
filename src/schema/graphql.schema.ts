@@ -1,4 +1,3 @@
-
 /*
  * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -7,20 +6,6 @@
 
 /* tslint:disable */
 /* eslint-disable */
-export interface NewUserInput {
-    email?: string;
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-}
-
-export interface UpdateUserInput {
-    firstName?: string;
-    middleName?: string;
-    lastName?: string;
-    active?: boolean;
-}
-
 export interface UserSignupInput {
     email?: string;
     phone?: string;
@@ -40,26 +25,26 @@ export interface UserPasswordInput {
     newPassword: string;
 }
 
-export interface User {
-    id: string;
+export interface NewUserInput {
     email?: string;
     firstName: string;
     middleName?: string;
     lastName: string;
-    active: boolean;
 }
 
-export interface IQuery {
-    getUsers(): User[] | Promise<User[]>;
-    getUser(id: string): User | Promise<User>;
+export interface UpdateUserInput {
+    firstName?: string;
+    middleName?: string;
+    lastName?: string;
+    active?: boolean;
 }
 
 export interface IMutation {
-    updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
-    deleteUser(id: string): User | Promise<User>;
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
+    updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
+    deleteUser(id: string): User | Promise<User>;
 }
 
 export interface TokenResponse {
@@ -73,4 +58,18 @@ export interface UserSignupResponse {
     firstName: string;
     middleName?: string;
     lastName: string;
+}
+
+export interface User {
+    id: string;
+    email?: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    active: boolean;
+}
+
+export interface IQuery {
+    getUsers(): User[] | Promise<User[]>;
+    getUser(id: string): User | Promise<User>;
 }
