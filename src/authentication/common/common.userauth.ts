@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import UserAuthDetails from './userauth.entity';
+import UserAuthDetails from '../entity/entity.userauth';
 import * as bcrypt from 'bcrypt';
 
 export function createToken(userDetails: UserAuthDetails) {

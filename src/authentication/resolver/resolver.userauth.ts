@@ -3,13 +3,13 @@ import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { TokenResponse, UserSignupResponse } from 'src/schema/graphql.schema';
 import User from 'src/user/user.entity';
 import ValidationPipe from 'src/validation/validation.pipe';
-import { AuthGaurd } from './userauth.gaurd';
-import { UserauthService } from './userauth.service';
+import { AuthGaurd } from '../authentication.gaurd';
+import { UserauthService } from '../service/service.userauth';
 import {
   UserLoginInputSchema,
   UserPasswordInputSchema,
   UserSignupInputSchema,
-} from './userauth.validation.schema';
+} from '../validation/validation.userauth.schema';
 
 @Resolver('Userauth')
 export class UserauthResolver {

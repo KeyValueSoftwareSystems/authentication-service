@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UserauthService } from './userauth.service';
-import { UserauthResolver } from './userauth.resolver';
+import { UserauthService } from './service/service.userauth';
+import { UserauthResolver } from './resolver/resolver.userauth';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import UserAuthDetails from './userauth.entity';
+import UserAuthDetails from './entity/entity.userauth';
 import UserService from 'src/user/user.service';
 import User from 'src/user/user.entity';
 

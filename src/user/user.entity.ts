@@ -1,4 +1,4 @@
-import UserAuthDetails from 'src/userauth/userauth.entity';
+import UserAuthDetails from 'src/authentication/entity/entity.userauth';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

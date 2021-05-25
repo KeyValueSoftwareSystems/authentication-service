@@ -12,12 +12,12 @@ import {
   UserSignupResponse,
 } from 'src/schema/graphql.schema';
 import { Repository } from 'typeorm';
-import UserAuthDetails from './userauth.entity';
+import UserAuthDetails from '../entity/entity.userauth';
 import {
   createToken,
   generatePasswordHash,
   isPasswordValid,
-} from './userauth.common';
+} from '../common/common.userauth';
 import User from 'src/user/user.entity';
 import UserService from 'src/user/user.service';
 
