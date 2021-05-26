@@ -37,16 +37,20 @@ export class UserauthService {
       .createQueryBuilder('user_authorization_details')
       .innerJoinAndSelect('user_authorization_details.user', 'user');
 
+    let userRecord;
     if (email) {
       query = query.where('user_authorization_details.email = :email', {
         email: `${email}`,
       });
-    } else if (phone) {
+      userRecord = await query.getOne();
+    }
+    if (phone && !userRecord) {
       query = query.where('user_authorization_details.phone = :phone', {
         phone: `${phone}`,
       });
+      userRecord = await query.getOne();
     }
-    return query.getOne();
+    return userRecord;
   }
 
   async getUserDetailsByUsername(

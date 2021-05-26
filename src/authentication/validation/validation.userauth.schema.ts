@@ -2,7 +2,7 @@ import * as Joi from '@hapi/joi';
 
 export const UserSignupInputSchema = Joi.object({
   email: Joi.string().email({ tlds: { allow: false } }),
-  phone: Joi.string(),
+  phone: Joi.number(),
   password: Joi.string().required().min(10),
   firstName: Joi.string().required(),
   middleName: Joi.string(),
