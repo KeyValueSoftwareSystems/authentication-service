@@ -6,11 +6,11 @@ import {
   UpdateUserInput,
   UpdateUserPermissionInput,
   User,
-} from '../schema/graphql.schema';
-import UserService from './user.service';
-import ValidationPipe from '../validation/validation.pipe';
-import * as UserSchema from './user.validation.schema';
-import Permission from '../permission/permission.entity';
+} from '../../schema/graphql.schema';
+import UserService from '../service/user.service';
+import ValidationPipe from '../../validation/validation.pipe';
+import * as UserSchema from '../validation/user.validation.schema';
+import Permission from '../entity/permission.entity';
 
 @Resolver('User')
 export class UserResolver {

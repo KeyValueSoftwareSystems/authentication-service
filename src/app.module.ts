@@ -2,11 +2,9 @@ import { Module } from '@nestjs/common';
 import * as Joi from '@hapi/joi';
 import { ConfigModule } from '@nestjs/config';
 
-import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { AppGraphQLModule } from './graphql/graphql.module';
-import { GroupModule } from './group/group.module';
-import { PermissionModule } from './permission/permission.module';
+import { AuthorizationModule } from './authorization/authorization.module';
 
 @Module({
   imports: [
@@ -22,9 +20,7 @@ import { PermissionModule } from './permission/permission.module';
     }),
     AppGraphQLModule,
     DatabaseModule,
-    UserModule,
-    GroupModule,
-    PermissionModule,
+    AuthorizationModule,
   ],
   controllers: [],
   providers: [],

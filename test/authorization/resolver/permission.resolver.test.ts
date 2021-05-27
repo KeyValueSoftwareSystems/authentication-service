@@ -7,9 +7,9 @@ import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../src/schema/graphql.schema';
-import { PermissionService } from '../../src/permission/permission.service';
-import Permission from '../../src/permission/permission.entity';
-import { PermissionResolver } from '../../src/permission/permission.resolver';
+import { PermissionService } from '../../src/authorization/service/permission.service';
+import Permission from '../../src/authorization/entity/permission.entity';
+import { PermissionResolver } from '../../src/authorization/resolver/permission.resolver';
 
 const gql = '/graphql';
 

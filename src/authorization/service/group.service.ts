@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewGroupInput, UpdateGroupInput } from 'src/schema/graphql.schema';
 import { Repository } from 'typeorm';
-import Group from './group.entity';
-import { GroupNotFoundException } from './group.exception';
+import Group from '../entity/group.entity';
+import { GroupNotFoundException } from '../exception/group.exception';
 
 @Injectable()
 export class GroupService {

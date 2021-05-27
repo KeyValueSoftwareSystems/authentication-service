@@ -4,8 +4,8 @@ import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
-import Permission from './permission.entity';
-import { PermissionService } from './permission.service';
+import Permission from '../entity/permission.entity';
+import { PermissionService } from '../service/permission.service';
 
 @Resolver('Permission')
 export class PermissionResolver {

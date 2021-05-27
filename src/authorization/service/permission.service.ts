@@ -5,9 +5,9 @@ import {
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
 import { Repository } from 'typeorm';
-import { PermissionNotFoundException } from './permission.exception';
-import Permission from './permission.entity';
-import { LoggerService } from '../logger/logger.service';
+import { PermissionNotFoundException } from '../exception/permission.exception';
+import Permission from '../entity/permission.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class PermissionService {

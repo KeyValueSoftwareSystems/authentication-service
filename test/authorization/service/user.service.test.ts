@@ -1,10 +1,10 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import User from '../../src/user/user.entity';
+import User from '../../../src/authorization/entity/user.entity';
 import { Repository } from 'typeorm';
-import UserService from '../../src/user/user.service';
+import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
-import { NewUserInput } from 'src/schema/graphql.schema';
+import { NewUserInput, UpdateUserInput } from 'src/schema/graphql.schema';
 import { Args } from '@nestjs/graphql';
 
 const users: User[] = [
@@ -28,7 +28,7 @@ describe('test UserService', () => {
       providers: [
         UserService,
         {
-          provide: getRepositoryToken(User),
+          provide: 'UserRepository',
           useValue: userRepository,
         },
       ],
@@ -38,7 +38,8 @@ describe('test UserService', () => {
 
   it('should get all users', async () => {
     userRepository
-      .find({ where: { active: true } })
+      .find({ where: { active: true },
+        relations: ['groups'], })
       .returns(Promise.resolve(users));
     const resp = await userService.getAllUsers();
     expect(resp).toEqual(users);
@@ -48,6 +49,7 @@ describe('test UserService', () => {
     userRepository
       .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8', {
         where: { active: true },
+        relations: ['groups'],
       })
       .returns(Promise.resolve(users[0]));
     const resp = await userService.getUserById(
@@ -57,22 +59,23 @@ describe('test UserService', () => {
   });
 
   it('should create a user', async () => {
-    const input: NewUserInput = {
+    const input = {
       email: 'user@test.com',
       firstName: 'Test1',
       lastName: 'Test2',
+      groups: []
     };
     userRepository.create(input).returns(users[0]);
 
-    userRepository.save(users[0]).returns(Promise.resolve(users[0]));
+    userRepository.save(users[0]).resolves(users[0]);
 
     const resp = await userService.createUser(input);
+    console.log(resp)
     expect(resp).toEqual(users[0]);
   });
 
   it('should update a user', async () => {
-    const input: NewUserInput = {
-      email: 'user@test.com',
+    const input = {
       firstName: 'Test1',
       lastName: 'Test2',
     };

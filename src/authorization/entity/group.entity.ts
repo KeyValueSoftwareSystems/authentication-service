@@ -1,6 +1,6 @@
 import { Field } from '@nestjs/graphql';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import Permission from '../permission/permission.entity';
+import Permission from './permission.entity';
 
 @Entity()
 class Group {

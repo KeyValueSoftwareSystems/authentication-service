@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import User from './user.entity';
+import User from '../entity/user.entity';
 import {
   NewUserInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
-} from '../schema/graphql.schema';
-import { UserNotFoundException } from './user.exception';
-import Group from '../group/group.entity';
-import Permission from '../permission/permission.entity';
+} from '../../schema/graphql.schema';
+import { UserNotFoundException } from '../exception/user.exception';
+import Group from '../entity/group.entity';
+import Permission from '../entity/permission.entity';
 
 @Injectable()
 export default class UserService {
@@ -43,11 +43,14 @@ export default class UserService {
       groups: user.groups ? user.groups.map((group) => ({ id: group })) : [],
     });
     const createdUser = await this.usersRepository.save(newUser);
-    const savedUser = await this.usersRepository.findOneOrFail(createdUser.id, {
+    const savedUser = await this.usersRepository.findOne(createdUser.id, {
       where: { active: true },
       relations: ['groups'],
     });
-    return savedUser;
+    if (savedUser) {
+      return savedUser;
+    }
+    throw new UserNotFoundException(user.email);
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {

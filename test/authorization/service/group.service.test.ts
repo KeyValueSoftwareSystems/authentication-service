@@ -3,8 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import { NewGroupInput, UpdateGroupInput } from 'src/schema/graphql.schema';
-import Group from '../../src/group/group.entity';
-import { GroupService } from '../../src/group/group.service';
+import Group from '../../src/authorization/entity/group.entity';
+import { GroupService } from '../../src/authorization/service/group.service';
 
 const groups: Group[] = [
   {

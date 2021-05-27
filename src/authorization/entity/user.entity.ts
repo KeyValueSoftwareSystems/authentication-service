@@ -1,5 +1,5 @@
 import { Field } from '@nestjs/graphql';
-import { type } from 'node:os';
+import { type, userInfo } from 'node:os';
 import {
   Column,
   Entity,
@@ -8,8 +8,8 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import Group from '../group/group.entity';
-import Permission from '../permission/permission.entity';
+import Group from './group.entity';
+import Permission from './permission.entity';
 
 @Entity()
 class User {
@@ -44,3 +44,16 @@ class User {
 }
 
 export default User;
+
+
+
+/*
+
+Authorization
+  user(user_group, user_permission), group(group_permission), permissions -> 
+
+Authentication
+  sign up, login
+  social login -> google, apple, 
+
+*/

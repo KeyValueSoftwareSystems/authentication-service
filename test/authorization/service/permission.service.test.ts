@@ -6,8 +6,8 @@ import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../src/schema/graphql.schema';
-import { PermissionService } from '../../src/permission/permission.service';
-import Permission from '../../src/permission/permission.entity';
+import { PermissionService } from '../../src/authorization/service/permission.service';
+import Permission from '../../src/authorization/entity/permission.entity';
 
 const permissions: Permission[] = [
   {

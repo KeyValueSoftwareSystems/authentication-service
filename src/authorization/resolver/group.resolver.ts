@@ -1,8 +1,8 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { NewGroupInput, UpdateGroupInput } from 'src/schema/graphql.schema';
-import Group from './group.entity';
-import { GroupService } from './group.service';
+import Group from '../entity/group.entity';
+import { GroupService } from '../service/group.service';
 
 @Resolver('Group')
 export class GroupResolver {
