@@ -18,6 +18,7 @@ import { UserauthModule } from './authentication/authentication.module';
         POSTGRES_DB: Joi.string().required(),
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required().min(10),
+        GOOGLE_CLIENT_ID: Joi.string(),
       }),
     }),
     AppGraphQLModule,

@@ -2,6 +2,7 @@ type Mutation {
     login(input: UserLoginInput!): TokenResponse
     signup(input: UserSignupInput!): UserSignupResponse
     changePassword(input: UserPasswordInput!): User
+    google(input: GoogleLoginInput!): TokenResponse
 }
 
 input UserSignupInput {
@@ -34,4 +35,8 @@ type UserSignupResponse {
 input UserPasswordInput {
   currentPassword: String!
   newPassword: String!
+}
+
+input GoogleLoginInput {
+  idToken: String!
 }
