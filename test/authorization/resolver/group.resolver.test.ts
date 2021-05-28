@@ -1,15 +1,15 @@
 import Substitute from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppGraphQLModule } from '../../src/graphql/graphql.module';
-import Group from '../../src/authorization/entity/group.entity';
-import { GroupService } from '../../src/authorization/service/group.service';
-import { GroupResolver } from '../../src/authorization/resolver/group.resolver';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import Group from '../../../src/authorization/entity/group.entity';
+import { GroupService } from '../../../src/authorization/service/group.service';
+import { GroupResolver } from '../../../src/authorization/resolver/group.resolver';
 import * as request from 'supertest';
 import {
   NewGroupInput,
   UpdateGroupInput,
-} from '../../src/schema/graphql.schema';
+} from '../../../src/schema/graphql.schema';
 
 const gql = '/graphql';
 

@@ -1,6 +1,11 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { NewGroupInput, UpdateGroupInput } from 'src/schema/graphql.schema';
+import {
+  NewGroupInput,
+  Permission,
+  UpdateGroupInput,
+  UpdateGroupPermissionInput,
+} from 'src/schema/graphql.schema';
 import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
 
@@ -29,6 +34,14 @@ export class GroupResolver {
     @Args('input') groupInput: UpdateGroupInput,
   ): Promise<Group> {
     return this.groupService.updateGroup(id, groupInput);
+  }
+
+  @Mutation()
+  async updateGroupPermissions(
+    @Args('id', ParseUUIDPipe) id: string,
+    @Args('input') groupInput: UpdateGroupPermissionInput,
+  ): Promise<Permission[]> {
+    return this.groupService.updateGroupPermissions(id, groupInput);
   }
 
   @Mutation()

@@ -16,6 +16,10 @@ export interface UpdateGroupInput {
     active?: boolean;
 }
 
+export interface UpdateGroupPermissionInput {
+    permissions: string[];
+}
+
 export interface NewPermissionInput {
     name: string;
 }
@@ -30,7 +34,6 @@ export interface NewUserInput {
     firstName: string;
     middleName?: string;
     lastName: string;
-    groups?: string[];
 }
 
 export interface UpdateUserInput {
@@ -38,17 +41,26 @@ export interface UpdateUserInput {
     middleName?: string;
     lastName?: string;
     active?: boolean;
-    groups?: string[];
 }
 
 export interface UpdateUserPermissionInput {
     permissions: string[];
 }
 
+export interface UpdateUserGroupInput {
+    groups: string[];
+}
+
 export interface Group {
     id: string;
     name: string;
     active: boolean;
+}
+
+export interface GroupPermission {
+    id: string;
+    name: string;
+    active?: boolean;
 }
 
 export interface IQuery {
@@ -64,6 +76,7 @@ export interface IMutation {
     createGroup(input?: NewGroupInput): Group | Promise<Group>;
     updateGroup(id: string, input?: UpdateGroupInput): Group | Promise<Group>;
     deleteGroup(id: string): Group | Promise<Group>;
+    updateGroupPermissions(id: string, input?: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
     createPermission(input?: NewPermissionInput): Permission | Promise<Permission>;
     updatePermission(id: string, input?: UpdatePermissionInput): Permission | Promise<Permission>;
     deletePermission(id: string): Permission | Promise<Permission>;
@@ -71,6 +84,7 @@ export interface IMutation {
     updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
     deleteUser(id: string): User | Promise<User>;
     updateUserPermissions(id: string, input?: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
+    updateUserGroups(id: string, input?: UpdateUserGroupInput): UserGroupResponse[] | Promise<UserGroupResponse[]>;
 }
 
 export interface Permission {
@@ -86,7 +100,12 @@ export interface User {
     middleName?: string;
     lastName: string;
     active: boolean;
-    groups?: Group[];
+}
+
+export interface UserGroupResponse {
+    id: string;
+    name: string;
+    active?: boolean;
 }
 
 export interface UserPermissions {

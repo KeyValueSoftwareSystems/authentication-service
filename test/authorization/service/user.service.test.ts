@@ -6,6 +6,10 @@ import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import { NewUserInput, UpdateUserInput } from 'src/schema/graphql.schema';
 import { Args } from '@nestjs/graphql';
+import Group from '../../../src/authorization/entity/group.entity';
+import Permission from '../../../src/authorization/entity/permission.entity';
+import UserPermission from '../../../src/authorization/entity/userPermission.entity';
+import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 
 const users: User[] = [
   {
@@ -20,6 +24,10 @@ const users: User[] = [
 describe('test UserService', () => {
   let userService: UserService;
   const userRepository = Substitute.for<Repository<User>>();
+  const groupRepository = Substitute.for<Repository<Group>>();
+  const permissionRepository = Substitute.for<Repository<Permission>>();
+  const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
+  const userGroupRepository = Substitute.for<Repository<UserGroup>>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -31,6 +39,22 @@ describe('test UserService', () => {
           provide: 'UserRepository',
           useValue: userRepository,
         },
+        {
+          provide: getRepositoryToken(Permission),
+          useValue: permissionRepository,
+        },
+        {
+          provide: getRepositoryToken(Group),
+          useValue: groupRepository,
+        },
+        {
+          provide: getRepositoryToken(UserGroup),
+          useValue: userGroupRepository,
+        },
+        {
+          provide: getRepositoryToken(UserPermission),
+          useValue: userPermissionRepository,
+        },
       ],
     }).compile();
     userService = moduleRef.get<UserService>(UserService);
@@ -38,8 +62,7 @@ describe('test UserService', () => {
 
   it('should get all users', async () => {
     userRepository
-      .find({ where: { active: true },
-        relations: ['groups'], })
+      .find({ where: { active: true } })
       .returns(Promise.resolve(users));
     const resp = await userService.getAllUsers();
     expect(resp).toEqual(users);
@@ -49,7 +72,6 @@ describe('test UserService', () => {
     userRepository
       .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8', {
         where: { active: true },
-        relations: ['groups'],
       })
       .returns(Promise.resolve(users[0]));
     const resp = await userService.getUserById(
@@ -63,14 +85,13 @@ describe('test UserService', () => {
       email: 'user@test.com',
       firstName: 'Test1',
       lastName: 'Test2',
-      groups: []
     };
     userRepository.create(input).returns(users[0]);
 
     userRepository.save(users[0]).resolves(users[0]);
 
     const resp = await userService.createUser(input);
-    console.log(resp)
+    console.log(resp);
     expect(resp).toEqual(users[0]);
   });
 

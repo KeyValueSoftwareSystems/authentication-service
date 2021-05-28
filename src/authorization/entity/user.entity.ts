@@ -30,22 +30,9 @@ class User {
 
   @Column({ default: true })
   public active!: boolean;
-
-  @ManyToMany((type) => Group)
-  @JoinTable()
-  public groups?: Group[];
-
-  @ManyToMany((type) => Permission, (permission) => permission.id, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  @JoinTable({ name: 'user_permissions_permission' })
-  permissions?: Permission[];
 }
 
 export default User;
-
-
 
 /*
 

@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NewGroupInput, UpdateGroupInput } from 'src/schema/graphql.schema';
+import {
+  NewGroupInput,
+  UpdateGroupInput,
+  UpdateGroupPermissionInput,
+} from 'src/schema/graphql.schema';
 import { Repository } from 'typeorm';
 import Group from '../entity/group.entity';
+import GroupPermission from '../entity/groupPermission.entity';
+import Permission from '../entity/permission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 
 @Injectable()
@@ -10,6 +16,10 @@ export class GroupService {
   constructor(
     @InjectRepository(Group)
     private groupsRepository: Repository<Group>,
+    @InjectRepository(GroupPermission)
+    private groupPermissionRepository: Repository<GroupPermission>,
+    @InjectRepository(Permission)
+    private permissionRepository: Repository<Permission>,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -48,5 +58,28 @@ export class GroupService {
       return deletedGroup;
     }
     throw new GroupNotFoundException(id);
+  }
+
+  async updateGroupPermissions(
+    id: string,
+    request: UpdateGroupPermissionInput,
+  ): Promise<Permission[]> {
+    const updatedGroup = await this.groupsRepository.findOne(id);
+    if (!updatedGroup) {
+      throw new GroupNotFoundException(id);
+    }
+    const groupPermission = this.groupPermissionRepository.create(
+      request.permissions.map((permission) => ({
+        groupId: id,
+        permissionId: permission,
+      })),
+    );
+    const savedGroupPermissions = await this.groupPermissionRepository.save(
+      groupPermission,
+    );
+    const permissions = this.permissionRepository.findByIds(
+      savedGroupPermissions.map((g) => g.permissionId),
+    );
+    return permissions;
   }
 }

@@ -5,31 +5,40 @@ import { Repository } from 'typeorm';
 import User from '../entity/user.entity';
 import {
   NewUserInput,
+  UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
 } from '../../schema/graphql.schema';
 import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
+import UserGroup from '../entity/userGroup.entity';
+import UserPermission from '../entity/userPermission.entity';
 
 @Injectable()
 export default class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(UserGroup)
+    private userGroupRepository: Repository<UserGroup>,
+    @InjectRepository(Group)
+    private groupRepository: Repository<Group>,
+    @InjectRepository(UserPermission)
+    private userPermissionRepository: Repository<UserPermission>,
+    @InjectRepository(Permission)
+    private permissionRepository: Repository<Permission>,
   ) {}
 
   getAllUsers(): Promise<User[]> {
     return this.usersRepository.find({
       where: { active: true },
-      relations: ['groups'],
     });
   }
 
   async getUserById(id: string): Promise<User> {
     const user = await this.usersRepository.findOne(id, {
       where: { active: true },
-      relations: ['groups'],
     });
     if (user) {
       return user;
@@ -38,14 +47,10 @@ export default class UserService {
   }
 
   async createUser(user: NewUserInput): Promise<User> {
-    const newUser = await this.usersRepository.create({
-      ...user,
-      groups: user.groups ? user.groups.map((group) => ({ id: group })) : [],
-    });
+    const newUser = await this.usersRepository.create(user);
     const createdUser = await this.usersRepository.save(newUser);
     const savedUser = await this.usersRepository.findOne(createdUser.id, {
       where: { active: true },
-      relations: ['groups'],
     });
     if (savedUser) {
       return savedUser;
@@ -54,19 +59,35 @@ export default class UserService {
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
-    const newUser = await this.usersRepository.create({
-      ...user,
-      groups: user.groups ? user.groups.map((group) => ({ id: group })) : [],
-    });
+    const newUser = await this.usersRepository.create(user);
     await this.usersRepository.update(id, newUser);
     const updatedUser = await this.usersRepository.findOne(id, {
       where: { active: true },
-      relations: ['groups'],
     });
     if (updatedUser) {
       return updatedUser;
     }
     throw new UserNotFoundException(id);
+  }
+
+  async updateUserGroups(
+    id: string,
+    user: UpdateUserGroupInput,
+  ): Promise<Group[]> {
+    const existingUser = await this.usersRepository.findOne(id, {
+      where: { active: true },
+    });
+    if (!existingUser) {
+      throw new UserNotFoundException(id);
+    }
+    const userGroups = this.userGroupRepository.create(
+      user.groups.map((group) => ({ userId: id, groupId: group })),
+    );
+    const updatedUserGroups = await this.userGroupRepository.save(userGroups);
+    const groups = await this.groupRepository.findByIds(
+      updatedUserGroups.map((u) => u.groupId),
+    );
+    return groups;
   }
 
   async updateUserPermissions(
@@ -75,23 +96,24 @@ export default class UserService {
   ): Promise<Permission[]> {
     const existingUser = await this.usersRepository.findOne(id, {
       where: { active: true },
-      relations: ['groups', 'permissions'],
     });
     if (!existingUser) {
       throw new UserNotFoundException(id);
     }
-    const userToBeUpdated = await this.usersRepository.create({
-      ...existingUser,
-      permissions: request.permissions.map((permission) => ({
-        id: permission,
+
+    const userPermissionsCreated = this.userPermissionRepository.create(
+      request.permissions.map((permission) => ({
+        userId: id,
+        permissionId: permission,
       })),
-    });
-    const newUser = await this.usersRepository.save(userToBeUpdated);
-    const updatedUser = await this.usersRepository.findOneOrFail(id, {
-      where: { active: true },
-      relations: ['groups', 'permissions'],
-    });
-    return updatedUser.permissions ? updatedUser.permissions : [];
+    );
+    const userPermissionsUpdated = await this.userPermissionRepository.save(
+      userPermissionsCreated,
+    );
+    const userPermissions = await this.permissionRepository.findByIds(
+      userPermissionsUpdated.map((u) => u.permissionId),
+    );
+    return userPermissions;
   }
 
   async deleteUser(id: string): Promise<User> {

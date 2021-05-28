@@ -3,8 +3,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import { NewGroupInput, UpdateGroupInput } from 'src/schema/graphql.schema';
-import Group from '../../src/authorization/entity/group.entity';
-import { GroupService } from '../../src/authorization/service/group.service';
+import Group from '../../../src/authorization/entity/group.entity';
+import { GroupService } from '../../../src/authorization/service/group.service';
+import Permission from '../../../src/authorization/entity/permission.entity';
+import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 
 const groups: Group[] = [
   {
@@ -17,7 +19,10 @@ const groups: Group[] = [
 describe('test Group Service', () => {
   let groupService: GroupService;
   const groupRepository = Substitute.for<Repository<Group>>();
-
+  const permissionRepository = Substitute.for<Repository<Permission>>();
+  const groupPermissionRepository = Substitute.for<
+    Repository<GroupPermission>
+  >();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -27,6 +32,14 @@ describe('test Group Service', () => {
         {
           provide: getRepositoryToken(Group),
           useValue: groupRepository,
+        },
+        {
+          provide: getRepositoryToken(Permission),
+          useValue: permissionRepository,
+        },
+        {
+          provide: getRepositoryToken(GroupPermission),
+          useValue: groupPermissionRepository,
         },
       ],
     }).compile();

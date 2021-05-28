@@ -1,15 +1,15 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppGraphQLModule } from '../../src/graphql/graphql.module';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
-} from '../../src/schema/graphql.schema';
-import { PermissionService } from '../../src/authorization/service/permission.service';
-import Permission from '../../src/authorization/entity/permission.entity';
-import { PermissionResolver } from '../../src/authorization/resolver/permission.resolver';
+} from '../../../src/schema/graphql.schema';
+import { PermissionService } from '../../../src/authorization/service/permission.service';
+import Permission from '../../../src/authorization/entity/permission.entity';
+import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
 
 const gql = '/graphql';
 

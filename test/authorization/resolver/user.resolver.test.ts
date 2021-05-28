@@ -1,12 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import UserService from '../../src/authorization/service/user.service';
+import UserService from '../../../src/authorization/service/user.service';
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
-import User from '../../src/authorization/entity/user.entity';
-import { UserResolver } from '../../src/authorization/resolver/user.resolver';
-import { AppGraphQLModule } from '../../src/graphql/graphql.module';
-import { NewUserInput, UpdateUserInput } from '../../src/schema/graphql.schema';
+import User from '../../../src/authorization/entity/user.entity';
+import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import {
+  NewUserInput,
+  UpdateUserInput,
+} from '../../../src/schema/graphql.schema';
 
 const users: User[] = [
   {

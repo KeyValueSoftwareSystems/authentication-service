@@ -5,9 +5,9 @@ import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
-} from '../../src/schema/graphql.schema';
-import { PermissionService } from '../../src/authorization/service/permission.service';
-import Permission from '../../src/authorization/entity/permission.entity';
+} from '../../../src/schema/graphql.schema';
+import { PermissionService } from '../../../src/authorization/service/permission.service';
+import Permission from '../../../src/authorization/entity/permission.entity';
 
 const permissions: Permission[] = [
   {
