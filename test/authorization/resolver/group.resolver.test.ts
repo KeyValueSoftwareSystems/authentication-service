@@ -9,7 +9,9 @@ import * as request from 'supertest';
 import {
   NewGroupInput,
   UpdateGroupInput,
+  UpdateGroupPermissionInput,
 } from '../../../src/schema/graphql.schema';
+import Permission from 'src/authorization/entity/permission.entity';
 
 const gql = '/graphql';
 
@@ -20,6 +22,14 @@ const groups: Group[] = [
     active: true,
   },
 ];
+
+const permissions = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    active: true,
+  },
+]
 const groupService = Substitute.for<GroupService>();
 describe('Group Module', () => {
   let app: INestApplication;
@@ -130,6 +140,28 @@ describe('Group Module', () => {
             expect(res.body.data.deleteGroup).toEqual(groups[0]);
           });
       });
+    });
+
+    it('should update group permissions', () => {
+      const input: UpdateGroupPermissionInput = {
+        permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"],
+      };
+      const obj = Object.create(null);
+      groupService
+        .updateGroupPermissions("ae032b1b-cc3c-4e44-9197-276ca877a7f8", Object.assign(obj, input))
+        .resolves(permissions);
+
+      return request(app.getHttpServer())
+        .post(gql)
+        .send({
+          query:
+            'mutation { updateGroupPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log(res.body.data);
+          expect(res.body.data.updateGroupPermissions).toEqual(permissions);
+        });
     });
   });
 });

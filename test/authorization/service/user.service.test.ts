@@ -4,7 +4,7 @@ import User from '../../../src/authorization/entity/user.entity';
 import { Repository } from 'typeorm';
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
-import { NewUserInput, UpdateUserInput } from 'src/schema/graphql.schema';
+import { NewUserInput, UpdateUserInput, UpdateUserPermissionInput } from 'src/schema/graphql.schema';
 import { Args } from '@nestjs/graphql';
 import Group from '../../../src/authorization/entity/group.entity';
 import Permission from '../../../src/authorization/entity/permission.entity';
@@ -21,6 +21,21 @@ const users: User[] = [
   },
 ];
 
+const permissions: Permission[] = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    active: true,
+  },
+];
+
+const groups: Group[] = [
+  {
+    id: '39d338b9-02bd-4971-a24e-b39a3f475580',
+    name: 'Customers',
+    active: true,
+  },
+];
 describe('test UserService', () => {
   let userService: UserService;
   const userRepository = Substitute.for<Repository<User>>();
@@ -124,5 +139,31 @@ describe('test UserService', () => {
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
     expect(resp).toEqual(users[0]);
+  });
+
+  it('should update user permissions', async () => {
+    const request = [{userId: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", permissionId: "2b33268a-7ff5-4cac-a87a-6bfc4430d34c"}]
+    userPermissionRepository.create(request).returns(request);
+    userPermissionRepository.save(request).resolves(request);
+    permissionRepository.findByIds(["2b33268a-7ff5-4cac-a87a-6bfc4430d34c"]).resolves(permissions);
+
+    const resp = await userService.updateUserPermissions(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      {permissions: ["2b33268a-7ff5-4cac-a87a-6bfc4430d34c"]}
+    );
+    expect(resp).toEqual(permissions);
+  });
+
+  it('should update user groups', async () => {
+    const request = [{userId: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", groupId: "39d338b9-02bd-4971-a24e-b39a3f475580"}]
+    userGroupRepository.create(request).returns(request);
+    userGroupRepository.save(request).resolves(request);
+    groupRepository.findByIds(["39d338b9-02bd-4971-a24e-b39a3f475580"]).resolves(groups);
+
+    const resp = await userService.updateUserGroups(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      {groups: ["39d338b9-02bd-4971-a24e-b39a3f475580"]}
+    );
+    expect(resp).toEqual(groups);
   });
 });
