@@ -5,7 +5,6 @@ import {
   NewUserInput,
   UpdateUserGroupInput,
   UpdateUserInput,
-  UserGroupResponse,
   UpdateUserPermissionInput,
   User,
   Group,

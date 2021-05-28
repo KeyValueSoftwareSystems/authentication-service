@@ -11,7 +11,6 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
 } from '../../../src/schema/graphql.schema';
-import Permission from 'src/authorization/entity/permission.entity';
 
 const gql = '/graphql';
 
@@ -29,7 +28,7 @@ const permissions = [
     name: 'Customers',
     active: true,
   },
-]
+];
 const groupService = Substitute.for<GroupService>();
 describe('Group Module', () => {
   let app: INestApplication;
@@ -123,9 +122,6 @@ describe('Group Module', () => {
       });
 
       it('should delete a group', () => {
-        const input: NewGroupInput = {
-          name: 'Test1',
-        };
         groupService
           .deleteGroup('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(groups[0]));
@@ -144,11 +140,14 @@ describe('Group Module', () => {
 
     it('should update group permissions', () => {
       const input: UpdateGroupPermissionInput = {
-        permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"],
+        permissions: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
       };
       const obj = Object.create(null);
       groupService
-        .updateGroupPermissions("ae032b1b-cc3c-4e44-9197-276ca877a7f8", Object.assign(obj, input))
+        .updateGroupPermissions(
+          'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+          Object.assign(obj, input),
+        )
         .resolves(permissions);
 
       return request(app.getHttpServer())

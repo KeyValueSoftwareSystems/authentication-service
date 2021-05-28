@@ -1,16 +1,4 @@
-import { Field } from '@nestjs/graphql';
-import { type, userInfo } from 'node:os';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import Group from './group.entity';
-import Permission from './permission.entity';
-
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 class User {
   @PrimaryGeneratedColumn('uuid')

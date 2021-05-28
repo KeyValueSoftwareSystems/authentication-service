@@ -7,7 +7,6 @@ import {
 import { Repository } from 'typeorm';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import Permission from '../entity/permission.entity';
-import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class PermissionService {

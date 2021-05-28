@@ -1,14 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  PrimaryColumn,
-} from 'typeorm';
-import Group from './group.entity';
-import User from './user.entity';
-
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity()
 class UserGroup {
   @Column()
