@@ -1,6 +1,7 @@
 type User {
   id: ID!
   email: String
+  phone: String
   firstName: String!
   middleName: String
   lastName: String!

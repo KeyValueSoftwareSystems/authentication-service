@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
-import { UserauthService } from './service/service.userauth';
-import { UserauthResolver } from './resolver/resolver.userauth';
+import { UserauthService } from './service/userauth.service';
+import { UserauthResolver } from './resolver/userauth.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import UserAuthDetails from './entity/entity.userauth';
 import UserService from 'src/user/user.service';
 import User from 'src/user/user.entity';
+import { ConfigModule } from '@nestjs/config';
+import { AuthenticationHelper } from './authentication.helper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserAuthDetails, User])],
-  providers: [UserauthResolver, UserauthService, UserService],
+  imports: [TypeOrmModule.forFeature([User]), ConfigModule],
+  providers: [
+    UserauthResolver,
+    UserauthService,
+    UserService,
+    AuthenticationHelper,
+  ],
 })
 export class UserauthModule {}

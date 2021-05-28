@@ -4,12 +4,12 @@ import { TokenResponse, UserSignupResponse } from 'src/schema/graphql.schema';
 import User from 'src/user/user.entity';
 import ValidationPipe from 'src/validation/validation.pipe';
 import { AuthGaurd } from '../authentication.gaurd';
-import { UserauthService } from '../service/service.userauth';
+import { UserauthService } from '../service/userauth.service';
 import {
   UserLoginInputSchema,
   UserPasswordInputSchema,
   UserSignupInputSchema,
-} from '../validation/validation.userauth.schema';
+} from '../validation/userauthschema.validation';
 
 @Resolver('Userauth')
 export class UserauthResolver {
@@ -28,7 +28,7 @@ export class UserauthResolver {
   }
 
   @Mutation('changePassword')
-  @UseGuards(new AuthGaurd())
+  @UseGuards(AuthGaurd)
   async changeUserPassword(
     @Args('input', new ValidationPipe(UserPasswordInputSchema)) request: any,
     @Context('user') user: any,

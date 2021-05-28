@@ -50,4 +50,45 @@ export default class UserService {
     }
     throw new UserNotFoundException(id);
   }
+
+  async getUserDetailsByEmailOrPhone(
+    email?: string | undefined,
+    phone?: string | undefined,
+  ): Promise<any> {
+    let user;
+    if (email) {
+      user = await this.usersRepository.findOne({
+        where: { email: email },
+      });
+    }
+
+    if (phone && !user) {
+      user = await this.usersRepository.findOne({
+        where: { phone: phone },
+      });
+    }
+
+    return user;
+  }
+
+  async getUserDetailsByUsername(
+    email?: string | undefined,
+    phone?: string | undefined,
+  ): Promise<User | undefined> {
+    const nullCheckedEmail = email ? email : null;
+    const nullCheckedPhone = phone ? phone : null;
+
+    return this.usersRepository.findOne({
+      where: [{ email: nullCheckedEmail }, { phone: nullCheckedPhone }],
+    });
+  }
+
+  async updateField(id: string, field: string, value: any): Promise<User> {
+    await this.usersRepository.update(id, { [field]: value });
+    const updatedUser = await this.usersRepository.findOne(id);
+    if (updatedUser) {
+      return updatedUser;
+    }
+    throw new UserNotFoundException(id);
+  }
 }

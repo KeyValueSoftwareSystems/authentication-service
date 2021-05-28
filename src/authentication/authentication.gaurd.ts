@@ -1,13 +1,15 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { validateAuthToken } from './common/common.userauth';
+import { AuthenticationHelper } from './authentication.helper';
 
 @Injectable()
 export class AuthGaurd implements CanActivate {
+  constructor(private authenticationHelper: AuthenticationHelper) {}
+
   canActivate(context: ExecutionContext): boolean {
     const ctx = GqlExecutionContext.create(context).getContext();
     if (ctx) {
-      ctx.user = validateAuthToken(ctx);
+      ctx.user = this.authenticationHelper.validateAuthToken(ctx);
       return true;
     }
     return false;

@@ -58,11 +58,13 @@ export interface UserSignupResponse {
     firstName: string;
     middleName?: string;
     lastName: string;
+    active: boolean;
 }
 
 export interface User {
     id: string;
     email?: string;
+    phone?: string;
     firstName: string;
     middleName?: string;
     lastName: string;
