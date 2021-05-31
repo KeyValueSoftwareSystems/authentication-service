@@ -1,12 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import UserService from '../../src/user/user.service';
-import Substitute, { Arg } from '@fluffy-spoon/substitute';
-import User from '../../src/user/user.entity';
-import { UserResolver } from '../../src/user/user.resolver';
-import { AppGraphQLModule } from '../../src/graphql/graphql.module';
-import { NewUserInput, UpdateUserInput } from '../../src/schema/graphql.schema';
+import UserService from '../../../src/authorization/service/user.service';
+import Substitute from '@fluffy-spoon/substitute';
+import User from '../../../src/authorization/entity/user.entity';
+import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import {
+  NewUserInput,
+  UpdateUserGroupInput,
+  UpdateUserInput,
+  UpdateUserPermissionInput,
+} from '../../../src/schema/graphql.schema';
+import Group from 'src/authorization/entity/group.entity';
 
 const users: User[] = [
   {
@@ -18,6 +24,21 @@ const users: User[] = [
   },
 ];
 
+const permissions = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    active: true,
+  },
+];
+
+const groups: Group[] = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    active: true,
+  },
+];
 const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
@@ -118,11 +139,6 @@ describe('User Module', () => {
       });
 
       it('should delete a user', () => {
-        const input: NewUserInput = {
-          email: 'user@test.com',
-          firstName: 'Test1',
-          lastName: 'Test2',
-        };
         userService
           .deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
@@ -135,6 +151,54 @@ describe('User Module', () => {
           .expect(200)
           .expect((res) => {
             expect(res.body.data.deleteUser).toEqual(users[0]);
+          });
+      });
+
+      it('should update user permissions', () => {
+        const input: UpdateUserPermissionInput = {
+          permissions: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
+        };
+        const obj = Object.create(null);
+        userService
+          .updateUserPermissions(
+            'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+            Object.assign(obj, input),
+          )
+          .resolves(permissions);
+
+        return request(app.getHttpServer())
+          .post(gql)
+          .send({
+            query:
+              'mutation { updateUserPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.data.updateUserPermissions).toEqual(permissions);
+          });
+      });
+
+      it('should update user groups', () => {
+        const input: UpdateUserGroupInput = {
+          groups: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
+        };
+        const obj = Object.create(null);
+        userService
+          .updateUserGroups(
+            'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+            Object.assign(obj, input),
+          )
+          .resolves(groups);
+
+        return request(app.getHttpServer())
+          .post(gql)
+          .send({
+            query:
+              'mutation { updateUserGroups(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {groups: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.data.updateUserGroups).toEqual(permissions);
           });
       });
     });
