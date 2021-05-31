@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
   NewUserInput,
+  OperationType,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -14,8 +15,9 @@ import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
-import { PermissionNotFoundException } from '../exception/permission.exception';
+import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
+import { PermissionNotFoundException } from '../exception/permission.exception';
 
 @Injectable()
 export default class UserService {
@@ -30,6 +32,8 @@ export default class UserService {
     private userPermissionRepository: Repository<UserPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
+    @InjectRepository(GroupPermission)
+    private groupPermissionRepository: Repository<GroupPermission>,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -145,5 +149,25 @@ export default class UserService {
       return deletedUser;
     }
     throw new UserNotFoundException(id);
+  }
+
+  async verifyUserPermissions(id: string, permissionToVerify: string[], operation: OperationType): Promise<Boolean> {
+    const userGroups = await this.userGroupRepository.find({where: {userId: id}});
+    const permissionsRequired = await this.permissionRepository.find({where: {name: In(permissionToVerify)}});
+    const groupPermissions = (await this.groupPermissionRepository.find({ where: {groupId: In(userGroups.map(x => x.groupId))}})).map(x => x.permissionId);
+    const userPermissions = (await this.userPermissionRepository.find({ where: { userId: id}})).map(x => x.permissionId);
+   
+    const allPermissions = userPermissions.concat(groupPermissions);
+    const requiredPermissionsWithUser = permissionsRequired.map(x => x.id).filter(x => allPermissions.includes(x));
+    console.log("required permissions");
+    console.log(requiredPermissionsWithUser);
+    switch(operation) {
+      case OperationType.AND:
+        return permissionsRequired.length > 0 && requiredPermissionsWithUser.length === permissionsRequired.length;
+      case OperationType.OR:
+        return requiredPermissionsWithUser.length > 0; 
+        default:
+        return  false;
+    }
   }
 }
