@@ -174,7 +174,6 @@ describe('User Module', () => {
           })
           .expect(200)
           .expect((res) => {
-            console.log(res.body.data);
             expect(res.body.data.updateUserPermissions).toEqual(permissions);
           });
       });
@@ -199,7 +198,6 @@ describe('User Module', () => {
           })
           .expect(200)
           .expect((res) => {
-            console.log(res.body.data);
             expect(res.body.data.updateUserGroups).toEqual(permissions);
           });
       });

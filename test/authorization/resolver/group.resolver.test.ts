@@ -158,7 +158,6 @@ describe('Group Module', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log(res.body.data);
           expect(res.body.data.updateGroupPermissions).toEqual(permissions);
         });
     });

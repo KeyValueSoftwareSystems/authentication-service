@@ -14,6 +14,8 @@ import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
+import { PermissionNotFoundException } from '../exception/permission.exception';
+import { GroupNotFoundException } from '../exception/group.exception';
 
 @Injectable()
 export default class UserService {
@@ -80,6 +82,14 @@ export default class UserService {
     if (!existingUser) {
       throw new UserNotFoundException(id);
     }
+    const groupsInRequest = await this.groupRepository.findByIds(user.groups);
+    if (groupsInRequest.length !== user.groups.length) {
+      const validPermissions = groupsInRequest.map((p) => p.id);
+      throw new GroupNotFoundException(
+        user.groups.filter((p) => !validPermissions.includes(p)).toString(),
+      );
+    }
+
     const userGroups = this.userGroupRepository.create(
       user.groups.map((group) => ({ userId: id, groupId: group })),
     );
@@ -99,6 +109,18 @@ export default class UserService {
     });
     if (!existingUser) {
       throw new UserNotFoundException(id);
+    }
+
+    const permissionsInRequest = await this.permissionRepository.findByIds(
+      request.permissions,
+    );
+    if (permissionsInRequest.length !== request.permissions.length) {
+      const validPermissions = permissionsInRequest.map((p) => p.id);
+      throw new PermissionNotFoundException(
+        request.permissions
+          .filter((p) => !validPermissions.includes(p))
+          .toString(),
+      );
     }
 
     const userPermissionsCreated = this.userPermissionRepository.create(

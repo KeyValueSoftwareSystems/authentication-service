@@ -8,6 +8,8 @@ import Group from '../../../src/authorization/entity/group.entity';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
 import UserGroup from '../../../src/authorization/entity/userGroup.entity';
+import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
+import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
 
 const users: User[] = [
   {
@@ -104,7 +106,6 @@ describe('test UserService', () => {
     userRepository.save(users[0]).resolves(users[0]);
 
     const resp = await userService.createUser(input);
-    console.log(resp);
     expect(resp).toEqual(users[0]);
   });
 
@@ -159,6 +160,30 @@ describe('test UserService', () => {
     expect(resp).toEqual(permissions);
   });
 
+  it('should throw exception when user is updated with invalid permissions', async () => {
+    const request = [
+      {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        permissionId: '23097816-39ef-4862-b557-dab6cc67d5c5',
+      },
+    ];
+    userPermissionRepository.create(request).returns(request);
+    userPermissionRepository.save(request).resolves(request);
+    permissionRepository
+      .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'])
+      .resolves([]);
+
+    const resp = userService.updateUserPermissions(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      { permissions: ['23097816-39ef-4862-b557-dab6cc67d5c5'] },
+    );
+    await expect(resp).rejects.toThrowError(
+      new PermissionNotFoundException(
+        ['23097816-39ef-4862-b557-dab6cc67d5c5'].toString(),
+      ),
+    );
+  });
+
   it('should update user groups', async () => {
     const request = [
       {
@@ -177,5 +202,29 @@ describe('test UserService', () => {
       { groups: ['39d338b9-02bd-4971-a24e-b39a3f475580'] },
     );
     expect(resp).toEqual(groups);
+  });
+
+  it('should throw exception if user groups are invalid', async () => {
+    const request = [
+      {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        groupId: '91742290-4049-45c9-9c27-c9f6200fef4c',
+      },
+    ];
+    userGroupRepository.create(request).returns(request);
+    userGroupRepository.save(request).resolves(request);
+    groupRepository
+      .findByIds(['91742290-4049-45c9-9c27-c9f6200fef4c'])
+      .resolves([]);
+
+    const resp = userService.updateUserGroups(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      { groups: ['91742290-4049-45c9-9c27-c9f6200fef4c'] },
+    );
+    await expect(resp).rejects.toThrowError(
+      new GroupNotFoundException(
+        ['91742290-4049-45c9-9c27-c9f6200fef4c'].toString(),
+      ),
+    );
   });
 });

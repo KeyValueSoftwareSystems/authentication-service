@@ -10,6 +10,7 @@ import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
+import { PermissionNotFoundException } from '../exception/permission.exception';
 
 @Injectable()
 export class GroupService {
@@ -68,6 +69,18 @@ export class GroupService {
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
+
+    const permissionsInRequest = await this.permissionRepository.findByIds(
+      request.permissions,
+    );
+    if (permissionsInRequest.length !== request.permissions.length) {
+      const validPermissions = permissionsInRequest.map((p) => p.id);
+      throw new PermissionNotFoundException(
+        request.permissions
+          .filter((p) => !validPermissions.includes(p))
+          .toString(),
+      );
+    }
     const groupPermission = this.groupPermissionRepository.create(
       request.permissions.map((permission) => ({
         groupId: id,
@@ -77,7 +90,7 @@ export class GroupService {
     const savedGroupPermissions = await this.groupPermissionRepository.save(
       groupPermission,
     );
-    const permissions = this.permissionRepository.findByIds(
+    const permissions = await this.permissionRepository.findByIds(
       savedGroupPermissions.map((g) => g.permissionId),
     );
     return permissions;

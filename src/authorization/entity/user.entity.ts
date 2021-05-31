@@ -21,14 +21,3 @@ class User {
 }
 
 export default User;
-
-/*
-
-Authorization
-  user(user_group, user_permission), group(group_permission), permissions -> 
-
-Authentication
-  sign up, login
-  social login -> google, apple, 
-
-*/

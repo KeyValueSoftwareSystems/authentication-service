@@ -34,9 +34,6 @@ export class PermissionService {
     const savedPermission = await this.permissionsRepository.save(
       newPermission,
     );
-    console.log('permission save response');
-    console.log(savedPermission);
-    console.log(newPermission);
     return savedPermission;
   }
 

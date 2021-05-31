@@ -25,7 +25,6 @@ export class PermissionResolver {
   async createPermission(
     @Args('input') userInput: NewPermissionInput,
   ): Promise<Permission> {
-    console.log('permission save started');
     return this.permissionService.createPermission(userInput);
   }
 
