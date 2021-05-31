@@ -5,6 +5,7 @@ export const CreateUserSchema = Joi.object({
   firstName: Joi.string().required(),
   middleName: Joi.string(),
   lastName: Joi.string().required(),
+  groups: Joi.array(),
 }).options({ abortEarly: false });
 
 export const UpdateUserSchema = Joi.object({
@@ -12,4 +13,5 @@ export const UpdateUserSchema = Joi.object({
   middleName: Joi.string(),
   lastName: Joi.string(),
   active: Joi.boolean(),
+  groups: Joi.array(),
 }).options({ abortEarly: false });
