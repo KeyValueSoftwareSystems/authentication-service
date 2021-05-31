@@ -84,9 +84,9 @@ export default class UserService {
     }
     const groupsInRequest = await this.groupRepository.findByIds(user.groups);
     if (groupsInRequest.length !== user.groups.length) {
-      const validPermissions = groupsInRequest.map((p) => p.id);
+      const validGroups = groupsInRequest.map((p) => p.id);
       throw new GroupNotFoundException(
-        user.groups.filter((p) => !validPermissions.includes(p)).toString(),
+        user.groups.filter((p) => !validGroups.includes(p)).toString(),
       );
     }
 
