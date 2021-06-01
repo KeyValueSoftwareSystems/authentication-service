@@ -93,6 +93,7 @@ export interface TokenResponse {
 }
 
 export interface UserSignupResponse {
+    id: string;
     email?: string;
     phone?: string;
     firstName: string;

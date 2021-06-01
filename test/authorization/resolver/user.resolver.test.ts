@@ -11,6 +11,7 @@ import {
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
+  UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
 import Group from 'src/authorization/entity/group.entity';
 
@@ -18,9 +19,23 @@ const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     email: 'user@test.com',
+    phone: '9112345678910',
+    password: 'secret',
     firstName: 'Test1',
     lastName: 'Test2',
     active: true,
+    updatedDate: new Date(2021, 1, 1),
+  },
+];
+
+const usersInput: UserSignupResponse[] = [
+  {
+    id: users[0].id,
+    email: users[0].email,
+    phone: users[0].phone,
+    firstName: users[0].firstName,
+    lastName: users[0].lastName,
+    active: users[0].active,
   },
 ];
 
@@ -69,10 +84,12 @@ describe('User Module', () => {
         userService.getAllUsers().returns(Promise.resolve(users));
         return request(app.getHttpServer())
           .post(gql)
-          .send({ query: '{getUsers {id email firstName lastName active }}' })
+          .send({
+            query: '{getUsers { id email phone firstName lastName active }}',
+          })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.getUsers).toEqual(users);
+            expect(res.body.data.getUsers).toEqual(usersInput);
           });
       });
 
@@ -84,33 +101,11 @@ describe('User Module', () => {
           .post(gql)
           .send({
             query:
-              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id email firstName lastName active }}',
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName active }}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.getUser).toEqual(users[0]);
-          });
-      });
-
-      it('should create a user', () => {
-        const input: NewUserInput = {
-          email: 'user@test.com',
-          firstName: 'Test1',
-          lastName: 'Test2',
-        };
-        const obj = Object.create(null);
-        userService
-          .createUser(Object.assign(obj, input))
-          .returns(Promise.resolve(users[0]));
-        return request(app.getHttpServer())
-          .post(gql)
-          .send({
-            query:
-              'mutation { createUser(input: {email: "user@test.com", firstName: "Test1", lastName: "Test2"}) {id email firstName lastName active }}',
-          })
-          .expect(200)
-          .expect((res) => {
-            expect(res.body.data.createUser).toEqual(users[0]);
+            expect(res.body.data.getUser).toEqual(usersInput[0]);
           });
       });
 
@@ -130,11 +125,11 @@ describe('User Module', () => {
           .post(gql)
           .send({
             query:
-              'mutation { updateUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {firstName: "Test1", lastName: "Test2"}) {id email firstName lastName active }}',
+              'mutation { updateUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {firstName: "Test1", lastName: "Test2"}) {id email phone firstName lastName active }}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.updateUser).toEqual(users[0]);
+            expect(res.body.data.updateUser).toEqual(usersInput[0]);
           });
       });
 
@@ -146,11 +141,11 @@ describe('User Module', () => {
           .post(gql)
           .send({
             query:
-              'mutation { deleteUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id email firstName lastName active }}',
+              'mutation { deleteUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id email phone firstName lastName active }}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.deleteUser).toEqual(users[0]);
+            expect(res.body.data.deleteUser).toEqual(usersInput[0]);
           });
       });
 
