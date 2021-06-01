@@ -1,7 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
+<<<<<<< HEAD
 import { In, Repository } from 'typeorm';
+=======
+import { Repository } from 'typeorm';
+>>>>>>> origin/master
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
@@ -10,7 +14,10 @@ import UserPermission from '../../../src/authorization/entity/userPermission.ent
 import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
 import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
+<<<<<<< HEAD
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
+=======
+>>>>>>> origin/master
 
 const users: User[] = [
   {
@@ -44,9 +51,12 @@ describe('test UserService', () => {
   const permissionRepository = Substitute.for<Repository<Permission>>();
   const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
   const userGroupRepository = Substitute.for<Repository<UserGroup>>();
+<<<<<<< HEAD
   const groupPermissionRepository = Substitute.for<
     Repository<GroupPermission>
   >();
+=======
+>>>>>>> origin/master
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -74,10 +84,13 @@ describe('test UserService', () => {
           provide: getRepositoryToken(UserPermission),
           useValue: userPermissionRepository,
         },
+<<<<<<< HEAD
         {
           provide: getRepositoryToken(GroupPermission),
           useValue: groupPermissionRepository,
         },
+=======
+>>>>>>> origin/master
       ],
     }).compile();
     userService = moduleRef.get<UserService>(UserService);
@@ -235,6 +248,7 @@ describe('test UserService', () => {
       ),
     );
   });
+<<<<<<< HEAD
 
   it('should verify and return true if user has required permissions', async () => {
     const userGroups: UserGroup[] = [
@@ -331,4 +345,6 @@ describe('test UserService', () => {
     );
     expect(resp).toEqual(false);
   });
+=======
+>>>>>>> origin/master
 });

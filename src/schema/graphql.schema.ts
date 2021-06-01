@@ -7,11 +7,6 @@
 
 /* tslint:disable */
 /* eslint-disable */
-export enum OperationType {
-    AND = "AND",
-    OR = "OR"
-}
-
 export interface NewGroupInput {
     name: string;
 }
@@ -56,11 +51,6 @@ export interface UpdateUserGroupInput {
     groups: string[];
 }
 
-export interface UserPermissionsVerification {
-    permissions: string[];
-    operation?: OperationType;
-}
-
 export interface Group {
     id: string;
     name: string;
@@ -80,7 +70,6 @@ export interface IQuery {
     getPermission(id: string): Permission | Promise<Permission>;
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
-    verifyUserPermission(id: string, params?: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
 export interface IMutation {

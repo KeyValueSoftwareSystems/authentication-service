@@ -41,20 +41,9 @@ type UserPermissions {
   active: Boolean
 }
 
-enum OperationType {
-  AND
-  OR
-}
-
-input UserPermissionsVerification {
-permissions: [String]!,
-operation: OperationType
-}
-
 type Query {
   getUsers: [User]!
   getUser(id: ID!): User
-  verifyUserPermission(id: ID!, params: UserPermissionsVerification): Boolean
 }
 
 type Mutation {
