@@ -9,9 +9,9 @@ import {
   UserSignupInput,
   UserSignupResponse,
 } from 'src/schema/graphql.schema';
-import User from 'src/user/user.entity';
-import UserService from 'src/user/user.service';
-import { UserNotFoundException } from 'src/user/user.exception';
+import User from 'src/authorization/entity/user.entity';
+import UserService from 'src/authorization/service/user.service';
+import { UserNotFoundException } from 'src/authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
 
 @Injectable()

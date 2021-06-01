@@ -1,7 +1,7 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { TokenResponse, UserSignupResponse } from 'src/schema/graphql.schema';
-import User from 'src/user/user.entity';
+import User from 'src/authorization/entity/user.entity';
 import ValidationPipe from 'src/validation/validation.pipe';
 import { AuthGaurd } from '../authentication.gaurd';
 import { UserauthService } from '../service/userauth.service';

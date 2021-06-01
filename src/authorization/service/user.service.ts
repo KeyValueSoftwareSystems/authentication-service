@@ -57,7 +57,7 @@ export default class UserService {
     if (savedUser) {
       return savedUser;
     }
-    throw new UserNotFoundException(user.email);
+    throw new UserNotFoundException(user.email || ''); //FIXME: Email is now not mandatory.
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
