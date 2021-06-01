@@ -151,23 +151,48 @@ export default class UserService {
     throw new UserNotFoundException(id);
   }
 
-  async verifyUserPermissions(id: string, permissionToVerify: string[], operation: OperationType): Promise<Boolean> {
-    const userGroups = await this.userGroupRepository.find({where: {userId: id}});
-    const permissionsRequired = await this.permissionRepository.find({where: {name: In(permissionToVerify)}});
-    const groupPermissions = (await this.groupPermissionRepository.find({ where: {groupId: In(userGroups.map(x => x.groupId))}})).map(x => x.permissionId);
-    const userPermissions = (await this.userPermissionRepository.find({ where: { userId: id}})).map(x => x.permissionId);
-   
-    const allPermissions = userPermissions.concat(groupPermissions);
-    const requiredPermissionsWithUser = permissionsRequired.map(x => x.id).filter(x => allPermissions.includes(x));
-    console.log("required permissions");
-    console.log(requiredPermissionsWithUser);
-    switch(operation) {
+  async verifyUserPermissions(
+    id: string,
+    permissionToVerify: string[],
+    operation: OperationType = OperationType.AND,
+  ): Promise<boolean> {
+    const userGroups = await this.userGroupRepository.find({
+      where: { userId: id },
+    });
+    const permissionsRequired = await this.permissionRepository.find({
+      where: { name: In(permissionToVerify) },
+    });
+    if (permissionsRequired.length !== permissionToVerify.length) {
+      const validPermissions = new Set(permissionsRequired.map((p) => p.name));
+      throw new PermissionNotFoundException(
+        permissionToVerify.filter((p) => !validPermissions.has(p)).toString(),
+      );
+    }
+    const groupPermissions = (
+      await this.groupPermissionRepository.find({
+        where: { groupId: In(userGroups.map((x) => x.groupId)) },
+      })
+    ).map((x) => x.permissionId);
+    const userPermissions = (
+      await this.userPermissionRepository.find({ where: { userId: id } })
+    ).map((x) => x.permissionId);
+
+    const allPermissionsOfUser = new Set(
+      userPermissions.concat(groupPermissions),
+    );
+    const requiredPermissionsWithUser = permissionsRequired
+      .map((x) => x.id)
+      .filter((x) => allPermissionsOfUser.has(x));
+    switch (operation) {
       case OperationType.AND:
-        return permissionsRequired.length > 0 && requiredPermissionsWithUser.length === permissionsRequired.length;
+        return (
+          permissionsRequired.length > 0 &&
+          requiredPermissionsWithUser.length === permissionsRequired.length
+        );
       case OperationType.OR:
-        return requiredPermissionsWithUser.length > 0; 
-        default:
-        return  false;
+        return requiredPermissionsWithUser.length > 0;
+      default:
+        return false;
     }
   }
 }

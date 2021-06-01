@@ -10,7 +10,6 @@ import {
   Group,
   Permission,
   UserPermissionsVerification,
-  OperationType,
 } from '../../schema/graphql.schema';
 import UserService from '../service/user.service';
 import ValidationPipe from '../../validation/validation.pipe';
@@ -72,7 +71,12 @@ export class UserResolver {
   async verifyUserPermission(
     @Args('id', ParseUUIDPipe) id: string,
     @Args('params')
-    param: UserPermissionsVerification) {
-      return this.userService.verifyUserPermissions(id, param.permissions, param.operation || OperationType.AND);
-    }
+    param: UserPermissionsVerification,
+  ) {
+    return this.userService.verifyUserPermissions(
+      id,
+      param.permissions,
+      param.operation,
+    );
+  }
 }
