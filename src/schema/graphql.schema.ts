@@ -7,6 +7,11 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum OperationType {
+    OR = "OR",
+    AND = "AND"
+}
+
 export interface NewGroupInput {
     name: string;
 }
@@ -45,6 +50,7 @@ export interface UpdateUserInput {
 
 export interface UpdateUserPermissionInput {
     permissions: string[];
+    operationType?: OperationType;
 }
 
 export interface UpdateUserGroupInput {
