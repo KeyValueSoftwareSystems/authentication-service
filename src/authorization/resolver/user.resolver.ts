@@ -71,8 +71,13 @@ export class UserResolver {
   @Query()
   async verifyUserPermission(
     @Args('id', ParseUUIDPipe) id: string,
-    @Args('param')
-    param: UserPermissionsVerification) {
-      return this.userService.verifyUserPermissions(id, param.permissions, param.operation || OperationType.AND);
-    }
+    @Args('params')
+    params: UserPermissionsVerification,
+  ) {
+    return this.userService.verifyUserPermissions(
+      id,
+      params.permissions,
+      params.operation || OperationType.AND,
+    );
+  }
 }

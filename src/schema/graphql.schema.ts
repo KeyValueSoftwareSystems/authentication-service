@@ -50,7 +50,6 @@ export interface UpdateUserInput {
 
 export interface UpdateUserPermissionInput {
     permissions: string[];
-    operationType?: OperationType;
 }
 
 export interface UpdateUserGroupInput {
