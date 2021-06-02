@@ -43,8 +43,8 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@apollo/gateway": "^0.26.3",
     "@fluffy-spoon/substitute": "^1.208.0",
+    "@apollo/gateway": "^0.26.3",
     "@nestjs/cli": "^7.6.0",
     "@nestjs/schematics": "^7.3.1",
     "@nestjs/testing": "^7.6.15",

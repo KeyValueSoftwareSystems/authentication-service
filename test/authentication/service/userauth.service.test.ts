@@ -17,7 +17,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     active: true,
-    updatedDate: new Date(2020, 1, 1),
+    updatedDate: new Date(),
   },
 ];
 

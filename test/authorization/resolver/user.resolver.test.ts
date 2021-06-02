@@ -7,7 +7,6 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
-  NewUserInput,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -24,7 +23,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     active: true,
-    updatedDate: new Date(2021, 1, 1),
+    updatedDate: new Date(),
   },
 ];
 
