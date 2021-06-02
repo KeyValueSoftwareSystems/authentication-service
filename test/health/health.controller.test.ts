@@ -5,8 +5,6 @@ import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import {
   HealthCheckResult,
   HealthCheckService,
-  HealthIndicatorResult,
-  TerminusModule,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { HealthController } from '../../src/health/health.controller';
@@ -74,11 +72,11 @@ describe('Health Module (e2e)', () => {
         .returns(
           Promise.reject(new ServiceUnavailableException(errorResponse)),
         );
-      const result = request(app.getHttpServer())
+      request(app.getHttpServer())
         .get('/health')
         .send()
         .expect(503)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) throw err;
         });
     });

@@ -1,6 +1,7 @@
 type User {
   id: ID!
   email: String
+  phone: String
   firstName: String!
   middleName: String
   lastName: String!
@@ -21,6 +22,26 @@ input UpdateUserInput {
   active: Boolean
 }
 
+input UpdateUserPermissionInput {
+  permissions: [ID!]!
+}
+
+input UpdateUserGroupInput {
+  groups: [ID!]!
+}
+
+type UserGroupResponse {
+  id: ID!,
+  name: String!,
+  active: Boolean
+}
+
+type UserPermissions {
+  id: ID!,
+  name: String!,
+  active: Boolean
+}
+
 type Query {
   getUsers: [User]!
   getUser(id: ID!): User
@@ -29,4 +50,6 @@ type Query {
 type Mutation {
   updateUser(id: ID!, input: UpdateUserInput): User
   deleteUser(id: ID!): User
+  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput): [UserPermissions]
+  updateUserGroups(id: ID!, input: UpdateUserGroupInput): [UserGroupResponse]
 }

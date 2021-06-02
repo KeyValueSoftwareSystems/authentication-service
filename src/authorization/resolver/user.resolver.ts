@@ -1,9 +1,17 @@
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UpdateUserInput, User } from '../schema/graphql.schema';
-import UserService from './user.service';
-import ValidationPipe from '../validation/validation.pipe';
-import * as UserSchema from './user.validation.schema';
+import {
+  NewUserInput,
+  UpdateUserGroupInput,
+  UpdateUserInput,
+  UpdateUserPermissionInput,
+  User,
+  Group,
+  Permission,
+} from '../../schema/graphql.schema';
+import UserService from '../service/user.service';
+import ValidationPipe from '../../validation/validation.pipe';
+import * as UserSchema from '../validation/user.validation.schema';
 
 @Resolver('User')
 export class UserResolver {
@@ -26,6 +34,24 @@ export class UserResolver {
     userInput: UpdateUserInput,
   ): Promise<User> {
     return this.userService.updateUser(id, userInput);
+  }
+
+  @Mutation()
+  async updateUserGroups(
+    @Args('id', ParseUUIDPipe) id: string,
+    @Args('input')
+    userInput: UpdateUserGroupInput,
+  ): Promise<Group[]> {
+    return this.userService.updateUserGroups(id, userInput);
+  }
+
+  @Mutation()
+  async updateUserPermissions(
+    @Args('id', ParseUUIDPipe) id: string,
+    @Args('input')
+    userInput: UpdateUserPermissionInput,
+  ): Promise<Permission[]> {
+    return this.userService.updateUserPermissions(id, userInput);
   }
 
   @Mutation()
