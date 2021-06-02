@@ -23,7 +23,7 @@ export class AuthenticationHelper {
   }
 
   validateAuthToken(request: { headers: { authorization: string } }) {
-    const secret = process.env.JWT_SECRET || '';
+    const secret = this.configService.get('JWT_SECRET') || '';
     const reqAuthToken = request.headers.authorization.split(' ')[1];
     const verificationResponse: any = jwt.verify(reqAuthToken, secret);
     return verificationResponse;
