@@ -2,17 +2,17 @@ import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { TokenResponse, UserSignupResponse } from 'src/schema/graphql.schema';
 import User from 'src/authorization/entity/user.entity';
-import ValidationPipe from 'src/validation/validation.pipe';
 import { AuthGaurd } from '../authentication.gaurd';
-import { UserauthService } from '../service/userauth.service';
+import UserauthService from '../service/userauth.service';
 import {
   UserLoginInputSchema,
   UserPasswordInputSchema,
   UserSignupInputSchema,
 } from '../validation/userauthschema.validation';
+import ValidationPipe from '../../validation/validation.pipe';
 
 @Resolver('Userauth')
-export class UserauthResolver {
+export default class UserauthResolver {
   constructor(private readonly userauthService: UserauthService) {}
 
   @Mutation('login')

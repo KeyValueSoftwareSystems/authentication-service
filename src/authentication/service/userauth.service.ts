@@ -9,13 +9,13 @@ import {
   UserSignupInput,
   UserSignupResponse,
 } from 'src/schema/graphql.schema';
-import User from 'src/authorization/entity/user.entity';
-import UserService from 'src/authorization/service/user.service';
-import { UserNotFoundException } from 'src/authorization/exception/user.exception';
+import User from '../../authorization/entity/user.entity';
+import UserService from '../../authorization/service/user.service';
+import { UserNotFoundException } from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
 
 @Injectable()
-export class UserauthService {
+export default class UserauthService {
   constructor(
     private userService: UserService,
     private authenticationHelper: AuthenticationHelper,

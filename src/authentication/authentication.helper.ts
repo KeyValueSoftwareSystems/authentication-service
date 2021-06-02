@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import User from 'src/authorization/entity/user.entity';
+import User from '../authorization/entity/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 

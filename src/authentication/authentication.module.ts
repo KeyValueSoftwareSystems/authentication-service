@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UserauthService } from './service/userauth.service';
-import { UserauthResolver } from './resolver/userauth.resolver';
+import UserauthService from './service/userauth.service';
+import UserauthResolver from './resolver/userauth.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import UserService from 'src/authorization/service/user.service';
 import User from 'src/authorization/entity/user.entity';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthenticationHelper } from './authentication.helper';
 import Group from 'src/authorization/entity/group.entity';
 import GroupPermission from 'src/authorization/entity/groupPermission.entity';
@@ -27,6 +27,7 @@ import UserPermission from 'src/authorization/entity/userPermission.entity';
     UserauthService,
     UserService,
     AuthenticationHelper,
+    ConfigService,
   ],
 })
 export class UserauthModule {}
