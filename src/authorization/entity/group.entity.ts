@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
 @Entity()
 class Group {
   @PrimaryGeneratedColumn('uuid')

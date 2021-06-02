@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
-  NewUserInput,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -48,7 +47,7 @@ export default class UserService {
     throw new UserNotFoundException(id);
   }
 
-  async createUser(user: NewUserInput): Promise<User> {
+  async createUser(user: User): Promise<User> {
     const newUser = await this.usersRepository.create(user);
     const createdUser = await this.usersRepository.save(newUser);
     const savedUser = await this.usersRepository.findOne(createdUser.id, {
@@ -57,7 +56,7 @@ export default class UserService {
     if (savedUser) {
       return savedUser;
     }
-    throw new UserNotFoundException(user.email || ''); //FIXME: Email is now not mandatory.
+    throw new UserNotFoundException(user.email || user.phone || '');
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {

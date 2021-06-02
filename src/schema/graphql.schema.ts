@@ -48,13 +48,6 @@ export interface UpdatePermissionInput {
     active?: boolean;
 }
 
-export interface NewUserInput {
-    email?: string;
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-}
-
 export interface UpdateUserInput {
     firstName?: string;
     middleName?: string;

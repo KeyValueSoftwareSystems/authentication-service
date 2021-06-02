@@ -1,7 +1,6 @@
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
-  NewUserInput,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,

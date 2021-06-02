@@ -8,13 +8,6 @@ type User {
   active: Boolean!
 }
 
-input NewUserInput {
-  email: String
-  firstName: String!
-  middleName: String
-  lastName: String!
-}
-
 input UpdateUserInput {
   firstName: String
   middleName: String
