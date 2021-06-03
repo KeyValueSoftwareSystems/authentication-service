@@ -19,7 +19,7 @@ type Query {
 }
 
 type Mutation {
-  createPermission(input: NewPermissionInput): Permission
-  updatePermission(id: ID!, input: UpdatePermissionInput): Permission
+  createPermission(input: NewPermissionInput!): Permission
+  updatePermission(id: ID!, input: UpdatePermissionInput!): Permission
   deletePermission(id: ID!): Permission
 }

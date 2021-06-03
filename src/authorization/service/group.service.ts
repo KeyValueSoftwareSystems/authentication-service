@@ -44,7 +44,8 @@ export class GroupService {
   }
 
   async updateGroup(id: string, group: UpdateGroupInput): Promise<Group> {
-    await this.groupsRepository.update(id, group);
+    const groupToUpdate = this.groupsRepository.create(group);
+    await this.groupsRepository.update(id, groupToUpdate);
     const updatedGroup = await this.groupsRepository.findOne(id);
     if (updatedGroup) {
       return updatedGroup;

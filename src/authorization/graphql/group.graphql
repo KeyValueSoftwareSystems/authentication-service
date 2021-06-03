@@ -29,8 +29,8 @@ type Query {
 }
 
 type Mutation {
-  createGroup(input: NewGroupInput): Group
-  updateGroup(id: ID!, input: UpdateGroupInput): Group
+  createGroup(input: NewGroupInput!): Group
+  updateGroup(id: ID!, input: UpdateGroupInput!): Group
   deleteGroup(id: ID!): Group
-  updateGroupPermissions(id: ID!, input: UpdateGroupPermissionInput): [GroupPermission]
+  updateGroupPermissions(id: ID!, input: UpdateGroupPermissionInput!): [GroupPermission]
 }
