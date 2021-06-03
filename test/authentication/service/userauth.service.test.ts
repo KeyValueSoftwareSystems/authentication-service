@@ -7,6 +7,11 @@ import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import UserauthService from '../../../src/authentication/service/userauth.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { UserLoginInput } from 'src/schema/graphql.schema';
+import {
+  InvalidCredentialsException,
+  InvalidPayloadException,
+  UserExistsException,
+} from '../../../src/authentication/exception/userauth.exception';
 
 const users: User[] = [
   {
@@ -76,6 +81,16 @@ describe('test UserauthService', () => {
     expect(resp).toHaveProperty('token');
   });
 
+  it('should not login user since the user password is wrong', async () => {
+    const input: UserLoginInput = {
+      username: 'user@test.com',
+      password: 's3cr3tWrong',
+    };
+
+    const resp = userauthService.userLogin(input);
+    expect(resp).rejects.toThrowError(new InvalidCredentialsException());
+  });
+
   it('should signup a user', async () => {
     const hashedPassword = authenticationHelper.generatePasswordHash(
       users[0].password,
@@ -115,6 +130,31 @@ describe('test UserauthService', () => {
     expect(expectedResponse).toEqual(users[0]);
   });
 
+  it('should throw error when signing up an existing user', async () => {
+    const existUsers: User[] = [
+      {
+        id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        email: 'user2@test.com',
+        phone: '91123456789101',
+        password: 's3cr3t',
+        firstName: 'Test1',
+        lastName: 'Test2',
+        active: true,
+        updatedDate: new Date(),
+      },
+    ];
+
+    userService
+      .getUserDetailsByEmailOrPhone(existUsers[0].email, existUsers[0].phone)
+      .resolves(existUsers[0]);
+
+    const resp = userauthService.userSignup(existUsers[0]);
+
+    await expect(resp).rejects.toThrowError(
+      new UserExistsException(existUsers[0].email || existUsers[0].phone || ''),
+    );
+  });
+
   it('should update a user password', async () => {
     const input = {
       username: 'user@test.com',
@@ -127,10 +167,23 @@ describe('test UserauthService', () => {
       .returns(Promise.resolve(users[0]));
 
     userService
-      .getUserDetailsByUsername('user@test.com')
+      .getUserDetailsByUsername(Arg.any())
       .returns(Promise.resolve(users[0]));
 
     const resp = await userauthService.updatePassword(input.username, input);
     expect(resp).toHaveReturned;
+  });
+
+  it('should throw invalid password exception', async () => {
+    const input = {
+      username: 'user@test.com',
+      currentPassword: 's3cr3tWrong',
+      newPassword: 'n3ws3cr3t',
+    };
+
+    const resp = userauthService.updatePassword(input.username, input);
+    await expect(resp).rejects.toThrowError(
+      new InvalidPayloadException('Current password is incorrect'),
+    );
   });
 });
