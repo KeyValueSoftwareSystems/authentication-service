@@ -1,6 +1,7 @@
 type User {
   id: ID!
-  email: String!
+  email: String
+  phone: String
   firstName: String!
   middleName: String
   lastName: String!
@@ -12,12 +13,6 @@ enum OperationType {
   AND
 }
 
-input NewUserInput {
-  email: String!
-  firstName: String!
-  middleName: String
-  lastName: String!
-}
 
 input UpdateUserInput {
   firstName: String
@@ -63,7 +58,6 @@ type Query {
 }
 
 type Mutation {
-  createUser(input: NewUserInput): User
   updateUser(id: ID!, input: UpdateUserInput): User
   deleteUser(id: ID!): User
   updateUserPermissions(id: ID!, input: UpdateUserPermissionInput): [UserPermissions]

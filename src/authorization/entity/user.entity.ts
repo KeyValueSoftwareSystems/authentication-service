@@ -1,11 +1,23 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
 @Entity()
 class User {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ unique: true })
-  public email!: string;
+  @Column({ nullable: true })
+  public email?: string;
+
+  @Column({ nullable: true })
+  public phone?: string;
+
+  @Column({ nullable: false })
+  public password!: string;
 
   @Column()
   public firstName!: string;
@@ -18,6 +30,9 @@ class User {
 
   @Column({ default: true })
   public active!: boolean;
+
+  @UpdateDateColumn()
+  updatedDate!: Date;
 }
 
 export default User;

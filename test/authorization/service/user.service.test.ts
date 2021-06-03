@@ -16,9 +16,12 @@ const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     email: 'user@test.com',
+    phone: '9112345678910',
+    password: 'SecretPassword',
     firstName: 'Test1',
     lastName: 'Test2',
     active: true,
+    updatedDate: new Date(),
   },
 ];
 
@@ -104,10 +107,15 @@ describe('test UserService', () => {
   });
 
   it('should create a user', async () => {
-    const input = {
+    const input: User = {
+      id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       email: 'user@test.com',
+      phone: '9112345678910',
+      password: 'SecretPassword',
       firstName: 'Test1',
       lastName: 'Test2',
+      active: true,
+      updatedDate: new Date(),
     };
     userRepository.create(input).returns(users[0]);
 

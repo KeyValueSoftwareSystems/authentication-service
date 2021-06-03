@@ -11,6 +11,24 @@ export enum OperationType {
     AND = "AND",
     OR = "OR"
 }
+export interface UserSignupInput {
+    email?: string;
+    phone?: string;
+    password: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+}
+
+export interface UserLoginInput {
+    username: string;
+    password: string;
+}
+
+export interface UserPasswordInput {
+    currentPassword: string;
+    newPassword: string;
+}
 
 export interface NewGroupInput {
     name: string;
@@ -34,13 +52,6 @@ export interface UpdatePermissionInput {
     active?: boolean;
 }
 
-export interface NewUserInput {
-    email: string;
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-}
-
 export interface UpdateUserInput {
     firstName?: string;
     middleName?: string;
@@ -59,6 +70,37 @@ export interface UpdateUserGroupInput {
 export interface UserPermissionsVerification {
     permissions: string[];
     operation?: OperationType;
+}
+export interface IMutation {
+    login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
+    signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    changePassword(input: UserPasswordInput): User | Promise<User>;
+    createGroup(input?: NewGroupInput): Group | Promise<Group>;
+    updateGroup(id: string, input?: UpdateGroupInput): Group | Promise<Group>;
+    deleteGroup(id: string): Group | Promise<Group>;
+    updateGroupPermissions(id: string, input?: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
+    createPermission(input?: NewPermissionInput): Permission | Promise<Permission>;
+    updatePermission(id: string, input?: UpdatePermissionInput): Permission | Promise<Permission>;
+    deletePermission(id: string): Permission | Promise<Permission>;
+    updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
+    deleteUser(id: string): User | Promise<User>;
+    updateUserPermissions(id: string, input?: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
+    updateUserGroups(id: string, input?: UpdateUserGroupInput): UserGroupResponse[] | Promise<UserGroupResponse[]>;
+}
+
+export interface TokenResponse {
+    expiresInSeconds: number;
+    token: string;
+}
+
+export interface UserSignupResponse {
+    id: string;
+    email?: string;
+    phone?: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    active: boolean;
 }
 
 export interface Group {
@@ -83,21 +125,6 @@ export interface IQuery {
     verifyUserPermission(id: string, params?: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
-export interface IMutation {
-    createGroup(input?: NewGroupInput): Group | Promise<Group>;
-    updateGroup(id: string, input?: UpdateGroupInput): Group | Promise<Group>;
-    deleteGroup(id: string): Group | Promise<Group>;
-    updateGroupPermissions(id: string, input?: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
-    createPermission(input?: NewPermissionInput): Permission | Promise<Permission>;
-    updatePermission(id: string, input?: UpdatePermissionInput): Permission | Promise<Permission>;
-    deletePermission(id: string): Permission | Promise<Permission>;
-    createUser(input?: NewUserInput): User | Promise<User>;
-    updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
-    deleteUser(id: string): User | Promise<User>;
-    updateUserPermissions(id: string, input?: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
-    updateUserGroups(id: string, input?: UpdateUserGroupInput): UserGroupResponse[] | Promise<UserGroupResponse[]>;
-}
-
 export interface Permission {
     id: string;
     name: string;
@@ -106,7 +133,8 @@ export interface Permission {
 
 export interface User {
     id: string;
-    email: string;
+    email?: string;
+    phone?: string;
     firstName: string;
     middleName?: string;
     lastName: string;
