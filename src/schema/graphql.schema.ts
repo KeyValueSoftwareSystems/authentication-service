@@ -11,7 +11,10 @@ export enum OperationType {
     AND = "AND",
     OR = "OR"
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 export interface UserSignupInput {
     email?: string;
     phone?: string;
@@ -85,7 +88,6 @@ export interface UserPermissionsVerification {
     permissions: string[];
     operation?: OperationType;
 }
-
 export interface IMutation {
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
@@ -143,6 +145,7 @@ export interface IQuery {
     getPermission(id: string): Permission | Promise<Permission>;
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
+<<<<<<< HEAD
     verifyUserPermission(id: string, params: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
@@ -156,6 +159,9 @@ export interface GroupPermission {
     id: string;
     name: string;
     active?: boolean;
+=======
+    verifyUserPermission(id: string, params?: UserPermissionsVerification): boolean | Promise<boolean>;
+>>>>>>> origin/master
 }
 
 export interface Permission {
