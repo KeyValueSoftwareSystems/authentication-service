@@ -9,7 +9,8 @@ export class AuthenticationHelper {
   constructor(private configService: ConfigService) {}
 
   createToken(userDetails: User) {
-    const expiresIn = 60 * 60;
+    const expiresIn =
+      this.configService.get('JWT_TOKEN_EXPTIME') * 1 || 60 * 60;
     const secret = this.configService.get('JWT_SECRET') as string;
     const username = userDetails.email || userDetails.phone;
 

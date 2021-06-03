@@ -75,6 +75,7 @@ describe('test UserauthService', () => {
       .returns(Promise.resolve(users[0]));
 
     configService.get('JWT_SECRET').returns('s3cr3t1234567890');
+    configService.get('JWT_TOKEN_EXPTIME').returns(3600);
 
     const resp = await userauthService.userLogin(input);
     expect(resp).toHaveProperty('expiresInSeconds', 3600);
