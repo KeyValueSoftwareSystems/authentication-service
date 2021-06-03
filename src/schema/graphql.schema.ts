@@ -11,6 +11,7 @@ export enum OperationType {
     AND = "AND",
     OR = "OR"
 }
+
 export interface UserSignupInput {
     email?: string;
     phone?: string;
@@ -28,6 +29,19 @@ export interface UserLoginInput {
 export interface UserPasswordInput {
     currentPassword: string;
     newPassword: string;
+}
+
+export interface NewEntityInput {
+    name: string;
+}
+
+export interface UpdateEntityInput {
+    name: string;
+    active?: boolean;
+}
+
+export interface UpdateEntityPermissionInput {
+    permissions: string[];
 }
 
 export interface NewGroupInput {
@@ -51,28 +65,6 @@ export interface UpdatePermissionInput {
     name: string;
     active?: boolean;
 }
-export interface NewEntityInput {
-        name: string;
-    }
-    
-    export interface UpdateEntityInput {
-        name: string;
-        active?: boolean;
-    }
-    
-    export interface UpdateEntityPermissionInput {
-        permissions: string[];
-    }
-    export interface Entity {
-        id: string;
-        name: string;
-        active: boolean;
-    }
-    export interface EntityPermission {
-        id: string;
-        name: string;
-        active?: boolean;
-    }
 
 export interface UpdateUserInput {
     firstName?: string;
@@ -93,6 +85,7 @@ export interface UserPermissionsVerification {
     permissions: string[];
     operation?: OperationType;
 }
+
 export interface IMutation {
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
@@ -129,13 +122,13 @@ export interface UserSignupResponse {
     active: boolean;
 }
 
-export interface Group {
+export interface Entity {
     id: string;
     name: string;
     active: boolean;
 }
 
-export interface GroupPermission {
+export interface EntityPermission {
     id: string;
     name: string;
     active?: boolean;
@@ -152,17 +145,19 @@ export interface IQuery {
     getUser(id: string): User | Promise<User>;
     verifyUserPermission(id: string, params?: UserPermissionsVerification): boolean | Promise<boolean>;
 }
+
 export interface Group {
-        id: string;
-        name: string;
-        active: boolean;
-    }
-    
-    export interface GroupPermission {
-        id: string;
-        name: string;
-        active?: boolean;
-    }
+    id: string;
+    name: string;
+    active: boolean;
+}
+
+export interface GroupPermission {
+    id: string;
+    name: string;
+    active?: boolean;
+}
+
 export interface Permission {
     id: string;
     name: string;
