@@ -51,6 +51,28 @@ export interface UpdatePermissionInput {
     name: string;
     active?: boolean;
 }
+export interface NewEntityInput {
+        name: string;
+    }
+    
+    export interface UpdateEntityInput {
+        name: string;
+        active?: boolean;
+    }
+    
+    export interface UpdateEntityPermissionInput {
+        permissions: string[];
+    }
+    export interface Entity {
+        id: string;
+        name: string;
+        active: boolean;
+    }
+    export interface EntityPermission {
+        id: string;
+        name: string;
+        active?: boolean;
+    }
 
 export interface UpdateUserInput {
     firstName?: string;
@@ -75,6 +97,10 @@ export interface IMutation {
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
+    createEntity(input?: NewEntityInput): Entity | Promise<Entity>;
+    updateEntity(id: string, input?: UpdateEntityInput): Entity | Promise<Entity>;
+    deleteEntity(id: string): Entity | Promise<Entity>;
+    updateEntityPermissions(id: string, input?: UpdateGroupPermissionInput): EntityPermission[] | Promise<EntityPermission[]>;
     createGroup(input?: NewGroupInput): Group | Promise<Group>;
     updateGroup(id: string, input?: UpdateGroupInput): Group | Promise<Group>;
     deleteGroup(id: string): Group | Promise<Group>;
@@ -116,6 +142,8 @@ export interface GroupPermission {
 }
 
 export interface IQuery {
+    getEntities(): Entity[] | Promise<Entity[]>;
+    getEntity(id: string): Entity | Promise<Entity>;
     getGroups(): Group[] | Promise<Group[]>;
     getGroup(id: string): Group | Promise<Group>;
     getPermissions(): Permission[] | Promise<Permission[]>;
@@ -124,7 +152,17 @@ export interface IQuery {
     getUser(id: string): User | Promise<User>;
     verifyUserPermission(id: string, params?: UserPermissionsVerification): boolean | Promise<boolean>;
 }
-
+export interface Group {
+        id: string;
+        name: string;
+        active: boolean;
+    }
+    
+    export interface GroupPermission {
+        id: string;
+        name: string;
+        active?: boolean;
+    }
 export interface Permission {
     id: string;
     name: string;
