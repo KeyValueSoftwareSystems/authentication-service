@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
-  NewUserInput,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -48,7 +47,7 @@ export default class UserService {
     throw new UserNotFoundException(id);
   }
 
-  async createUser(user: NewUserInput): Promise<User> {
+  async createUser(user: User): Promise<User> {
     const newUser = await this.usersRepository.create(user);
     const createdUser = await this.usersRepository.save(newUser);
     const savedUser = await this.usersRepository.findOne(createdUser.id, {
@@ -57,7 +56,7 @@ export default class UserService {
     if (savedUser) {
       return savedUser;
     }
-    throw new UserNotFoundException(user.email);
+    throw new UserNotFoundException(user.email || user.phone || '');
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
@@ -143,6 +142,47 @@ export default class UserService {
     const deletedUser = await this.usersRepository.findOne(id);
     if (deletedUser) {
       return deletedUser;
+    }
+    throw new UserNotFoundException(id);
+  }
+
+  async getUserDetailsByEmailOrPhone(
+    email?: string | undefined,
+    phone?: string | undefined,
+  ): Promise<any> {
+    let user;
+    if (email) {
+      user = await this.usersRepository.findOne({
+        where: { email: email },
+      });
+    }
+
+    if (phone && !user) {
+      user = await this.usersRepository.findOne({
+        where: { phone: phone },
+      });
+    }
+
+    return user;
+  }
+
+  async getUserDetailsByUsername(
+    email?: string | undefined,
+    phone?: string | undefined,
+  ): Promise<User | undefined> {
+    const nullCheckedEmail = email ? email : null;
+    const nullCheckedPhone = phone ? phone : null;
+
+    return this.usersRepository.findOne({
+      where: [{ email: nullCheckedEmail }, { phone: nullCheckedPhone }],
+    });
+  }
+
+  async updateField(id: string, field: string, value: any): Promise<User> {
+    await this.usersRepository.update(id, { [field]: value });
+    const updatedUser = await this.usersRepository.findOne(id);
+    if (updatedUser) {
+      return updatedUser;
     }
     throw new UserNotFoundException(id);
   }

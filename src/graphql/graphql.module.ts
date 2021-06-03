@@ -13,6 +13,7 @@ import { join } from 'path';
         path: join(process.cwd(), 'src/schema/graphql.schema.ts'),
       },
       formatError: formatGraphqlError,
+      context: ({ req }) => ({ headers: req.headers }),
     }),
   ],
 })
