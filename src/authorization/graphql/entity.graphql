@@ -29,8 +29,8 @@ type Query {
 }
 
 type Mutation {
-  createEntity(input: NewEntityInput): Entity
-  updateEntity(id: ID!, input: UpdateEntityInput): Entity
+  createEntity(input: NewEntityInput!): Entity
+  updateEntity(id: ID!, input: UpdateEntityInput!): Entity
   deleteEntity(id: ID!): Entity
-  updateEntityPermissions(id: ID!, input: UpdateGroupPermissionInput): [EntityPermission]
+  updateEntityPermissions(id: ID!, input: UpdateGroupPermissionInput!): [EntityPermission]
 }
