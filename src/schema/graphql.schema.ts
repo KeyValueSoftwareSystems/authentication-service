@@ -90,21 +90,21 @@ export interface IMutation {
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
-    createEntity(input?: NewEntityInput): Entity | Promise<Entity>;
-    updateEntity(id: string, input?: UpdateEntityInput): Entity | Promise<Entity>;
+    createEntity(input: NewEntityInput): Entity | Promise<Entity>;
+    updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;
-    updateEntityPermissions(id: string, input?: UpdateGroupPermissionInput): EntityPermission[] | Promise<EntityPermission[]>;
-    createGroup(input?: NewGroupInput): Group | Promise<Group>;
-    updateGroup(id: string, input?: UpdateGroupInput): Group | Promise<Group>;
+    updateEntityPermissions(id: string, input: UpdateGroupPermissionInput): EntityPermission[] | Promise<EntityPermission[]>;
+    createGroup(input: NewGroupInput): Group | Promise<Group>;
+    updateGroup(id: string, input: UpdateGroupInput): Group | Promise<Group>;
     deleteGroup(id: string): Group | Promise<Group>;
-    updateGroupPermissions(id: string, input?: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
-    createPermission(input?: NewPermissionInput): Permission | Promise<Permission>;
-    updatePermission(id: string, input?: UpdatePermissionInput): Permission | Promise<Permission>;
+    updateGroupPermissions(id: string, input: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
+    createPermission(input: NewPermissionInput): Permission | Promise<Permission>;
+    updatePermission(id: string, input: UpdatePermissionInput): Permission | Promise<Permission>;
     deletePermission(id: string): Permission | Promise<Permission>;
-    updateUser(id: string, input?: UpdateUserInput): User | Promise<User>;
+    updateUser(id: string, input: UpdateUserInput): User | Promise<User>;
     deleteUser(id: string): User | Promise<User>;
-    updateUserPermissions(id: string, input?: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
-    updateUserGroups(id: string, input?: UpdateUserGroupInput): UserGroupResponse[] | Promise<UserGroupResponse[]>;
+    updateUserPermissions(id: string, input: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
+    updateUserGroups(id: string, input: UpdateUserGroupInput): UserGroupResponse[] | Promise<UserGroupResponse[]>;
 }
 
 export interface TokenResponse {
@@ -143,7 +143,7 @@ export interface IQuery {
     getPermission(id: string): Permission | Promise<Permission>;
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
-    verifyUserPermission(id: string, params?: UserPermissionsVerification): boolean | Promise<boolean>;
+    verifyUserPermission(id: string, params: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
 export interface Group {

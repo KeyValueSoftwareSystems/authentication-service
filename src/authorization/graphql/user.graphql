@@ -54,12 +54,12 @@ operation: OperationType
 type Query {
   getUsers: [User]!
   getUser(id: ID!): User
-  verifyUserPermission(id: ID!, params: UserPermissionsVerification): Boolean
+  verifyUserPermission(id: ID!, params: UserPermissionsVerification!): Boolean
 }
 
 type Mutation {
-  updateUser(id: ID!, input: UpdateUserInput): User
+  updateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): User
-  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput): [UserPermissions]
-  updateUserGroups(id: ID!, input: UpdateUserGroupInput): [UserGroupResponse]
+  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput!): [UserPermissions]
+  updateUserGroups(id: ID!, input: UpdateUserGroupInput!): [UserGroupResponse]
 }
