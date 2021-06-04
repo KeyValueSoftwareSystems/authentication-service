@@ -1,0 +1,36 @@
+type Entity {
+  id: ID!
+  name: String!
+  active: Boolean!
+}
+
+input NewEntityInput {
+  name: String!
+}
+
+input UpdateEntityInput {
+  name: String!
+  active: Boolean
+}
+
+input UpdateEntityPermissionInput {
+  permissions: [ID!]!
+}
+
+type EntityPermission {
+  id: ID!,
+  name: String!,
+  active: Boolean
+}
+
+type Query {
+  getEntities: [Entity]!
+  getEntity(id: ID!): Entity
+}
+
+type Mutation {
+  createEntity(input: NewEntityInput!): Entity
+  updateEntity(id: ID!, input: UpdateEntityInput!): Entity
+  deleteEntity(id: ID!): Entity
+  updateEntityPermissions(id: ID!, input: UpdateGroupPermissionInput!): [EntityPermission]
+}

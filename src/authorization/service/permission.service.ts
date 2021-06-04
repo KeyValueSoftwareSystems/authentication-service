@@ -41,7 +41,8 @@ export class PermissionService {
     id: string,
     permission: UpdatePermissionInput,
   ): Promise<Permission> {
-    await this.permissionsRepository.update(id, permission);
+    const permissionToUpdate = this.permissionsRepository.create(permission);
+    await this.permissionsRepository.update(id, permissionToUpdate);
     const updatedPermission = await this.permissionsRepository.findOne(id);
     if (updatedPermission) {
       return updatedPermission;

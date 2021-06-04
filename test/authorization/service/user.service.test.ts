@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
@@ -10,6 +10,7 @@ import UserPermission from '../../../src/authorization/entity/userPermission.ent
 import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
 import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
+import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 
 const users: User[] = [
   {
@@ -46,6 +47,9 @@ describe('test UserService', () => {
   const permissionRepository = Substitute.for<Repository<Permission>>();
   const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
   const userGroupRepository = Substitute.for<Repository<UserGroup>>();
+  const groupPermissionRepository = Substitute.for<
+    Repository<GroupPermission>
+  >();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -72,6 +76,10 @@ describe('test UserService', () => {
         {
           provide: getRepositoryToken(UserPermission),
           useValue: userPermissionRepository,
+        },
+        {
+          provide: getRepositoryToken(GroupPermission),
+          useValue: groupPermissionRepository,
         },
       ],
     }).compile();
@@ -234,5 +242,101 @@ describe('test UserService', () => {
         ['91742290-4049-45c9-9c27-c9f6200fef4c'].toString(),
       ),
     );
+  });
+
+  it('should verify and return true if user has required permissions', async () => {
+    const userGroups: UserGroup[] = [
+      {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        groupId: '91742290-4049-45c9-9c27-c9f6200fef4c',
+      },
+    ];
+    const userPermissions = [
+      {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        permissionId: '23097816-39ef-4862-b557-dab6cc67d5c5',
+      },
+    ];
+    const groupPermissions = [
+      {
+        groupId: '91742290-4049-45c9-9c27-c9f6200fef4c',
+        permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+      },
+    ];
+    const permissions: Permission[] = [
+      {
+        id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+        name: 'CreateUser',
+        active: true,
+      },
+    ];
+    userGroupRepository
+      .find({ where: { userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' } })
+      .resolves(userGroups);
+    userPermissionRepository
+      .find({ where: { userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' } })
+      .resolves(userPermissions);
+    groupPermissionRepository
+      .find({
+        where: { groupId: In(['91742290-4049-45c9-9c27-c9f6200fef4c']) },
+      })
+      .resolves(groupPermissions);
+    permissionRepository
+      .find({ where: { name: In(['CreateUser']) } })
+      .resolves(permissions);
+
+    const resp = await userService.verifyUserPermissions(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      ['CreateUser'],
+    );
+    expect(resp).toEqual(true);
+  });
+
+  it('should verify and return false if user doesnot have required permissions', async () => {
+    const userGroups: UserGroup[] = [
+      {
+        userId: 'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
+        groupId: 'a8f55c77-4f8f-4a12-99f9-8962144e08f0',
+      },
+    ];
+    const userPermissions = [
+      {
+        userId: 'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
+        permissionId: '366ad922-464c-4e48-a26b-d8d5a9090763',
+      },
+    ];
+    const groupPermissions = [
+      {
+        groupId: 'a8f55c77-4f8f-4a12-99f9-8962144e08f0',
+        permissionId: '366ad922-464c-4e48-a26b-d8d5a9090763',
+      },
+    ];
+    const permissions: Permission[] = [
+      {
+        id: '366ad922-464c-4e48-a26b-d8d5a9090763',
+        name: 'CreateEmployee',
+        active: true,
+      },
+    ];
+    userGroupRepository
+      .find({ where: { userId: 'f95e6f6d-7678-4871-9e08-c3f23b87c3ff' } })
+      .resolves(userGroups);
+    userPermissionRepository
+      .find({ where: { userId: 'f95e6f6d-7678-4871-9e08-c3f23b87c3ff' } })
+      .resolves(userPermissions);
+    groupPermissionRepository
+      .find({
+        where: { groupId: In(['a8f55c77-4f8f-4a12-99f9-8962144e08f0']) },
+      })
+      .resolves(groupPermissions);
+    permissionRepository
+      .find({ where: { name: In(['CreateEmployee']) } })
+      .resolves(permissions);
+
+    const resp = await userService.verifyUserPermissions(
+      'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
+      ['CreateUser'],
+    );
+    expect(resp).toEqual(false);
   });
 });
