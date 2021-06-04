@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
 import {
   NewGroupInput,
   UpdateGroupInput,
@@ -21,6 +22,7 @@ export class GroupService {
     private groupPermissionRepository: Repository<GroupPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
+    private cacheManager: RedisCacheService,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -94,6 +96,13 @@ export class GroupService {
     const permissions = await this.permissionRepository.findByIds(
       savedGroupPermissions.map((g) => g.permissionId),
     );
+    this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
+    return permissions;
+  }
+
+  async getGroupPermissions(id: string): Promise<Permission[]> {
+    const groupPermissions = await this.groupPermissionRepository.find({where: {groupId: id}});
+    const permissions = this.permissionRepository.findByIds(groupPermissions.map(p => p.permissionId));
     return permissions;
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 
@@ -17,6 +17,7 @@ import UserPermission from '../entity/userPermission.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
+import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
 
 @Injectable()
 export default class UserService {
@@ -33,6 +34,7 @@ export default class UserService {
     private permissionRepository: Repository<Permission>,
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: Repository<GroupPermission>,
+    private cacheManager: RedisCacheService,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -103,6 +105,15 @@ export default class UserService {
     return groups;
   }
 
+  async getUserGroups(id: string): Promise<Group[]> {
+    const userGroups = await this.userGroupRepository.find({where: {userId: id}});
+    const groups = await this.groupRepository.findByIds(
+      userGroups.map((u) => u.groupId),
+    );
+    this.cacheManager.del(`USER:${id}:GROUPS`);
+    return groups;
+  }
+
   async updateUserPermissions(
     id: string,
     request: UpdateUserPermissionInput,
@@ -138,7 +149,19 @@ export default class UserService {
     const userPermissions = await this.permissionRepository.findByIds(
       userPermissionsUpdated.map((u) => u.permissionId),
     );
+
+    this.cacheManager.del(`USER:${id}:PERMISSIONS`);
     return userPermissions;
+  }
+
+  async getUserPermissions(id: string): Promise<Permission[]>{
+    const userPermissions = await this.userPermissionRepository.find(
+     {where: {userId: id}}
+    );
+    const permissions = await this.permissionRepository.findByIds(
+      userPermissions.map((u) => u.permissionId),
+    );
+    return permissions;
   }
 
   async deleteUser(id: string): Promise<User> {
@@ -150,14 +173,35 @@ export default class UserService {
     throw new UserNotFoundException(id);
   }
 
+private async getGroupPermissionsFromCache(groupId: string): Promise<string[]> {
+  const permissionsFromCache =  await this.cacheManager.get<string[]>(`GROUP:${groupId}:PERMISSIONS`)
+  const permissions = permissionsFromCache || (await this.groupPermissionRepository.find({where: { groupId: groupId }})).map((x) => x.permissionId);
+  permissionsFromCache || await this.cacheManager.set(`GROUP:${groupId}:PERMISSIONS`, permissions);
+  return permissionsFromCache || permissions
+}
+
+private async getUserGroupsFromCache(userId: string): Promise<string[]> {
+  const groupsFromCache =  await this.cacheManager.get<string[]>(`USER:${userId}:GROUPS`)
+  const groups = groupsFromCache || (await this.userGroupRepository.find({where: { userId: userId }})).map((x) => x.groupId);
+  groupsFromCache || await this.cacheManager.set(`USER:${userId}:GROUPS`, groups);
+  return groupsFromCache || groups
+}
+
+private async getUserPermissionsFromCache(userId: string): Promise<string[]> {
+  const permissionsFromCache =  await this.cacheManager.get<string[]>(`USER:${userId}:PERMISSIONS`)
+  const permissions = permissionsFromCache || (await this.userPermissionRepository.find({where: { userId: userId }})).map((x) => x.permissionId);
+  permissionsFromCache || await this.cacheManager.set(`USER:${userId}:PERMISSIONS`, permissions);
+  return permissionsFromCache || permissions
+}
+
+
   async verifyUserPermissions(
     id: string,
     permissionToVerify: string[],
     operation: OperationType = OperationType.AND,
   ): Promise<boolean> {
-    const userGroups = await this.userGroupRepository.find({
-      where: { userId: id },
-    });
+    const userGroups = await this.getUserGroupsFromCache(id);
+
     const permissionsRequired = await this.permissionRepository.find({
       where: { name: In(permissionToVerify) },
     });
@@ -167,14 +211,11 @@ export default class UserService {
         permissionToVerify.filter((p) => !validPermissions.has(p)).toString(),
       );
     }
-    const groupPermissions = (
-      await this.groupPermissionRepository.find({
-        where: { groupId: In(userGroups.map((x) => x.groupId)) },
-      })
-    ).map((x) => x.permissionId);
-    const userPermissions = (
-      await this.userPermissionRepository.find({ where: { userId: id } })
-    ).map((x) => x.permissionId);
+    const groupPermissions: string[] = (await Promise.all(
+      userGroups.map((x) => this.getGroupPermissionsFromCache(x))
+    )).flat(1);
+
+    const userPermissions: string[] = await this.getUserPermissionsFromCache(id);
 
     const allPermissionsOfUser = new Set(
       userPermissions.concat(groupPermissions),
