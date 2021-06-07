@@ -2,12 +2,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 class UserPermission {
-  @Column()
-  @PrimaryColumn()
+  @PrimaryColumn({type: 'uuid'})
   public permissionId!: string;
 
-  @PrimaryColumn()
-  @Column()
+  @PrimaryColumn({type: 'uuid'})
   public userId!: string;
 }
 

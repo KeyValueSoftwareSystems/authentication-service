@@ -6,7 +6,7 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
 } from 'src/schema/graphql.schema';
-import { Repository } from 'typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -59,6 +59,7 @@ export class GroupService {
     await this.groupsRepository.update(id, { active: false });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
+      await this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
       return deletedGroup;
     }
     throw new GroupNotFoundException(id);
@@ -101,8 +102,11 @@ export class GroupService {
   }
 
   async getGroupPermissions(id: string): Promise<Permission[]> {
-    const groupPermissions = await this.groupPermissionRepository.find({where: {groupId: id}});
-    const permissions = this.permissionRepository.findByIds(groupPermissions.map(p => p.permissionId));
+
+    const permissions = await createQueryBuilder<Permission>("permission").
+    leftJoinAndSelect(GroupPermission, "groupPermission", "Permission.id = groupPermission.permissionId").
+    where("groupPermission.groupId = :groupId", {groupId: id}).
+    getMany();
     return permissions;
   }
 }

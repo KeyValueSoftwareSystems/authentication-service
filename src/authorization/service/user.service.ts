@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { createQueryBuilder, In, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -102,15 +102,16 @@ export default class UserService {
     const groups = await this.groupRepository.findByIds(
       updatedUserGroups.map((u) => u.groupId),
     );
+    await this.cacheManager.del(`USER:${id}:GROUPS`);
     return groups;
   }
 
   async getUserGroups(id: string): Promise<Group[]> {
-    const userGroups = await this.userGroupRepository.find({where: {userId: id}});
-    const groups = await this.groupRepository.findByIds(
-      userGroups.map((u) => u.groupId),
-    );
-    this.cacheManager.del(`USER:${id}:GROUPS`);
+
+    const groups = await createQueryBuilder<Group>("group").
+    leftJoinAndSelect(UserGroup, "userGroup", "Group.id = userGroup.groupId").
+    where("userGroup.userId = :userId", {userId: id}).
+    getMany();
     return groups;
   }
 
@@ -155,12 +156,11 @@ export default class UserService {
   }
 
   async getUserPermissions(id: string): Promise<Permission[]>{
-    const userPermissions = await this.userPermissionRepository.find(
-     {where: {userId: id}}
-    );
-    const permissions = await this.permissionRepository.findByIds(
-      userPermissions.map((u) => u.permissionId),
-    );
+
+    const permissions = await createQueryBuilder<Permission>("permission").
+    leftJoinAndSelect(UserPermission, "userPermission", "Permission.id = userPermission.permissionId").
+    where("userPermission.userId = :userId", {userId: id}).
+    getMany();
     return permissions;
   }
 
@@ -168,6 +168,8 @@ export default class UserService {
     await this.usersRepository.update(id, { active: false });
     const deletedUser = await this.usersRepository.findOne(id);
     if (deletedUser) {
+      await this.cacheManager.del(`USER:${id}:PERMISSIONS`);
+      await this.cacheManager.del(`USER:${id}:GROUPS`);
       return deletedUser;
     }
     throw new UserNotFoundException(id);
@@ -195,12 +197,26 @@ private async getUserPermissionsFromCache(userId: string): Promise<string[]> {
 }
 
 
+private async getAllUserpermissionIds(id: string): Promise<Set<string>>  {
+  const userGroups = await this.getUserGroupsFromCache(id);
+  const groupPermissions: string[] = (await Promise.all(
+    userGroups.map((x) => this.getGroupPermissionsFromCache(x))
+  )).flat(1);
+
+  const userPermissions: string[] = await this.getUserPermissionsFromCache(id);
+
+  const allPermissionsOfUser = new Set(
+    userPermissions.concat(groupPermissions),
+  );
+  return allPermissionsOfUser; 
+}
+
   async verifyUserPermissions(
     id: string,
     permissionToVerify: string[],
     operation: OperationType = OperationType.AND,
   ): Promise<boolean> {
-    const userGroups = await this.getUserGroupsFromCache(id);
+    
 
     const permissionsRequired = await this.permissionRepository.find({
       where: { name: In(permissionToVerify) },
@@ -211,15 +227,7 @@ private async getUserPermissionsFromCache(userId: string): Promise<string[]> {
         permissionToVerify.filter((p) => !validPermissions.has(p)).toString(),
       );
     }
-    const groupPermissions: string[] = (await Promise.all(
-      userGroups.map((x) => this.getGroupPermissionsFromCache(x))
-    )).flat(1);
-
-    const userPermissions: string[] = await this.getUserPermissionsFromCache(id);
-
-    const allPermissionsOfUser = new Set(
-      userPermissions.concat(groupPermissions),
-    );
+    const allPermissionsOfUser = await this.getAllUserpermissionIds(id)
     const requiredPermissionsWithUser = permissionsRequired
       .map((x) => x.id)
       .filter((x) => allPermissionsOfUser.has(x));
