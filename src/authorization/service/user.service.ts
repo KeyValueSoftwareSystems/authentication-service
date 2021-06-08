@@ -46,18 +46,9 @@ export default class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    let user;
-    user = await this.userCacheService.getUserById(id);
-
-    if (!user) {
-      user = await this.usersRepository.findOne(id, {
-        where: { active: true },
-      });
-      if (user) {
-        this.userCacheService.setUseryById(id, user);
-      }
-    }
-
+    const user = await this.usersRepository.findOne(id, {
+      where: { active: true },
+    });
     if (user) {
       return user;
     }

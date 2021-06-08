@@ -16,15 +16,6 @@ export default class UserCacheService {
     private userPermissionRepository: Repository<UserPermission>,
   ) {}
 
-  async getUserById(id: string): Promise<User | undefined> {
-    return await this.cacheManager.get('USER:' + id);
-  }
-
-  async setUseryById(id: string, value: User): Promise<User> {
-    await this.cacheManager.set('USER:' + id, value);
-    return value;
-  }
-
   async getUserGroupsByUserId(userId: string): Promise<string[]> {
     const groupsFromCache = await this.cacheManager.get<string[]>(
       `USER:${userId}:GROUPS`,
