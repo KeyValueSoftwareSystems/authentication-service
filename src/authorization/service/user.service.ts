@@ -81,27 +81,27 @@ export default class UserService {
     id: string,
     user: UpdateUserGroupInput,
   ): Promise<Group[]> {
-    const existingUser = await this.usersRepository.findOne(id, {
-      where: { active: true },
-    });
-    if (!existingUser) {
-      throw new UserNotFoundException(id);
-    }
+    await this.getUserById(id);
     const groupsInRequest = await this.groupRepository.findByIds(user.groups);
+    const existingGroupsOfUser = await this.getUserGroups(id);
+    const validGroupsInRequest: Set<string> = new Set(groupsInRequest.map((p) => p.id)); 
     if (groupsInRequest.length !== user.groups.length) {
-      const validGroups = groupsInRequest.map((p) => p.id);
       throw new GroupNotFoundException(
-        user.groups.filter((p) => !validGroups.includes(p)).toString(),
+        user.groups.filter((p) => !validGroupsInRequest.has(p)).toString(),
       );
     }
 
+    const groupsToBeRemovedFromUser: UserGroup[] = existingGroupsOfUser.filter((p) => !validGroupsInRequest.has(p.id)).map(g => ({userId: id, groupId: g.id}));
     const userGroups = this.userGroupRepository.create(
       user.groups.map((group) => ({ userId: id, groupId: group })),
     );
-    const updatedUserGroups = await this.userGroupRepository.save(userGroups);
-    const groups = await this.groupRepository.findByIds(
-      updatedUserGroups.map((u) => u.groupId),
-    );
+    await getConnection().manager.transaction(async entityManager => {
+      const userGroupsRepo = entityManager.getRepository(UserGroup);
+      await userGroupsRepo.remove(groupsToBeRemovedFromUser);
+      await userGroupsRepo.save(userGroups);
+    });
+
+    const groups = await this.getUserGroups(id);
     await this.cacheManager.del(`USER:${id}:GROUPS`);
     return groups;
   }
@@ -119,24 +119,22 @@ export default class UserService {
     id: string,
     request: UpdateUserPermissionInput,
   ): Promise<Permission[]> {
-    const existingUser = await this.usersRepository.findOne(id, {
-      where: { active: true },
-    });
-    if (!existingUser) {
-      throw new UserNotFoundException(id);
-    }
-
-    const permissionsInRequest = await this.permissionRepository.findByIds(
-      request.permissions,
+    await this.getUserById(id);
+    const existingUserPermissions: Permission[] = await this.getUserPermissions(id);
+    const permissionsInRequest: Permission[] = await this.permissionRepository.findByIds(
+      request.permissions, {where: {active: true}}
     );
+    const validPermissions = new Set(permissionsInRequest.map((p) => p.id));
     if (permissionsInRequest.length !== request.permissions.length) {
-      const validPermissions = permissionsInRequest.map((p) => p.id);
       throw new PermissionNotFoundException(
         request.permissions
-          .filter((p) => !validPermissions.includes(p))
+          .filter((p) => !validPermissions.has(p))
           .toString(),
       );
     }
+
+    const userPermissionsToBeRemoved: UserPermission[] = existingUserPermissions.filter(p => !validPermissions.has(p.id)).map(p => ({userId: id, permissionId: p.id}));
+    this.userPermissionRepository.remove(userPermissionsToBeRemoved);
 
     const userPermissionsCreated = this.userPermissionRepository.create(
       request.permissions.map((permission) => ({
@@ -144,9 +142,12 @@ export default class UserService {
         permissionId: permission,
       })),
     );
-    const userPermissionsUpdated = await this.userPermissionRepository.save(
-      userPermissionsCreated,
-    );
+    const userPermissionsUpdated = await getConnection().manager.transaction(async entityManager => {
+      const userPermissionsRepo = entityManager.getRepository(UserPermission);
+      await userPermissionsRepo.remove(userPermissionsToBeRemoved);
+      return await userPermissionsRepo.save(userPermissionsCreated);
+    });
+    
     const userPermissions = await this.permissionRepository.findByIds(
       userPermissionsUpdated.map((u) => u.permissionId),
     );

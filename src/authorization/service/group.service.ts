@@ -60,13 +60,15 @@ export class GroupService {
   }
 
   async deleteGroup(id: string): Promise<Group> {
-    if(this.checkGroupUsage(id)) {
+    const usage = await this.checkGroupUsage(id)
+    console.log(usage)
+    if(usage) {
       throw new GroupDeleteNotAllowedException(id)
     }
     getConnection().manager.transaction(async entityManager => {
       const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
-      groupPermissionsRepo.delete({groupId: id});
-      this.groupsRepository.update(id, { active: false }, );
+      await groupPermissionsRepo.delete({groupId: id});
+      await this.groupsRepository.update(id, { active: false }, );
     });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
