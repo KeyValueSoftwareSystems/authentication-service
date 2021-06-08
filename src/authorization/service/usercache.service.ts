@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 export default class UserCacheService {
   constructor(private cacheManager: RedisCacheService) {}
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(id: string): Promise<User | undefined> {
     return await this.cacheManager.get('USER:' + id);
   }
 
