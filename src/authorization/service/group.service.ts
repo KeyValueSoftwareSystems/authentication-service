@@ -10,14 +10,18 @@ import { createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
-import { GroupNotFoundException } from '../exception/group.exception';
+import UserGroup from '../entity/userGroup.entity';
+import { GroupNotFoundException, GroupDeleteNotAllowedException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
+import {getConnection} from "typeorm";
 
 @Injectable()
 export class GroupService {
   constructor(
     @InjectRepository(Group)
     private groupsRepository: Repository<Group>,
+    @InjectRepository(UserGroup)
+    private userGroupRepository: Repository<UserGroup>,
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: Repository<GroupPermission>,
     @InjectRepository(Permission)
@@ -56,7 +60,14 @@ export class GroupService {
   }
 
   async deleteGroup(id: string): Promise<Group> {
-    await this.groupsRepository.update(id, { active: false });
+    if(this.checkGroupUsage(id)) {
+      throw new GroupDeleteNotAllowedException(id)
+    }
+    getConnection().manager.transaction(async entityManager => {
+      const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
+      groupPermissionsRepo.delete({groupId: id});
+      this.groupsRepository.update(id, { active: false }, );
+    });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
       await this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
@@ -108,5 +119,10 @@ export class GroupService {
     where("groupPermission.groupId = :groupId", {groupId: id}).
     getMany();
     return permissions;
+  }
+
+  private async checkGroupUsage(id: string){
+    const userCount = await this.userGroupRepository.count({where: {groupId: id}});
+    return userCount != 0
   }
 }

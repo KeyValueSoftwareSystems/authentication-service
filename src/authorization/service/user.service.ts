@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createQueryBuilder, In, Repository } from 'typeorm';
+import { createQueryBuilder, getConnection, In, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -165,7 +165,14 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    await this.usersRepository.update(id, { active: false });
+    getConnection().manager.transaction(async entityManager => {
+      const userPermissionsRepo = entityManager.getRepository(UserPermission);
+      userPermissionsRepo.delete({userId: id});
+      const userGroupsRepo = entityManager.getRepository(UserGroup);
+      userGroupsRepo.delete({userId: id});
+      this.usersRepository.update(id, { active: false }, );
+    });
+
     const deletedUser = await this.usersRepository.findOne(id);
     if (deletedUser) {
       await this.cacheManager.del(`USER:${id}:PERMISSIONS`);

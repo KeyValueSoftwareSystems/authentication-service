@@ -5,7 +5,7 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from 'src/schema/graphql.schema';
-import { Repository } from 'typeorm';
+import { createQueryBuilder, getConnection, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -54,7 +54,11 @@ export class EntityService {
   }
 
   async deleteEntity(id: string): Promise<EntityModel> {
-    await this.entityRepository.update(id, { active: false });
+    getConnection().manager.transaction(async entityManager => {
+      const entityPermissionsRepo = entityManager.getRepository(EntityPermission);
+      entityPermissionsRepo.delete({entityId: id});
+      await this.entityRepository.update(id, { active: false });
+    });
     const deletedEntity = await this.entityRepository.findOne(id);
     if (deletedEntity) {
       return deletedEntity;
@@ -94,6 +98,15 @@ export class EntityService {
     const permissions = await this.permissionRepository.findByIds(
       savedEntityPermissions.map((g) => g.permissionId),
     );
+    return permissions;
+  }
+
+  async getEntityPermissions(id: string): Promise<Permission[]> {
+
+    const permissions = await createQueryBuilder<Permission>("permission").
+    leftJoinAndSelect(EntityPermission, "entityPermission", "Permission.id = entityPermission.permissionId").
+    where("entityPermission.entityId = :entityId", {entityId: id}).
+    getMany();
     return permissions;
   }
 }
