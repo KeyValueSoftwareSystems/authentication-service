@@ -1,6 +1,6 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
-import { TokenResponse, UserSignupResponse } from 'src/schema/graphql.schema';
+import { TokenResponse, UserLoginInput, UserSignupResponse } from 'src/schema/graphql.schema';
 import User from 'src/authorization/entity/user.entity';
 import { AuthGaurd } from '../authentication.gaurd';
 import UserauthService from '../service/userauth.service';
@@ -17,7 +17,7 @@ export default class UserauthResolver {
 
   @Mutation('login')
   @UsePipes(new ValidationPipe(UserLoginInputSchema))
-  async userLogin(@Args('input') request: any): Promise<TokenResponse> {
+  async userLogin(@Args('input') request: UserLoginInput): Promise<TokenResponse> {
     return this.userauthService.userLogin(request);
   }
 

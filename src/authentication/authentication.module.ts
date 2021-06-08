@@ -23,6 +23,7 @@ import { RedisCacheModule } from 'src/cache/redis-cache/redis-cache.module';
     TypeOrmModule.forFeature([UserGroup]),
     TypeOrmModule.forFeature([UserPermission]),
     TypeOrmModule.forFeature([GroupPermission]),
+    RedisCacheModule,
     ConfigModule,
     RedisCacheModule,
   ],

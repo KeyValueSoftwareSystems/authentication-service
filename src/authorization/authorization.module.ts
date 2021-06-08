@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthenticationHelper } from 'src/authentication/authentication.helper';
 import { RedisCacheModule } from 'src/cache/redis-cache/redis-cache.module';
 import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
 import EntityModel from './entity/entity.entity';
@@ -43,6 +45,8 @@ import UserCacheService from './service/usercache.service';
     EntityResolver,
     RedisCacheService,
     UserCacheService,
+    AuthenticationHelper,
+    ConfigService,
   ],
 })
 export class AuthorizationModule {}

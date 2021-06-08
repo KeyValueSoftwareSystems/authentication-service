@@ -26,6 +26,7 @@ type GroupPermission {
 type Query {
   getGroups: [Group]!
   getGroup(id: ID!): Group
+  getGroupPermissions(id: ID!): [GroupPermission]
 }
 
 type Mutation {

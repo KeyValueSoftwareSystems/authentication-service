@@ -54,6 +54,8 @@ operation: OperationType
 type Query {
   getUsers: [User]!
   getUser(id: ID!): User
+  getUserGroups(id: ID!): [UserGroupResponse]
+  getUserPermissions(id: ID!): [UserPermissions]
   verifyUserPermission(id: ID!, params: UserPermissionsVerification!): Boolean
 }
 

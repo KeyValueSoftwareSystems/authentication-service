@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
 import {
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
 } from 'src/schema/graphql.schema';
-import { Repository } from 'typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -21,6 +22,7 @@ export class GroupService {
     private groupPermissionRepository: Repository<GroupPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
+    private cacheManager: RedisCacheService,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -57,6 +59,7 @@ export class GroupService {
     await this.groupsRepository.update(id, { active: false });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
+      await this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
       return deletedGroup;
     }
     throw new GroupNotFoundException(id);
@@ -94,6 +97,16 @@ export class GroupService {
     const permissions = await this.permissionRepository.findByIds(
       savedGroupPermissions.map((g) => g.permissionId),
     );
+    this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
+    return permissions;
+  }
+
+  async getGroupPermissions(id: string): Promise<Permission[]> {
+
+    const permissions = await createQueryBuilder<Permission>("permission").
+    leftJoinAndSelect(GroupPermission, "groupPermission", "Permission.id = groupPermission.permissionId").
+    where("groupPermission.groupId = :groupId", {groupId: id}).
+    getMany();
     return permissions;
   }
 }

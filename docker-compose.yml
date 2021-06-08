@@ -55,6 +55,8 @@ services:
       - '${REDIS_PORT}:${REDIS_PORT}'
     env_file:
       - docker.env
+    networks:
+      - authnet
 
 networks:
   authnet:
