@@ -17,6 +17,7 @@ import UserPermission from '../entity/userPermission.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
+import UserCacheService from './usercache.service';
 
 @Injectable()
 export default class UserService {
@@ -33,6 +34,7 @@ export default class UserService {
     private permissionRepository: Repository<Permission>,
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: Repository<GroupPermission>,
+    private userCacheService: UserCacheService,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -42,9 +44,18 @@ export default class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne(id, {
-      where: { active: true },
-    });
+    let user;
+    user = await this.userCacheService.getUserById(id);
+
+    if (!user) {
+      user = await this.usersRepository.findOne(id, {
+        where: { active: true },
+      });
+      if (user) {
+        this.userCacheService.setUseryById(id, user);
+      }
+    }
+
     if (user) {
       return user;
     }

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisCacheModule } from 'src/cache/redis-cache/redis-cache.module';
+import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
 import EntityModel from './entity/entity.entity';
 import EntityPermission from './entity/entityPermission.entity';
 import Group from './entity/group.entity';
@@ -16,6 +18,7 @@ import { EntityService } from './service/entity.service';
 import { GroupService } from './service/group.service';
 import { PermissionService } from './service/permission.service';
 import UserService from './service/user.service';
+import UserCacheService from './service/usercache.service';
 
 @Module({
   imports: [
@@ -27,6 +30,7 @@ import UserService from './service/user.service';
     TypeOrmModule.forFeature([GroupPermission]),
     TypeOrmModule.forFeature([EntityModel]),
     TypeOrmModule.forFeature([EntityPermission]),
+    RedisCacheModule,
   ],
   providers: [
     GroupResolver,
@@ -36,7 +40,9 @@ import UserService from './service/user.service';
     PermissionResolver,
     UserService,
     UserResolver,
-    EntityResolver
+    EntityResolver,
+    RedisCacheService,
+    UserCacheService,
   ],
 })
 export class AuthorizationModule {}
