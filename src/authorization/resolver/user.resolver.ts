@@ -84,13 +84,17 @@ export class UserResolver {
 
   @UseGuards(AuthGaurd)
   @Query()
-  async getUserPermissions(@Args('id', ParseUUIDPipe) id: string): Promise<Permission[]> {
+  async getUserPermissions(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<Permission[]> {
     return this.userService.getUserPermissions(id);
   }
 
   @UseGuards(AuthGaurd)
   @Query()
-  async getUserGroups(@Args('id', ParseUUIDPipe) id: string): Promise<Permission[]> {
+  async getUserGroups(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<Permission[]> {
     return this.userService.getUserGroups(id);
   }
 }

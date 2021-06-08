@@ -118,11 +118,10 @@ export default class UserService {
   }
 
   async getUserGroups(id: string): Promise<Group[]> {
-
-    const groups = await createQueryBuilder<Group>("group").
-    leftJoinAndSelect(UserGroup, "userGroup", "Group.id = userGroup.groupId").
-    where("userGroup.userId = :userId", {userId: id}).
-    getMany();
+    const groups = await createQueryBuilder<Group>('group')
+      .leftJoinAndSelect(UserGroup, 'userGroup', 'Group.id = userGroup.groupId')
+      .where('userGroup.userId = :userId', { userId: id })
+      .getMany();
     return groups;
   }
 
@@ -166,12 +165,15 @@ export default class UserService {
     return userPermissions;
   }
 
-  async getUserPermissions(id: string): Promise<Permission[]>{
-
-    const permissions = await createQueryBuilder<Permission>("permission").
-    leftJoinAndSelect(UserPermission, "userPermission", "Permission.id = userPermission.permissionId").
-    where("userPermission.userId = :userId", {userId: id}).
-    getMany();
+  async getUserPermissions(id: string): Promise<Permission[]> {
+    const permissions = await createQueryBuilder<Permission>('permission')
+      .leftJoinAndSelect(
+        UserPermission,
+        'userPermission',
+        'Permission.id = userPermission.permissionId',
+      )
+      .where('userPermission.userId = :userId', { userId: id })
+      .getMany();
     return permissions;
   }
 
@@ -186,49 +188,31 @@ export default class UserService {
     throw new UserNotFoundException(id);
   }
 
-private async getGroupPermissionsFromCache(groupId: string): Promise<string[]> {
-  const permissionsFromCache =  await this.cacheManager.get<string[]>(`GROUP:${groupId}:PERMISSIONS`)
-  const permissions = permissionsFromCache || (await this.groupPermissionRepository.find({where: { groupId: groupId }})).map((x) => x.permissionId);
-  permissionsFromCache || await this.cacheManager.set(`GROUP:${groupId}:PERMISSIONS`, permissions);
-  return permissionsFromCache || permissions
-}
+  private async getAllUserpermissionIds(id: string): Promise<Set<string>> {
+    const userGroups = await this.userCacheService.getUserGroupsByUserId(id);
+    const groupPermissions: string[] = (
+      await Promise.all(
+        userGroups.map((x) =>
+          this.userCacheService.getUserPermissionsByUserId(x),
+        ),
+      )
+    ).flat(1);
 
-private async getUserGroupsFromCache(userId: string): Promise<string[]> {
-  const groupsFromCache =  await this.cacheManager.get<string[]>(`USER:${userId}:GROUPS`)
-  const groups = groupsFromCache || (await this.userGroupRepository.find({where: { userId: userId }})).map((x) => x.groupId);
-  groupsFromCache || await this.cacheManager.set(`USER:${userId}:GROUPS`, groups);
-  return groupsFromCache || groups
-}
+    const userPermissions: string[] = await this.userCacheService.getUserPermissionsByUserId(
+      id,
+    );
 
-private async getUserPermissionsFromCache(userId: string): Promise<string[]> {
-  const permissionsFromCache =  await this.cacheManager.get<string[]>(`USER:${userId}:PERMISSIONS`)
-  const permissions = permissionsFromCache || (await this.userPermissionRepository.find({where: { userId: userId }})).map((x) => x.permissionId);
-  permissionsFromCache || await this.cacheManager.set(`USER:${userId}:PERMISSIONS`, permissions);
-  return permissionsFromCache || permissions
-}
-
-
-private async getAllUserpermissionIds(id: string): Promise<Set<string>>  {
-  const userGroups = await this.getUserGroupsFromCache(id);
-  const groupPermissions: string[] = (await Promise.all(
-    userGroups.map((x) => this.getGroupPermissionsFromCache(x))
-  )).flat(1);
-
-  const userPermissions: string[] = await this.getUserPermissionsFromCache(id);
-
-  const allPermissionsOfUser = new Set(
-    userPermissions.concat(groupPermissions),
-  );
-  return allPermissionsOfUser; 
-}
+    const allPermissionsOfUser = new Set(
+      userPermissions.concat(groupPermissions),
+    );
+    return allPermissionsOfUser;
+  }
 
   async verifyUserPermissions(
     id: string,
     permissionToVerify: string[],
     operation: OperationType = OperationType.AND,
   ): Promise<boolean> {
-    
-
     const permissionsRequired = await this.permissionRepository.find({
       where: { name: In(permissionToVerify) },
     });
@@ -238,7 +222,7 @@ private async getAllUserpermissionIds(id: string): Promise<Set<string>>  {
         permissionToVerify.filter((p) => !validPermissions.has(p)).toString(),
       );
     }
-    const allPermissionsOfUser = await this.getAllUserpermissionIds(id)
+    const allPermissionsOfUser = await this.getAllUserpermissionIds(id);
     const requiredPermissionsWithUser = permissionsRequired
       .map((x) => x.id)
       .filter((x) => allPermissionsOfUser.has(x));

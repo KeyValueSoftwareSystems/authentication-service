@@ -18,6 +18,7 @@ import { PermissionResolver } from './resolver/permission.resolver';
 import { UserResolver } from './resolver/user.resolver';
 import { EntityService } from './service/entity.service';
 import { GroupService } from './service/group.service';
+import GroupCacheService from './service/groupcache.service';
 import { PermissionService } from './service/permission.service';
 import UserService from './service/user.service';
 import UserCacheService from './service/usercache.service';
@@ -45,6 +46,7 @@ import UserCacheService from './service/usercache.service';
     EntityResolver,
     RedisCacheService,
     UserCacheService,
+    GroupCacheService,
     AuthenticationHelper,
     ConfigService,
   ],
