@@ -1,6 +1,11 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { Entity, NewEntityInput, UpdateEntityInput, UpdateEntityPermissionInput } from 'src/schema/graphql.schema';
+import {
+  Entity,
+  NewEntityInput,
+  UpdateEntityInput,
+  UpdateEntityPermissionInput,
+} from 'src/schema/graphql.schema';
 import { EntityService } from '../service/entity.service';
 
 @Resolver('Entity')
@@ -18,7 +23,9 @@ export class EntityResolver {
   }
 
   @Mutation()
-  async createEntity(@Args('input') entityInput: NewEntityInput): Promise<Entity> {
+  async createEntity(
+    @Args('input') entityInput: NewEntityInput,
+  ): Promise<Entity> {
     return this.entityService.createEntity(entityInput);
   }
 

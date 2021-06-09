@@ -43,7 +43,10 @@ export class EntityService {
     return newEntity;
   }
 
-  async updateEntity(id: string, entity: UpdateEntityInput): Promise<EntityModel> {
+  async updateEntity(
+    id: string,
+    entity: UpdateEntityInput,
+  ): Promise<EntityModel> {
     const entityToUpdate = this.entityRepository.create(entity);
     await this.entityRepository.update(id, entityToUpdate);
     const updatedEntity = await this.entityRepository.findOne(id);
@@ -54,9 +57,11 @@ export class EntityService {
   }
 
   async deleteEntity(id: string): Promise<EntityModel> {
-    getConnection().manager.transaction(async entityManager => {
-      const entityPermissionsRepo = entityManager.getRepository(EntityPermission);
-      entityPermissionsRepo.delete({entityId: id});
+    getConnection().manager.transaction(async (entityManager) => {
+      const entityPermissionsRepo = entityManager.getRepository(
+        EntityPermission,
+      );
+      entityPermissionsRepo.delete({ entityId: id });
       await this.entityRepository.update(id, { active: false });
     });
     const deletedEntity = await this.entityRepository.findOne(id);
@@ -102,11 +107,14 @@ export class EntityService {
   }
 
   async getEntityPermissions(id: string): Promise<Permission[]> {
-
-    const permissions = await createQueryBuilder<Permission>("permission").
-    leftJoinAndSelect(EntityPermission, "entityPermission", "Permission.id = entityPermission.permissionId").
-    where("entityPermission.entityId = :entityId", {entityId: id}).
-    getMany();
+    const permissions = await createQueryBuilder<Permission>('permission')
+      .leftJoinAndSelect(
+        EntityPermission,
+        'entityPermission',
+        'Permission.id = entityPermission.permissionId',
+      )
+      .where('entityPermission.entityId = :entityId', { entityId: id })
+      .getMany();
     return permissions;
   }
 }

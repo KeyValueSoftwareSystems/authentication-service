@@ -10,9 +10,12 @@ import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
-import { GroupNotFoundException, GroupDeleteNotAllowedException } from '../exception/group.exception';
+import {
+  GroupNotFoundException,
+  GroupDeleteNotAllowedException,
+} from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import {getConnection} from "typeorm";
+import { getConnection } from 'typeorm';
 import GroupCacheService from './groupcache.service';
 
 @Injectable()
@@ -60,15 +63,15 @@ export class GroupService {
   }
 
   async deleteGroup(id: string): Promise<Group> {
-    const usage = await this.checkGroupUsage(id)
-    console.log(usage)
-    if(usage) {
-      throw new GroupDeleteNotAllowedException(id)
+    const usage = await this.checkGroupUsage(id);
+    console.log(usage);
+    if (usage) {
+      throw new GroupDeleteNotAllowedException(id);
     }
-    getConnection().manager.transaction(async entityManager => {
+    getConnection().manager.transaction(async (entityManager) => {
       const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
-      await groupPermissionsRepo.delete({groupId: id});
-      await this.groupsRepository.update(id, { active: false }, );
+      await groupPermissionsRepo.delete({ groupId: id });
+      await this.groupsRepository.update(id, { active: false });
     });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
@@ -126,8 +129,10 @@ export class GroupService {
     return permissions;
   }
 
-  private async checkGroupUsage(id: string){
-    const userCount = await this.userGroupRepository.count({where: {groupId: id}});
-    return userCount != 0
+  private async checkGroupUsage(id: string) {
+    const userCount = await this.userGroupRepository.count({
+      where: { groupId: id },
+    });
+    return userCount != 0;
   }
 }

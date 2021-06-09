@@ -5,7 +5,10 @@ import {
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
 import { createQueryBuilder, Repository } from 'typeorm';
-import { PermissionNotFoundException, PermissionDeleteNotAllowedException } from '../exception/permission.exception';
+import {
+  PermissionNotFoundException,
+  PermissionDeleteNotAllowedException,
+} from '../exception/permission.exception';
 import Permission from '../entity/permission.entity';
 import UserPermission from '../entity/userPermission.entity';
 import GroupPermission from '../entity/groupPermission.entity';
@@ -57,7 +60,7 @@ export class PermissionService {
   }
 
   async deletePermission(id: string): Promise<Permission> {
-    if(this.checkPermissionUsage(id)){
+    if (this.checkPermissionUsage(id)) {
       throw new PermissionDeleteNotAllowedException(id);
     }
     await this.permissionsRepository.update(id, { active: false });
@@ -69,10 +72,14 @@ export class PermissionService {
   }
 
   private async checkPermissionUsage(id: string) {
-    const userCount = await this.userPermissionsRepository.count({where: {permissionId: id}});
-    const groupCount = await this.GroupPermission.count({where: {permissionId: id}});
-    
-    const totalCount = userCount + groupCount
-    return totalCount != 0
+    const userCount = await this.userPermissionsRepository.count({
+      where: { permissionId: id },
+    });
+    const groupCount = await this.GroupPermission.count({
+      where: { permissionId: id },
+    });
+
+    const totalCount = userCount + groupCount;
+    return totalCount != 0;
   }
 }
