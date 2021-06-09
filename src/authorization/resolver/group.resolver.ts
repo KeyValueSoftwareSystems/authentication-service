@@ -8,7 +8,6 @@ import {
   UpdateGroupPermissionInput,
 } from 'src/schema/graphql.schema';
 import Group from '../entity/group.entity';
-import GroupPermission from '../entity/groupPermission.entity';
 import { GroupService } from '../service/group.service';
 
 @Resolver('Group')
@@ -59,7 +58,9 @@ export class GroupResolver {
 
   @UseGuards(AuthGaurd)
   @Query()
-  async getGroupPermissions(@Args('id', ParseUUIDPipe) id: string): Promise<Permission[]> {
+  async getGroupPermissions(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<Permission[]> {
     return this.groupService.getGroupPermissions(id);
   }
 }

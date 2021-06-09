@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
 import {
   NewGroupInput,
   UpdateGroupInput,
@@ -14,6 +13,7 @@ import UserGroup from '../entity/userGroup.entity';
 import { GroupNotFoundException, GroupDeleteNotAllowedException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import {getConnection} from "typeorm";
+import GroupCacheService from './groupcache.service';
 
 @Injectable()
 export class GroupService {
@@ -26,7 +26,7 @@ export class GroupService {
     private groupPermissionRepository: Repository<GroupPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
-    private cacheManager: RedisCacheService,
+    private groupCacheService: GroupCacheService,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -72,7 +72,7 @@ export class GroupService {
     });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
-      await this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
+      await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
       return deletedGroup;
     }
     throw new GroupNotFoundException(id);
@@ -110,16 +110,19 @@ export class GroupService {
     const permissions = await this.permissionRepository.findByIds(
       savedGroupPermissions.map((g) => g.permissionId),
     );
-    this.cacheManager.del(`GROUP:${id}:PERMISSIONS`);
+    await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return permissions;
   }
 
   async getGroupPermissions(id: string): Promise<Permission[]> {
-
-    const permissions = await createQueryBuilder<Permission>("permission").
-    leftJoinAndSelect(GroupPermission, "groupPermission", "Permission.id = groupPermission.permissionId").
-    where("groupPermission.groupId = :groupId", {groupId: id}).
-    getMany();
+    const permissions = await createQueryBuilder<Permission>('permission')
+      .leftJoinAndSelect(
+        GroupPermission,
+        'groupPermission',
+        'Permission.id = groupPermission.permissionId',
+      )
+      .where('groupPermission.groupId = :groupId', { groupId: id })
+      .getMany();
     return permissions;
   }
 

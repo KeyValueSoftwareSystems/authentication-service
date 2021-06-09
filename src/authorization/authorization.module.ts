@@ -18,8 +18,10 @@ import { PermissionResolver } from './resolver/permission.resolver';
 import { UserResolver } from './resolver/user.resolver';
 import { EntityService } from './service/entity.service';
 import { GroupService } from './service/group.service';
+import GroupCacheService from './service/groupcache.service';
 import { PermissionService } from './service/permission.service';
 import UserService from './service/user.service';
+import UserCacheService from './service/usercache.service';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import UserService from './service/user.service';
     TypeOrmModule.forFeature([GroupPermission]),
     TypeOrmModule.forFeature([EntityModel]),
     TypeOrmModule.forFeature([EntityPermission]),
-    RedisCacheModule
+    RedisCacheModule,
   ],
   providers: [
     GroupResolver,
@@ -42,9 +44,11 @@ import UserService from './service/user.service';
     UserService,
     UserResolver,
     EntityResolver,
+    RedisCacheService,
+    UserCacheService,
+    GroupCacheService,
     AuthenticationHelper,
     ConfigService,
-    RedisCacheService
   ],
 })
 export class AuthorizationModule {}
