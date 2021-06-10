@@ -1,5 +1,5 @@
 import User from '../entity/user.entity';
-import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -42,5 +42,13 @@ export default class UserCacheService {
     permissionsFromCache ||
       (await this.cacheManager.set(`USER:${userId}:PERMISSIONS`, permissions));
     return permissionsFromCache || permissions;
+  }
+
+  async invalidateUserPermissionsCache(userId: string) {
+    await this.cacheManager.del(`USER:${userId}:PERMISSIONS`);
+  }
+
+  async invalidateUserGroupsCache(userId: string) {
+    await this.cacheManager.del(`USER:${userId}:GROUPS`);
   }
 }

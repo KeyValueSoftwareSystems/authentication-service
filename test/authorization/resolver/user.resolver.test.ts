@@ -13,6 +13,8 @@ import {
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
 import Group from 'src/authorization/entity/group.entity';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import { ConfigService } from '@nestjs/config';
 
 const users: User[] = [
   {
@@ -65,6 +67,8 @@ describe('User Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         UserResolver,
+        AuthenticationHelper,
+        ConfigService,
         { provide: 'UserService', useValue: userService },
       ],
     }).compile();

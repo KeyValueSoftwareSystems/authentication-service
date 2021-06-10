@@ -70,8 +70,9 @@ export class GroupService {
     }
     getConnection().manager.transaction(async (entityManager) => {
       const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
+      const groupsRepo = entityManager.getRepository(Group);
       await groupPermissionsRepo.delete({ groupId: id });
-      await this.groupsRepository.update(id, { active: false });
+      await groupsRepo.update(id, { active: false });
     });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {

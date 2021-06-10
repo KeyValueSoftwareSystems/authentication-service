@@ -14,7 +14,7 @@ import UserService from '../service/user.service';
 import ValidationPipe from '../../validation/validation.pipe';
 import * as UserSchema from '../validation/user.validation.schema';
 import { UseGuards } from '@nestjs/common';
-import { AuthGaurd } from 'src/authentication/authentication.gaurd';
+import { AuthGaurd } from '../../authentication/authentication.gaurd';
 
 @Resolver('User')
 export class UserResolver {

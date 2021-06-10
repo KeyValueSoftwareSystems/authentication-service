@@ -12,8 +12,7 @@ import Permission from 'src/authorization/entity/permission.entity';
 import UserGroup from 'src/authorization/entity/userGroup.entity';
 import UserPermission from 'src/authorization/entity/userPermission.entity';
 import UserCacheService from 'src/authorization/service/usercache.service';
-import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
-import { RedisCacheModule } from 'src/cache/redis-cache/redis-cache.module';
+import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 
 @Module({
   imports: [
@@ -23,7 +22,6 @@ import { RedisCacheModule } from 'src/cache/redis-cache/redis-cache.module';
     TypeOrmModule.forFeature([UserGroup]),
     TypeOrmModule.forFeature([UserPermission]),
     TypeOrmModule.forFeature([GroupPermission]),
-    RedisCacheModule,
     ConfigModule,
     RedisCacheModule,
   ],
@@ -33,7 +31,7 @@ import { RedisCacheModule } from 'src/cache/redis-cache/redis-cache.module';
     UserService,
     AuthenticationHelper,
     ConfigService,
-    RedisCacheService,
+    // RedisCacheService,
     UserCacheService,
   ],
 })

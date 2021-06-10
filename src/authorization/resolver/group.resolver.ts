@@ -1,6 +1,6 @@
 import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { AuthGaurd } from 'src/authentication/authentication.gaurd';
+import { AuthGaurd } from '../../authentication/authentication.gaurd';
 import {
   NewGroupInput,
   Permission,

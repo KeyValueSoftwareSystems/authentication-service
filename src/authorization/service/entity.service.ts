@@ -5,7 +5,7 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from 'src/schema/graphql.schema';
-import { createQueryBuilder, getConnection, Repository } from 'typeorm';
+import { createQueryBuilder, Entity, getConnection, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -61,8 +61,9 @@ export class EntityService {
       const entityPermissionsRepo = entityManager.getRepository(
         EntityPermission,
       );
-      entityPermissionsRepo.delete({ entityId: id });
-      await this.entityRepository.update(id, { active: false });
+      const entityRepo = entityManager.getRepository(EntityModel);
+      await entityPermissionsRepo.delete({ entityId: id });
+      await entityRepo.update(id, { active: false });
     });
     const deletedEntity = await this.entityRepository.findOne(id);
     if (deletedEntity) {

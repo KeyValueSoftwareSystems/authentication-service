@@ -1,7 +1,14 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
-import { In, Repository } from 'typeorm';
+import {
+  Connection,
+  createQueryBuilder,
+  EntityManager,
+  In,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
@@ -11,6 +18,11 @@ import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
 import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/common';
 
 const users: User[] = [
   {
@@ -50,13 +62,19 @@ describe('test UserService', () => {
   const groupPermissionRepository = Substitute.for<
     Repository<GroupPermission>
   >();
-
+  const userCacheService = Substitute.for<UserCacheService>();
+  const redisCacheService = Substitute.for<RedisCacheService>();
+  const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
+  const connection = Substitute.for<Connection>();
+  const entityManager = Substitute.for<EntityManager>();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
       controllers: [],
       providers: [
         UserService,
+        ConfigService,
+        AuthenticationHelper,
         {
           provide: 'UserRepository',
           useValue: userRepository,
@@ -80,6 +98,12 @@ describe('test UserService', () => {
         {
           provide: getRepositoryToken(GroupPermission),
           useValue: groupPermissionRepository,
+        },
+        { provide: 'UserCacheService', useValue: userCacheService },
+        { provide: 'RedisCacheService', useValue: redisCacheService },
+        {
+          provide: 'connection',
+          useValue: connection,
         },
       ],
     }).compile();
@@ -149,7 +173,24 @@ describe('test UserService', () => {
     userRepository
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
       .resolves(Arg.any());
+    userGroupRepository
+      .delete({ userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
+      .resolves(Arg.any());
+    userPermissionRepository
+      .delete({ userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
+      .resolves(Arg.any());
 
+    groupQueryBuilder
+      .leftJoinAndSelect(UserGroup, 'userGroup', 'Group.id = userGroup.groupId')
+      .returns(groupQueryBuilder);
+    groupQueryBuilder
+      .where('userGroup.userId = :userId', {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(groupQueryBuilder);
+    groupQueryBuilder.getMany().resolves([]);
+
+    connection.manager.returns(entityManager);
     const resp = await userService.deleteUser(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );

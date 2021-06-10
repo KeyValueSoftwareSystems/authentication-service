@@ -18,7 +18,7 @@ import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
-import { RedisCacheService } from 'src/cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 
 @Injectable()
 export default class UserService {
@@ -181,16 +181,17 @@ export default class UserService {
   async deleteUser(id: string): Promise<User> {
     getConnection().manager.transaction(async (entityManager) => {
       const userPermissionsRepo = entityManager.getRepository(UserPermission);
-      userPermissionsRepo.delete({ userId: id });
       const userGroupsRepo = entityManager.getRepository(UserGroup);
-      userGroupsRepo.delete({ userId: id });
-      this.usersRepository.update(id, { active: false });
+      const usersRepo = entityManager.getRepository(User);
+      await userPermissionsRepo.delete({ userId: id });
+      await userGroupsRepo.delete({ userId: id });
+      await usersRepo.update(id, { active: false });
     });
 
     const deletedUser = await this.usersRepository.findOne(id);
     if (deletedUser) {
-      await this.cacheManager.del(`USER:${id}:PERMISSIONS`);
-      await this.cacheManager.del(`USER:${id}:GROUPS`);
+      await this.userCacheService.invalidateUserPermissionsCache(id);
+      await this.userCacheService.invalidateUserGroupsCache(id);
       return deletedUser;
     }
     throw new UserNotFoundException(id);

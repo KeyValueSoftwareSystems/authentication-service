@@ -11,6 +11,8 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
 } from '../../../src/schema/graphql.schema';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -37,7 +39,9 @@ describe('Group Module', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
       providers: [
+        AuthenticationHelper,
         GroupResolver,
+        ConfigService,
         { provide: 'GroupService', useValue: groupService },
       ],
     }).compile();

@@ -12,7 +12,12 @@ import { GroupService } from '../../../src/authorization/service/group.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
-
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import UserGroup from '../../../src/authorization/entity/userGroup.entity';
+import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { ConfigService } from '@nestjs/config';
+import GroupCacheService from 'src/authorization/service/groupcache.service';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -36,12 +41,17 @@ describe('test Group Service', () => {
   const groupPermissionRepository = Substitute.for<
     Repository<GroupPermission>
   >();
+  const userGroupRepository = Substitute.for<Repository<UserGroup>>();
+  const groupCacheService = Substitute.for<GroupCacheService>();
+  const redisCacheService = Substitute.for<RedisCacheService>();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
       controllers: [],
       providers: [
         GroupService,
+        ConfigService,
+        AuthenticationHelper,
         {
           provide: getRepositoryToken(Group),
           useValue: groupRepository,
@@ -54,6 +64,12 @@ describe('test Group Service', () => {
           provide: getRepositoryToken(GroupPermission),
           useValue: groupPermissionRepository,
         },
+        {
+          provide: getRepositoryToken(UserGroup),
+          useValue: userGroupRepository,
+        },
+        { provide: 'GroupCacheService', useValue: groupCacheService },
+        { provide: 'RedisCacheService', useValue: redisCacheService },
       ],
     }).compile();
     groupService = moduleRef.get<GroupService>(GroupService);
