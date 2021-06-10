@@ -8,7 +8,6 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
-import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 
@@ -107,6 +106,16 @@ describe('test Permission service', () => {
     permissionRepository
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
       .resolves(Arg.any());
+    userPermissionRepository
+      .count({
+        where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
+      })
+      .returns(Promise.resolve(0));
+    groupPermissionRepository
+      .count({
+        where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
+      })
+      .returns(Promise.resolve(0));
 
     const resp = await permissionService.deletePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
