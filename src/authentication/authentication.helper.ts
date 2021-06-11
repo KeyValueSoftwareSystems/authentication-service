@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import User from 'src/authorization/entity/user.entity';
+import User from '../authorization/entity/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 
@@ -9,7 +9,8 @@ export class AuthenticationHelper {
   constructor(private configService: ConfigService) {}
 
   createToken(userDetails: User) {
-    const expiresIn = 60 * 60;
+    const expiresIn =
+      this.configService.get('JWT_TOKEN_EXPTIME') * 1 || 60 * 60;
     const secret = this.configService.get('JWT_SECRET') as string;
     const username = userDetails.email || userDetails.phone;
 
@@ -23,7 +24,7 @@ export class AuthenticationHelper {
   }
 
   validateAuthToken(request: { headers: { authorization: string } }) {
-    const secret = process.env.JWT_SECRET || '';
+    const secret = this.configService.get('JWT_SECRET') || '';
     const reqAuthToken = request.headers.authorization.split(' ')[1];
     const verificationResponse: any = jwt.verify(reqAuthToken, secret);
     return verificationResponse;

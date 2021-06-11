@@ -8,12 +8,11 @@ type User {
   active: Boolean!
 }
 
-input NewUserInput {
-  email: String
-  firstName: String!
-  middleName: String
-  lastName: String!
+enum OperationType {
+  OR
+  AND
 }
+
 
 input UpdateUserInput {
   firstName: String
@@ -42,14 +41,25 @@ type UserPermissions {
   active: Boolean
 }
 
+enum OperationType {
+  AND
+  OR
+}
+
+input UserPermissionsVerification {
+permissions: [String]!,
+operation: OperationType
+}
+
 type Query {
   getUsers: [User]!
   getUser(id: ID!): User
+  verifyUserPermission(id: ID!, params: UserPermissionsVerification!): Boolean
 }
 
 type Mutation {
-  updateUser(id: ID!, input: UpdateUserInput): User
+  updateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): User
-  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput): [UserPermissions]
-  updateUserGroups(id: ID!, input: UpdateUserGroupInput): [UserGroupResponse]
+  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput!): [UserPermissions]
+  updateUserGroups(id: ID!, input: UpdateUserGroupInput!): [UserGroupResponse]
 }

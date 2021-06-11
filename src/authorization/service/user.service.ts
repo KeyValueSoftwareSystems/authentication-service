@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
-  NewUserInput,
+  OperationType,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -14,8 +14,9 @@ import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
-import { PermissionNotFoundException } from '../exception/permission.exception';
+import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
+import { PermissionNotFoundException } from '../exception/permission.exception';
 
 @Injectable()
 export default class UserService {
@@ -30,6 +31,8 @@ export default class UserService {
     private userPermissionRepository: Repository<UserPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
+    @InjectRepository(GroupPermission)
+    private groupPermissionRepository: Repository<GroupPermission>,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -48,7 +51,7 @@ export default class UserService {
     throw new UserNotFoundException(id);
   }
 
-  async createUser(user: NewUserInput): Promise<User> {
+  async createUser(user: User): Promise<User> {
     const newUser = await this.usersRepository.create(user);
     const createdUser = await this.usersRepository.save(newUser);
     const savedUser = await this.usersRepository.findOne(createdUser.id, {
@@ -57,7 +60,7 @@ export default class UserService {
     if (savedUser) {
       return savedUser;
     }
-    throw new UserNotFoundException(user.email || ''); //FIXME: Email is now not mandatory.
+    throw new UserNotFoundException(user.email || user.phone || '');
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
@@ -145,6 +148,51 @@ export default class UserService {
       return deletedUser;
     }
     throw new UserNotFoundException(id);
+  }
+
+  async verifyUserPermissions(
+    id: string,
+    permissionToVerify: string[],
+    operation: OperationType = OperationType.AND,
+  ): Promise<boolean> {
+    const userGroups = await this.userGroupRepository.find({
+      where: { userId: id },
+    });
+    const permissionsRequired = await this.permissionRepository.find({
+      where: { name: In(permissionToVerify) },
+    });
+    if (permissionsRequired.length !== permissionToVerify.length) {
+      const validPermissions = new Set(permissionsRequired.map((p) => p.name));
+      throw new PermissionNotFoundException(
+        permissionToVerify.filter((p) => !validPermissions.has(p)).toString(),
+      );
+    }
+    const groupPermissions = (
+      await this.groupPermissionRepository.find({
+        where: { groupId: In(userGroups.map((x) => x.groupId)) },
+      })
+    ).map((x) => x.permissionId);
+    const userPermissions = (
+      await this.userPermissionRepository.find({ where: { userId: id } })
+    ).map((x) => x.permissionId);
+
+    const allPermissionsOfUser = new Set(
+      userPermissions.concat(groupPermissions),
+    );
+    const requiredPermissionsWithUser = permissionsRequired
+      .map((x) => x.id)
+      .filter((x) => allPermissionsOfUser.has(x));
+    switch (operation) {
+      case OperationType.AND:
+        return (
+          permissionsRequired.length > 0 &&
+          requiredPermissionsWithUser.length === permissionsRequired.length
+        );
+      case OperationType.OR:
+        return requiredPermissionsWithUser.length > 0;
+      default:
+        return false;
+    }
   }
 
   async getUserDetailsByEmailOrPhone(

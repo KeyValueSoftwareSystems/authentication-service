@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-class Group {
+class EntityModel {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
@@ -12,4 +12,4 @@ class Group {
   public active!: boolean;
 }
 
-export default Group;
+export default EntityModel;

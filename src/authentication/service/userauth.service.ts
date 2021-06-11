@@ -1,21 +1,22 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   TokenResponse,
   UserLoginInput,
   UserSignupInput,
   UserSignupResponse,
 } from 'src/schema/graphql.schema';
-import User from 'src/authorization/entity/user.entity';
-import UserService from 'src/authorization/service/user.service';
-import { UserNotFoundException } from 'src/authorization/exception/user.exception';
+import User from '../../authorization/entity/user.entity';
+import UserService from '../../authorization/service/user.service';
+import { UserNotFoundException } from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
+import {
+  InvalidCredentialsException,
+  InvalidPayloadException,
+  UserExistsException,
+} from '../exception/userauth.exception';
 
 @Injectable()
-export class UserauthService {
+export default class UserauthService {
   constructor(
     private userService: UserService,
     private authenticationHelper: AuthenticationHelper,
@@ -27,8 +28,8 @@ export class UserauthService {
       userDetails.phone,
     );
     if (existingUserDetails) {
-      throw new BadRequestException(
-        'User details exist. Cannot signup this user.',
+      throw new UserExistsException(
+        userDetails.email || userDetails.phone || '',
       );
     }
 
@@ -67,9 +68,7 @@ export class UserauthService {
         const tokenData = this.authenticationHelper.createToken(userRecord);
         return tokenData;
       }
-      throw new UnauthorizedException({
-        error: 'Invalid credentials',
-      });
+      throw new InvalidCredentialsException();
     }
     throw new UserNotFoundException(userDetails.username);
   }
@@ -100,9 +99,7 @@ export class UserauthService {
         );
         return userRecord;
       }
-      throw new BadRequestException({
-        error: 'Current password is incorrect',
-      });
+      throw new InvalidPayloadException('Current password is incorrect');
     }
     throw new UserNotFoundException(username);
   }
