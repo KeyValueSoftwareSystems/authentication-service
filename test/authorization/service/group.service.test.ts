@@ -14,7 +14,6 @@ import GroupPermission from '../../../src/authorization/entity/groupPermission.e
 import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import UserGroup from '../../../src/authorization/entity/userGroup.entity';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import { ConfigService } from '@nestjs/config';
 import GroupCacheService from 'src/authorization/service/groupcache.service';

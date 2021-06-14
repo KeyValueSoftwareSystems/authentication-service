@@ -1,6 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createQueryBuilder, getConnection, In, Repository } from 'typeorm';
+import {
+  Connection,
+  createQueryBuilder,
+  getConnection,
+  In,
+  Repository,
+} from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -19,6 +25,7 @@ import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
+import GroupCacheService from './groupcache.service';
 
 @Injectable()
 export default class UserService {
@@ -36,7 +43,9 @@ export default class UserService {
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: Repository<GroupPermission>,
     private userCacheService: UserCacheService,
+    private groupCacheService: GroupCacheService,
     private cacheManager: RedisCacheService,
+    private connection: Connection,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -86,6 +95,7 @@ export default class UserService {
     await this.getUserById(id);
     const groupsInRequest = await this.groupRepository.findByIds(user.groups);
     const existingGroupsOfUser = await this.getUserGroups(id);
+
     const validGroupsInRequest: Set<string> = new Set(
       groupsInRequest.map((p) => p.id),
     );
@@ -101,19 +111,21 @@ export default class UserService {
     const userGroups = this.userGroupRepository.create(
       user.groups.map((group) => ({ userId: id, groupId: group })),
     );
-    await getConnection().manager.transaction(async (entityManager) => {
+
+    await this.connection.manager.transaction(async (entityManager) => {
       const userGroupsRepo = entityManager.getRepository(UserGroup);
       await userGroupsRepo.remove(groupsToBeRemovedFromUser);
       await userGroupsRepo.save(userGroups);
     });
 
     const groups = await this.getUserGroups(id);
-    await this.cacheManager.del(`USER:${id}:GROUPS`);
+    await this.userCacheService.invalidateUserGroupsCache(id);
     return groups;
   }
 
   async getUserGroups(id: string): Promise<Group[]> {
-    const groups = await createQueryBuilder<Group>('group')
+    const groups = await this.groupRepository
+      .createQueryBuilder()
       .leftJoinAndSelect(UserGroup, 'userGroup', 'Group.id = userGroup.groupId')
       .where('userGroup.userId = :userId', { userId: id })
       .getMany();
@@ -150,7 +162,8 @@ export default class UserService {
         permissionId: permission,
       })),
     );
-    const userPermissionsUpdated = await getConnection().manager.transaction(
+
+    const userPermissionsUpdated = await this.connection.transaction(
       async (entityManager) => {
         const userPermissionsRepo = entityManager.getRepository(UserPermission);
         await userPermissionsRepo.remove(userPermissionsToBeRemoved);
@@ -162,12 +175,13 @@ export default class UserService {
       userPermissionsUpdated.map((u) => u.permissionId),
     );
 
-    this.cacheManager.del(`USER:${id}:PERMISSIONS`);
+    await this.userCacheService.invalidateUserPermissionsCache(id);
     return userPermissions;
   }
 
   async getUserPermissions(id: string): Promise<Permission[]> {
-    const permissions = await createQueryBuilder<Permission>('permission')
+    const permissions = await this.permissionRepository
+      .createQueryBuilder()
       .leftJoinAndSelect(
         UserPermission,
         'userPermission',
@@ -179,7 +193,7 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    getConnection().manager.transaction(async (entityManager) => {
+    await this.connection.manager.transaction(async (entityManager) => {
       const userPermissionsRepo = entityManager.getRepository(UserPermission);
       const userGroupsRepo = entityManager.getRepository(UserGroup);
       const usersRepo = entityManager.getRepository(User);
@@ -202,7 +216,7 @@ export default class UserService {
     const groupPermissions: string[] = (
       await Promise.all(
         userGroups.map((x) =>
-          this.userCacheService.getUserPermissionsByUserId(x),
+          this.groupCacheService.getGroupPermissionsFromGroupId(x),
         ),
       )
     ).flat(1);

@@ -13,6 +13,7 @@ import UserGroup from 'src/authorization/entity/userGroup.entity';
 import UserPermission from 'src/authorization/entity/userPermission.entity';
 import UserCacheService from 'src/authorization/service/usercache.service';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
+import GroupCacheService from 'src/authorization/service/groupcache.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
     ConfigService,
     // RedisCacheService,
     UserCacheService,
+    GroupCacheService,
   ],
 })
 export class UserauthModule {}

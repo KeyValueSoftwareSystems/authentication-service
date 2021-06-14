@@ -4,7 +4,7 @@ import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   PermissionNotFoundException,
   PermissionDeleteNotAllowedException,

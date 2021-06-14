@@ -1,5 +1,4 @@
-import { type } from 'node:os';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 class GroupPermission {

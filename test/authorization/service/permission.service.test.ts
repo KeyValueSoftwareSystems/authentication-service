@@ -8,7 +8,6 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
-import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 
