@@ -15,7 +15,6 @@ import {
   GroupDeleteNotAllowedException,
 } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import { getConnection } from 'typeorm';
 import GroupCacheService from './groupcache.service';
 
 @Injectable()
@@ -64,16 +63,10 @@ export class GroupService {
 
   async deleteGroup(id: string): Promise<Group> {
     const usage = await this.checkGroupUsage(id);
-    console.log(usage);
     if (usage) {
       throw new GroupDeleteNotAllowedException(id);
     }
-    getConnection().manager.transaction(async (entityManager) => {
-      const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
-      const groupsRepo = entityManager.getRepository(Group);
-      await groupPermissionsRepo.delete({ groupId: id });
-      await groupsRepo.update(id, { active: false });
-    });
+    await this.groupsRepository.update(id, { active: false });
     const deletedGroup = await this.groupsRepository.findOne(id);
     if (deletedGroup) {
       await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);

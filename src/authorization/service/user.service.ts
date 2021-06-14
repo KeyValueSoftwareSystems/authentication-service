@@ -193,15 +193,8 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    await this.connection.manager.transaction(async (entityManager) => {
-      const userPermissionsRepo = entityManager.getRepository(UserPermission);
-      const userGroupsRepo = entityManager.getRepository(UserGroup);
-      const usersRepo = entityManager.getRepository(User);
-      await userPermissionsRepo.delete({ userId: id });
-      await userGroupsRepo.delete({ userId: id });
-      await usersRepo.update(id, { active: false });
-    });
 
+    await this.usersRepository.update(id, { active: false });
     const deletedUser = await this.usersRepository.findOne(id);
     if (deletedUser) {
       await this.userCacheService.invalidateUserPermissionsCache(id);

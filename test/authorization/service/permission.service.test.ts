@@ -10,6 +10,7 @@ import { PermissionService } from '../../../src/authorization/service/permission
 import Permission from '../../../src/authorization/entity/permission.entity';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
+import { PermissionDeleteNotAllowedException } from '../../../src/authorization/exception/permission.exception';
 
 const permissions: Permission[] = [
   {
@@ -122,4 +123,22 @@ describe('test Permission service', () => {
     );
     expect(resp).toEqual(permissions[0]);
   });
+
+  it('should throw exception when deleting a permission in usage', async () => {
+    userPermissionRepository
+      .count({
+        where: { permissionId: '0d88ef27-dd26-4a01-bfef-4d703bcdb05d' },
+      })
+      .returns(Promise.resolve(1));
+    groupPermissionRepository
+      .count({
+        where: { permissionId: '0d88ef27-dd26-4a01-bfef-4d703bcdb05d' },
+      })
+      .returns(Promise.resolve(0));
+
+    const resp = permissionService.deletePermission(
+      '0d88ef27-dd26-4a01-bfef-4d703bcdb05d',
+    );
+    await expect(resp).rejects.toThrowError(new PermissionDeleteNotAllowedException('0d88ef27-dd26-4a01-bfef-4d703bcdb05d'));
+  })
 });

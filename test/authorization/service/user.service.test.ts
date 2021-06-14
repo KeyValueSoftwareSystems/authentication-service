@@ -20,6 +20,7 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import GroupCacheService from 'src/authorization/service/groupcache.service';
+import { ConfigService } from '@nestjs/config';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
