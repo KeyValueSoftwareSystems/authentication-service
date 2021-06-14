@@ -21,7 +21,7 @@ export class PermissionService {
     @InjectRepository(UserPermission)
     private userPermissionsRepository: Repository<UserPermission>,
     @InjectRepository(GroupPermission)
-    private GroupPermission: Repository<GroupPermission>,
+    private groupPermissionRepository: Repository<GroupPermission>,
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
@@ -60,7 +60,7 @@ export class PermissionService {
   }
 
   async deletePermission(id: string): Promise<Permission> {
-    if (this.checkPermissionUsage(id)) {
+    if (await this.checkPermissionUsage(id)) {
       throw new PermissionDeleteNotAllowedException(id);
     }
     await this.permissionsRepository.update(id, { active: false });
@@ -75,7 +75,7 @@ export class PermissionService {
     const userCount = await this.userPermissionsRepository.count({
       where: { permissionId: id },
     });
-    const groupCount = await this.GroupPermission.count({
+    const groupCount = await this.groupPermissionRepository.count({
       where: { permissionId: id },
     });
 
