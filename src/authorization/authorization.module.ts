@@ -36,7 +36,7 @@ import UserService from './service/user.service';
     PermissionResolver,
     UserService,
     UserResolver,
-    EntityResolver
+    EntityResolver,
   ],
 })
 export class AuthorizationModule {}

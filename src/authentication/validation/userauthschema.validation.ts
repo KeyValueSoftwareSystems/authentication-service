@@ -23,3 +23,12 @@ export const UserPasswordInputSchema = Joi.object({
     .required()
     .min(10),
 }).options({ abortEarly: false });
+
+export const GoogleUserSchema = Joi.object({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  firstName: Joi.string().required(),
+  middleName: Joi.string(),
+  lastName: Joi.string().required(),
+}).options({ abortEarly: false });

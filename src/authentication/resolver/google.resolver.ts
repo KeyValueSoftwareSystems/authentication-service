@@ -7,6 +7,6 @@ export class GoogleAuthResolver {
 
   @Mutation('google')
   async googleLogin(@Args('input') request: any) {
-    return this.googleAuthService.login(request);
+    return this.googleAuthService.googleLogin(request);
   }
 }

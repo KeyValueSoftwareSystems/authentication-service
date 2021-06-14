@@ -57,9 +57,10 @@ export default class UserauthService {
     );
 
     if (userRecord && userRecord.active) {
-      const hashedPassword = userRecord.password;
+      const hashedPassword = userRecord.password as string;
       const plainTextPassword = userDetails.password as string;
       if (
+        hashedPassword != null &&
         this.authenticationHelper.isPasswordValid(
           plainTextPassword,
           hashedPassword,
@@ -85,7 +86,7 @@ export default class UserauthService {
       if (
         this.authenticationHelper.isPasswordValid(
           passwordDetails.currentPassword,
-          userRecord.password,
+          userRecord.password as string,
         )
       ) {
         const hashedPassword = this.authenticationHelper.generatePasswordHash(
