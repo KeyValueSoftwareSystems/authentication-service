@@ -1,9 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
-import { In, Repository } from 'typeorm';
+import { Connection, In, Repository, SelectQueryBuilder } from 'typeorm';
 import UserService from '../../../src/authorization/service/user.service';
-import { Arg, Substitute } from '@fluffy-spoon/substitute';
+import { Arg, Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
@@ -11,7 +11,11 @@ import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
 import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
-
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import GroupCacheService from 'src/authorization/service/groupcache.service';
+import { ConfigService } from '@nestjs/config';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -45,11 +49,21 @@ describe('test UserService', () => {
   const userRepository = Substitute.for<Repository<User>>();
   const groupRepository = Substitute.for<Repository<Group>>();
   const permissionRepository = Substitute.for<Repository<Permission>>();
-  const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
+  const userPermissionRepository: SubstituteOf<
+    Repository<UserPermission>
+  > = Substitute.for<Repository<UserPermission>>();
   const userGroupRepository = Substitute.for<Repository<UserGroup>>();
   const groupPermissionRepository = Substitute.for<
     Repository<GroupPermission>
   >();
+  const userCacheService = Substitute.for<UserCacheService>();
+  const groupCacheService = Substitute.for<GroupCacheService>();
+  const redisCacheService = Substitute.for<RedisCacheService>();
+  const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
+  const permissionQueryBuilder = Substitute.for<
+    SelectQueryBuilder<Permission>
+  >();
+  const connectionMock = Substitute.for<Connection>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -57,6 +71,8 @@ describe('test UserService', () => {
       controllers: [],
       providers: [
         UserService,
+        ConfigService,
+        AuthenticationHelper,
         {
           provide: 'UserRepository',
           useValue: userRepository,
@@ -80,6 +96,13 @@ describe('test UserService', () => {
         {
           provide: getRepositoryToken(GroupPermission),
           useValue: groupPermissionRepository,
+        },
+        { provide: 'UserCacheService', useValue: userCacheService },
+        { provide: 'GroupCacheService', useValue: groupCacheService },
+        { provide: 'RedisCacheService', useValue: redisCacheService },
+        {
+          provide: Connection,
+          useValue: connectionMock,
         },
       ],
     }).compile();
@@ -146,10 +169,6 @@ describe('test UserService', () => {
   });
 
   it('should delete a user', async () => {
-    userRepository
-      .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
-      .resolves(Arg.any());
-
     const resp = await userService.deleteUser(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
@@ -165,9 +184,37 @@ describe('test UserService', () => {
     ];
     userPermissionRepository.create(request).returns(request);
     userPermissionRepository.save(request).resolves(request);
+    userPermissionRepository.remove([]).resolves(Arg.any());
+    permissionRepository
+      .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'], {
+        where: { active: true },
+      })
+      .resolves(permissions);
     permissionRepository
       .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
       .resolves(permissions);
+    permissionRepository.createQueryBuilder().returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .leftJoinAndSelect(
+        UserPermission,
+        'userPermission',
+        'Permission.id = userPermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder
+      .where('userPermission.userId = :userId', {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder.getMany().resolves([]);
+
+    connectionMock.transaction(Arg.any()).resolves(request);
+
+    userCacheService.invalidateUserPermissionsCache(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    );
 
     const resp = await userService.updateUserPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -186,7 +233,9 @@ describe('test UserService', () => {
     userPermissionRepository.create(request).returns(request);
     userPermissionRepository.save(request).resolves(request);
     permissionRepository
-      .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'])
+      .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'], {
+        where: { active: true },
+      })
       .resolves([]);
 
     const resp = userService.updateUserPermissions(
@@ -212,7 +261,17 @@ describe('test UserService', () => {
     groupRepository
       .findByIds(['39d338b9-02bd-4971-a24e-b39a3f475580'])
       .resolves(groups);
-
+    groupRepository.createQueryBuilder().returns(groupQueryBuilder);
+    groupQueryBuilder
+      .leftJoinAndSelect(UserGroup, 'userGroup', 'Group.id = userGroup.groupId')
+      .returns(groupQueryBuilder);
+    groupQueryBuilder
+      .where('userGroup.userId = :userId', {
+        userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(groupQueryBuilder);
+    groupQueryBuilder.getMany().resolves(groups);
+    userCacheService.invalidateUserGroupsCache(Arg.any()).resolves(Arg.any());
     const resp = await userService.updateUserGroups(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       { groups: ['39d338b9-02bd-4971-a24e-b39a3f475580'] },
@@ -284,7 +343,15 @@ describe('test UserService', () => {
     permissionRepository
       .find({ where: { name: In(['CreateUser']) } })
       .resolves(permissions);
-
+    userCacheService
+      .getUserGroupsByUserId('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(userGroups.map((x) => x.groupId));
+    userCacheService
+      .getUserPermissionsByUserId('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(userPermissions.map((x) => x.permissionId));
+    groupCacheService
+      .getGroupPermissionsFromGroupId('91742290-4049-45c9-9c27-c9f6200fef4c')
+      .resolves(groupPermissions.map((x) => x.permissionId));
     const resp = await userService.verifyUserPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       ['CreateUser'],
@@ -332,7 +399,15 @@ describe('test UserService', () => {
     permissionRepository
       .find({ where: { name: In(['CreateEmployee']) } })
       .resolves(permissions);
-
+    userCacheService
+      .getUserGroupsByUserId('f95e6f6d-7678-4871-9e08-c3f23b87c3ff')
+      .resolves(userGroups.map((x) => x.groupId));
+    userCacheService
+      .getUserPermissionsByUserId('f95e6f6d-7678-4871-9e08-c3f23b87c3ff')
+      .resolves(userPermissions.map((x) => x.permissionId));
+    groupCacheService
+      .getGroupPermissionsFromGroupId('a8f55c77-4f8f-4a12-99f9-8962144e08f0')
+      .resolves(groupPermissions.map((x) => x.permissionId));
     const resp = await userService.verifyUserPermissions(
       'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
       ['CreateUser'],

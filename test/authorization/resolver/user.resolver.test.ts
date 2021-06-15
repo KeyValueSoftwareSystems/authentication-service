@@ -13,6 +13,8 @@ import {
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
 import Group from 'src/authorization/entity/group.entity';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import { ConfigService } from '@nestjs/config';
 
 const users: User[] = [
   {
@@ -60,15 +62,21 @@ const userService = Substitute.for<UserService>();
 describe('User Module', () => {
   let app: INestApplication;
 
+  const configService = Substitute.for<ConfigService>();
+  let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
       providers: [
         UserResolver,
+        AuthenticationHelper,
+        { provide: 'ConfigService', useValue: configService },
         { provide: 'UserService', useValue: userService },
       ],
     }).compile();
-
+    authenticationHelper = moduleFixture.get<AuthenticationHelper>(
+      AuthenticationHelper,
+    );
     app = moduleFixture.createNestApplication();
     await app.init();
   });
@@ -80,9 +88,14 @@ describe('User Module', () => {
   describe(gql, () => {
     describe('users', () => {
       it('should get the user array', () => {
+        configService.get('JWT_SECRET').returns('s3cr3t1234567890');
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         userService.getAllUsers().returns(Promise.resolve(users));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query: '{getUsers { id email phone firstName lastName active }}',
           })
@@ -93,11 +106,14 @@ describe('User Module', () => {
       });
 
       it('should get single user', () => {
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
         userService
           .getUserById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName active }}',
@@ -109,6 +125,9 @@ describe('User Module', () => {
       });
 
       it('should update a user', () => {
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         const input: UpdateUserInput = {
           firstName: 'Test1',
           lastName: 'Test2',
@@ -122,6 +141,7 @@ describe('User Module', () => {
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { updateUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {firstName: "Test1", lastName: "Test2"}) {id email phone firstName lastName active }}',
@@ -133,11 +153,14 @@ describe('User Module', () => {
       });
 
       it('should delete a user', () => {
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
         userService
           .deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { deleteUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id email phone firstName lastName active }}',
@@ -152,6 +175,8 @@ describe('User Module', () => {
         const input: UpdateUserPermissionInput = {
           permissions: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
         };
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
         const obj = Object.create(null);
         userService
           .updateUserPermissions(
@@ -162,6 +187,7 @@ describe('User Module', () => {
 
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { updateUserPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
@@ -176,6 +202,8 @@ describe('User Module', () => {
         const input: UpdateUserGroupInput = {
           groups: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
         };
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
         const obj = Object.create(null);
         userService
           .updateUserGroups(
@@ -186,6 +214,7 @@ describe('User Module', () => {
 
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { updateUserGroups(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {groups: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',

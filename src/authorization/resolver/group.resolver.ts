@@ -1,5 +1,6 @@
-import { ParseUUIDPipe } from '@nestjs/common';
+import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { AuthGaurd } from '../../authentication/authentication.gaurd';
 import {
   NewGroupInput,
   Permission,
@@ -13,21 +14,25 @@ import { GroupService } from '../service/group.service';
 export class GroupResolver {
   constructor(private groupService: GroupService) {}
 
+  @UseGuards(AuthGaurd)
   @Query()
   getGroups(): Promise<Group[]> {
     return this.groupService.getAllGroups();
   }
 
+  @UseGuards(AuthGaurd)
   @Query()
   getGroup(@Args('id', ParseUUIDPipe) id: string): Promise<Group> {
     return this.groupService.getGroupById(id);
   }
 
+  @UseGuards(AuthGaurd)
   @Mutation()
   async createGroup(@Args('input') groupInput: NewGroupInput): Promise<Group> {
     return this.groupService.createGroup(groupInput);
   }
 
+  @UseGuards(AuthGaurd)
   @Mutation()
   async updateGroup(
     @Args('id', ParseUUIDPipe) id: string,
@@ -36,6 +41,7 @@ export class GroupResolver {
     return this.groupService.updateGroup(id, groupInput);
   }
 
+  @UseGuards(AuthGaurd)
   @Mutation()
   async updateGroupPermissions(
     @Args('id', ParseUUIDPipe) id: string,
@@ -44,8 +50,17 @@ export class GroupResolver {
     return this.groupService.updateGroupPermissions(id, groupInput);
   }
 
+  @UseGuards(AuthGaurd)
   @Mutation()
   async deleteGroup(@Args('id', ParseUUIDPipe) id: string): Promise<Group> {
     return this.groupService.deleteGroup(id);
+  }
+
+  @UseGuards(AuthGaurd)
+  @Query()
+  async getGroupPermissions(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<Permission[]> {
+    return this.groupService.getGroupPermissions(id);
   }
 }

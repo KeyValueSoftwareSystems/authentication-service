@@ -1,12 +1,10 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 @Entity()
 class UserGroup {
-  @Column()
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'uuid' })
   public groupId!: string;
 
-  @PrimaryColumn()
-  @Column()
+  @PrimaryColumn({ type: 'uuid' })
   public userId!: string;
 }
 

@@ -15,6 +15,8 @@ import UserauthService from '../../../src/authentication/service/userauth.servic
 import UserauthResolver from '../../../src/authentication/resolver/userauth.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
+import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 
 const users: User[] = [
   {
@@ -33,6 +35,8 @@ const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
 const userauthService = Substitute.for<UserauthService>();
+const userCacheService = Substitute.for<UserCacheService>();
+const redisCacheService = Substitute.for<RedisCacheService>();
 
 describe('Userauth Module', () => {
   let app: INestApplication;
@@ -49,6 +53,8 @@ describe('Userauth Module', () => {
         { provide: 'UserService', useValue: userService },
         { provide: 'UserauthService', useValue: userauthService },
         { provide: 'ConfigService', useValue: configService },
+        { provide: 'UserCacheService', useValue: userCacheService },
+        { provide: 'RedisCacheService', useValue: redisCacheService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

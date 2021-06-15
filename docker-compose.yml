@@ -46,6 +46,18 @@ services:
     networks:
       - authnet
 
+  redis:
+    container_name: cache
+    image: 'redis'
+    expose:
+      - '${REDIS_PORT}'
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    env_file:
+      - docker.env
+    networks:
+      - authnet
+
 networks:
   authnet:
     driver: bridge

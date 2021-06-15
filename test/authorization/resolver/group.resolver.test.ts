@@ -11,8 +11,24 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
 } from '../../../src/schema/graphql.schema';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import { ConfigService } from '@nestjs/config';
+import User from '../../../src/authorization/entity/user.entity';
 
 const gql = '/graphql';
+
+const users: User[] = [
+  {
+    id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    email: 'user@test.com',
+    phone: '9112345678910',
+    password: 's3cr3t1234567890',
+    firstName: 'Test1',
+    lastName: 'Test2',
+    active: true,
+    updatedDate: new Date(),
+  },
+];
 
 const groups: Group[] = [
   {
@@ -33,15 +49,21 @@ const groupService = Substitute.for<GroupService>();
 describe('Group Module', () => {
   let app: INestApplication;
 
+  const configService = Substitute.for<ConfigService>();
+  let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
       providers: [
+        AuthenticationHelper,
         GroupResolver,
+        { provide: 'ConfigService', useValue: configService },
         { provide: 'GroupService', useValue: groupService },
       ],
     }).compile();
-
+    authenticationHelper = moduleFixture.get<AuthenticationHelper>(
+      AuthenticationHelper,
+    );
     app = moduleFixture.createNestApplication();
     await app.init();
   });
@@ -52,9 +74,14 @@ describe('Group Module', () => {
   describe(gql, () => {
     describe('groups', () => {
       it('should get the groups', () => {
+        configService.get('JWT_SECRET').returns('s3cr3t1234567890');
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         groupService.getAllGroups().returns(Promise.resolve(groups));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({ query: '{getGroups {id name active }}' })
           .expect(200)
           .expect((res) => {
@@ -63,11 +90,15 @@ describe('Group Module', () => {
       });
 
       it('should get single group', () => {
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         groupService
           .getGroupById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(groups[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               '{getGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
@@ -83,11 +114,15 @@ describe('Group Module', () => {
           name: 'Test1',
         };
         const obj = Object.create(null);
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         groupService
           .createGroup(Object.assign(obj, input))
           .returns(Promise.resolve(groups[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { createGroup(input: {name: "Test1"}) {id name active }}',
@@ -103,6 +138,9 @@ describe('Group Module', () => {
           name: 'Test1',
         };
         const obj = Object.create(null);
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         groupService
           .updateGroup(
             'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -111,6 +149,7 @@ describe('Group Module', () => {
           .returns(Promise.resolve(groups[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { updateGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {name: "Test1"}) {id name active }}',
@@ -122,11 +161,15 @@ describe('Group Module', () => {
       });
 
       it('should delete a group', () => {
+        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const token = tokenResponse.token;
+
         groupService
           .deleteGroup('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(groups[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { deleteGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
@@ -150,8 +193,12 @@ describe('Group Module', () => {
         )
         .resolves(permissions);
 
+      const tokenResponse = authenticationHelper.createToken(users[0]);
+      const token = tokenResponse.token;
+
       return request(app.getHttpServer())
         .post(gql)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           query:
             'mutation { updateGroupPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
