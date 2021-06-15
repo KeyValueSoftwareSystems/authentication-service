@@ -139,6 +139,10 @@ describe('test Permission service', () => {
     const resp = permissionService.deletePermission(
       '0d88ef27-dd26-4a01-bfef-4d703bcdb05d',
     );
-    await expect(resp).rejects.toThrowError(new PermissionDeleteNotAllowedException('0d88ef27-dd26-4a01-bfef-4d703bcdb05d'));
-  })
+    await expect(resp).rejects.toThrowError(
+      new PermissionDeleteNotAllowedException(
+        '0d88ef27-dd26-4a01-bfef-4d703bcdb05d',
+      ),
+    );
+  });
 });

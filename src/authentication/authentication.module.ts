@@ -32,7 +32,6 @@ import GroupCacheService from 'src/authorization/service/groupcache.service';
     UserService,
     AuthenticationHelper,
     ConfigService,
-    // RedisCacheService,
     UserCacheService,
     GroupCacheService,
   ],

@@ -1,12 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
-import {
-  Connection,
-  In,
-  Repository,
-  SelectQueryBuilder,
-} from 'typeorm';
+import { Connection, In, Repository, SelectQueryBuilder } from 'typeorm';
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
@@ -174,20 +169,6 @@ describe('test UserService', () => {
   });
 
   it('should delete a user', async () => {
-    // userRepository
-    //   .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
-    //   .resolves(Arg.any());
-    // userGroupRepository
-    //   .delete({ userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
-    //   .resolves(Arg.any());
-    // userPermissionRepository
-    //   .delete({ userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
-    //   .resolves(Arg.any());
-
-    // connection.transaction(Arg.any()).resolves(Arg.any());
-    // userCacheService.invalidateUserPermissionsCache(Arg.any()).resolves(Arg.any());
-    // userCacheService.invalidateUserGroupsCache(Arg.any()).resolves(Arg.any());
-
     const resp = await userService.deleteUser(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );

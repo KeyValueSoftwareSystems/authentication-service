@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Connection,
-  createQueryBuilder,
-  getConnection,
   In,
   Repository,
 } from 'typeorm';
@@ -193,7 +191,6 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-
     await this.usersRepository.update(id, { active: false });
     const deletedUser = await this.usersRepository.findOne(id);
     if (deletedUser) {
