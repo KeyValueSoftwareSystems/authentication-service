@@ -271,7 +271,6 @@ describe('test UserService', () => {
       })
       .returns(groupQueryBuilder);
     groupQueryBuilder.getMany().resolves(groups);
-    // connection.transaction(Arg.any()).resolves(Arg.any());
     userCacheService.invalidateUserGroupsCache(Arg.any()).resolves(Arg.any());
     const resp = await userService.updateUserGroups(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
