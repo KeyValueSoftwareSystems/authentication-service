@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { AppGraphQLModule } from './graphql/graphql.module';
 import { UserauthModule } from './authentication/authentication.module';
 import { AuthorizationModule } from './authorization/authorization.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthorizationModule } from './authorization/authorization.module';
     DatabaseModule,
     UserauthModule,
     AuthorizationModule,
+    GroupModule,
   ],
   controllers: [],
   providers: [],
