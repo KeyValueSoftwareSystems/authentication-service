@@ -43,7 +43,10 @@ export class EntityService {
     return newEntity;
   }
 
-  async updateEntity(id: string, entity: UpdateEntityInput): Promise<EntityModel> {
+  async updateEntity(
+    id: string,
+    entity: UpdateEntityInput,
+  ): Promise<EntityModel> {
     const entityToUpdate = this.entityRepository.create(entity);
     await this.entityRepository.update(id, entityToUpdate);
     const updatedEntity = await this.entityRepository.findOne(id);

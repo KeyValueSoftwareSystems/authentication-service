@@ -1,4 +1,3 @@
-
 /*
  * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -32,7 +31,10 @@ export interface UserPasswordInput {
 }
 
 export interface GoogleLoginInput {
-    idToken: string;
+    email?: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
 }
 
 export interface NewEntityInput {

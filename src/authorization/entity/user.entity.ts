@@ -34,6 +34,9 @@ class User {
   @Column({ default: 'simple' })
   public origin!: string;
 
+  @Column({ nullable: true })
+  public externalUserId?: string;
+
   @UpdateDateColumn()
   updatedDate!: Date;
 }

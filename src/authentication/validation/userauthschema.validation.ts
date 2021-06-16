@@ -31,4 +31,5 @@ export const GoogleUserSchema = Joi.object({
   firstName: Joi.string().required(),
   middleName: Joi.string(),
   lastName: Joi.string().required(),
+  externalUserId: Joi.string().required(),
 }).options({ abortEarly: false });

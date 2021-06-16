@@ -38,7 +38,3 @@ input UserPasswordInput {
   currentPassword: String!
   newPassword: String!
 }
-
-input GoogleLoginInput {
-  idToken: String!
-}
