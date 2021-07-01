@@ -26,6 +26,7 @@ type EntityPermission {
 type Query {
   getEntities: [Entity]!
   getEntity(id: ID!): Entity
+  getEntityPermissions(id: ID!): [EntityPermission]
 }
 
 type Mutation {

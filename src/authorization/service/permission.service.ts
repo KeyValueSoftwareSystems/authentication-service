@@ -5,14 +5,23 @@ import {
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
 import { Repository } from 'typeorm';
-import { PermissionNotFoundException } from '../exception/permission.exception';
+import {
+  PermissionNotFoundException,
+  PermissionDeleteNotAllowedException,
+} from '../exception/permission.exception';
 import Permission from '../entity/permission.entity';
+import UserPermission from '../entity/userPermission.entity';
+import GroupPermission from '../entity/groupPermission.entity';
 
 @Injectable()
 export class PermissionService {
   constructor(
     @InjectRepository(Permission)
     private permissionsRepository: Repository<Permission>,
+    @InjectRepository(UserPermission)
+    private userPermissionsRepository: Repository<UserPermission>,
+    @InjectRepository(GroupPermission)
+    private groupPermissionRepository: Repository<GroupPermission>,
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
@@ -51,11 +60,26 @@ export class PermissionService {
   }
 
   async deletePermission(id: string): Promise<Permission> {
+    if (await this.checkPermissionUsage(id)) {
+      throw new PermissionDeleteNotAllowedException(id);
+    }
     await this.permissionsRepository.update(id, { active: false });
     const deletedPermission = await this.permissionsRepository.findOne(id);
     if (deletedPermission) {
       return deletedPermission;
     }
     throw new PermissionNotFoundException(id);
+  }
+
+  private async checkPermissionUsage(id: string) {
+    const userCount = await this.userPermissionsRepository.count({
+      where: { permissionId: id },
+    });
+    const groupCount = await this.groupPermissionRepository.count({
+      where: { permissionId: id },
+    });
+
+    const totalCount = userCount + groupCount;
+    return totalCount != 0;
   }
 }

@@ -14,6 +14,9 @@ import Permission from 'src/authorization/entity/permission.entity';
 import UserGroup from 'src/authorization/entity/userGroup.entity';
 import UserPermission from 'src/authorization/entity/userPermission.entity';
 import { GoogleStrategy } from './passport/googleStrategy';
+import UserCacheService from 'src/authorization/service/usercache.service';
+import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
+import GroupCacheService from 'src/authorization/service/groupcache.service';
 
 @Module({
   imports: [
@@ -24,6 +27,7 @@ import { GoogleStrategy } from './passport/googleStrategy';
     TypeOrmModule.forFeature([UserPermission]),
     TypeOrmModule.forFeature([GroupPermission]),
     ConfigModule,
+    RedisCacheModule,
   ],
   providers: [
     UserauthResolver,
@@ -33,7 +37,11 @@ import { GoogleStrategy } from './passport/googleStrategy';
     GoogleAuthService,
     AuthenticationHelper,
     ConfigService,
-    GoogleStrategy,
+    GoogleStrategy,    
+    AuthenticationHelper,
+    ConfigService,
+    UserCacheService,
+    GroupCacheService,
   ],
   controllers: [GoogleAuthController],
 })

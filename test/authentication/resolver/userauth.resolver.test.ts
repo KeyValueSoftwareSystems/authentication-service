@@ -15,6 +15,8 @@ import UserauthService from '../../../src/authentication/service/userauth.servic
 import UserauthResolver from '../../../src/authentication/resolver/userauth.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
+import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 
 const users: User[] = [
   {
@@ -26,6 +28,7 @@ const users: User[] = [
     lastName: 'Test2',
     active: true,
     updatedDate: new Date(),
+    origin: 'simple',
   },
 ];
 
@@ -33,6 +36,8 @@ const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
 const userauthService = Substitute.for<UserauthService>();
+const userCacheService = Substitute.for<UserCacheService>();
+const redisCacheService = Substitute.for<RedisCacheService>();
 
 describe('Userauth Module', () => {
   let app: INestApplication;
@@ -49,6 +54,8 @@ describe('Userauth Module', () => {
         { provide: 'UserService', useValue: userService },
         { provide: 'UserauthService', useValue: userauthService },
         { provide: 'ConfigService', useValue: configService },
+        { provide: 'UserCacheService', useValue: userCacheService },
+        { provide: 'RedisCacheService', useValue: redisCacheService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(
@@ -102,7 +109,7 @@ describe('Userauth Module', () => {
         {
           email: users[0].email,
           phone: users[0].phone,
-          password: users[0].password,
+          password: users[0].password as string,
           firstName: users[0].firstName,
           lastName: users[0].lastName,
         },

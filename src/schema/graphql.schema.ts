@@ -144,12 +144,16 @@ export interface EntityPermission {
 export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
+    getEntityPermissions(id: string): EntityPermission[] | Promise<EntityPermission[]>;
     getGroups(): Group[] | Promise<Group[]>;
     getGroup(id: string): Group | Promise<Group>;
+    getGroupPermissions(id: string): GroupPermission[] | Promise<GroupPermission[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
     getPermission(id: string): Permission | Promise<Permission>;
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
+    getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
+    getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
     verifyUserPermission(id: string, params: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 

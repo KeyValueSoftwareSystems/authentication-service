@@ -8,6 +8,9 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
+import UserPermission from '../../../src/authorization/entity/userPermission.entity';
+import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
+import { PermissionDeleteNotAllowedException } from '../../../src/authorization/exception/permission.exception';
 
 const permissions: Permission[] = [
   {
@@ -20,7 +23,10 @@ const permissions: Permission[] = [
 describe('test Permission service', () => {
   let permissionService: PermissionService;
   const permissionRepository = Substitute.for<Repository<Permission>>();
-
+  const groupPermissionRepository = Substitute.for<
+    Repository<GroupPermission>
+  >();
+  const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -30,6 +36,14 @@ describe('test Permission service', () => {
         {
           provide: getRepositoryToken(Permission),
           useValue: permissionRepository,
+        },
+        {
+          provide: getRepositoryToken(UserPermission),
+          useValue: userPermissionRepository,
+        },
+        {
+          provide: getRepositoryToken(GroupPermission),
+          useValue: groupPermissionRepository,
         },
       ],
     }).compile();
@@ -93,10 +107,42 @@ describe('test Permission service', () => {
     permissionRepository
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
       .resolves(Arg.any());
+    userPermissionRepository
+      .count({
+        where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
+      })
+      .returns(Promise.resolve(0));
+    groupPermissionRepository
+      .count({
+        where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
+      })
+      .returns(Promise.resolve(0));
 
     const resp = await permissionService.deletePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
     expect(resp).toEqual(permissions[0]);
+  });
+
+  it('should throw exception when deleting a permission in usage', async () => {
+    userPermissionRepository
+      .count({
+        where: { permissionId: '0d88ef27-dd26-4a01-bfef-4d703bcdb05d' },
+      })
+      .returns(Promise.resolve(1));
+    groupPermissionRepository
+      .count({
+        where: { permissionId: '0d88ef27-dd26-4a01-bfef-4d703bcdb05d' },
+      })
+      .returns(Promise.resolve(0));
+
+    const resp = permissionService.deletePermission(
+      '0d88ef27-dd26-4a01-bfef-4d703bcdb05d',
+    );
+    await expect(resp).rejects.toThrowError(
+      new PermissionDeleteNotAllowedException(
+        '0d88ef27-dd26-4a01-bfef-4d703bcdb05d',
+      ),
+    );
   });
 });
