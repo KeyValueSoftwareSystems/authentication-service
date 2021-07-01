@@ -1,4 +1,3 @@
-import User from '../entity/user.entity';
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import GroupPermission from '../entity/groupPermission.entity';

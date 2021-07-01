@@ -1,3 +1,4 @@
+
 /*
  * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -28,13 +29,6 @@ export interface UserLoginInput {
 export interface UserPasswordInput {
     currentPassword: string;
     newPassword: string;
-}
-
-export interface GoogleLoginInput {
-    email?: string;
-    firstName: string;
-    middleName?: string;
-    lastName: string;
 }
 
 export interface NewEntityInput {
@@ -96,7 +90,6 @@ export interface IMutation {
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
-    google(input: GoogleLoginInput): TokenResponse | Promise<TokenResponse>;
     createEntity(input: NewEntityInput): Entity | Promise<Entity>;
     updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;

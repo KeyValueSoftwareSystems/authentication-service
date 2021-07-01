@@ -5,7 +5,7 @@ export class LoggerService {
   private context: string;
   private static instance: LoggerService;
 
-  private constructor(context: string) {
+  constructor(context: string) {
     this.winstonLogger = LoggerService.createWinstonLogger();
     this.context = context;
   }

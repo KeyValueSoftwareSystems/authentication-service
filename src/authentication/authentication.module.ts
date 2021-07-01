@@ -17,6 +17,7 @@ import { GoogleStrategy } from './passport/googleStrategy';
 import UserCacheService from 'src/authorization/service/usercache.service';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import GroupCacheService from 'src/authorization/service/groupcache.service';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Module({
   imports: [
@@ -37,11 +38,12 @@ import GroupCacheService from 'src/authorization/service/groupcache.service';
     GoogleAuthService,
     AuthenticationHelper,
     ConfigService,
-    GoogleStrategy,    
+    GoogleStrategy,
     AuthenticationHelper,
     ConfigService,
     UserCacheService,
     GroupCacheService,
+    LoggerService,
   ],
   controllers: [GoogleAuthController],
 })

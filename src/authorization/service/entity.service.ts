@@ -5,7 +5,7 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from 'src/schema/graphql.schema';
-import { createQueryBuilder, getConnection, Repository } from 'typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
