@@ -21,3 +21,11 @@ export class InvalidPayloadException extends BadRequestException {
     });
   }
 }
+
+export class GoogleSetupError extends BadRequestException {
+  constructor() {
+    super({
+      error: 'Google login is not supported.',
+    });
+  }
+}

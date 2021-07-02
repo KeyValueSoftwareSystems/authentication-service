@@ -26,6 +26,7 @@ const users: User[] = [
     lastName: 'Test2',
     active: true,
     updatedDate: new Date(),
+    origin: 'simple',
   },
 ];
 

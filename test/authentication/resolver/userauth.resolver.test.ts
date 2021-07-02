@@ -28,6 +28,7 @@ const users: User[] = [
     lastName: 'Test2',
     active: true,
     updatedDate: new Date(),
+    origin: 'simple',
   },
 ];
 
@@ -108,7 +109,7 @@ describe('Userauth Module', () => {
         {
           email: users[0].email,
           phone: users[0].phone,
-          password: users[0].password,
+          password: users[0].password as string,
           firstName: users[0].firstName,
           lastName: users[0].lastName,
         },

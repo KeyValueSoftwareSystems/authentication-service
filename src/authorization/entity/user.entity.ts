@@ -16,8 +16,8 @@ class User {
   @Column({ nullable: true })
   public phone?: string;
 
-  @Column({ nullable: false })
-  public password!: string;
+  @Column({ nullable: true })
+  public password?: string;
 
   @Column()
   public firstName!: string;
@@ -30,6 +30,12 @@ class User {
 
   @Column({ default: true })
   public active!: boolean;
+
+  @Column({ default: 'simple' })
+  public origin!: string;
+
+  @Column({ nullable: true })
+  public externalUserId?: string;
 
   @UpdateDateColumn()
   updatedDate!: Date;

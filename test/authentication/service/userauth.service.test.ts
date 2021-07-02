@@ -6,7 +6,7 @@ import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import UserauthService from '../../../src/authentication/service/userauth.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import { UserLoginInput } from 'src/schema/graphql.schema';
+import { UserLoginInput, UserSignupInput } from 'src/schema/graphql.schema';
 import {
   InvalidCredentialsException,
   InvalidPayloadException,
@@ -23,6 +23,7 @@ const users: User[] = [
     lastName: 'Test2',
     active: true,
     updatedDate: new Date(),
+    origin: 'simple',
   },
 ];
 
@@ -62,6 +63,7 @@ describe('test UserauthService', () => {
         lastName: 'Test2',
         active: true,
         updatedDate: new Date(2020, 1, 1),
+        origin: 'simple',
       },
     ];
 
@@ -94,7 +96,7 @@ describe('test UserauthService', () => {
 
   it('should signup a user', async () => {
     const hashedPassword = authenticationHelper.generatePasswordHash(
-      users[0].password,
+      users[0].password as string,
     );
 
     const userResponse: User[] = [
@@ -107,15 +109,19 @@ describe('test UserauthService', () => {
         lastName: users[0].lastName,
         active: users[0].active,
         updatedDate: users[0].updatedDate,
+        origin: 'simple',
       },
     ];
-
+    const userSingup: UserSignupInput = {
+      ...users[0],
+      password: users[0].password as string,
+    };
     userService
       .getUserDetailsByEmailOrPhone(users[0].email, users[0].phone)
       .returns(Promise.resolve(undefined));
     userService.createUser(Arg.any()).returns(Promise.resolve(userResponse[0]));
 
-    const resp = await userauthService.userSignup(users[0]);
+    const resp = await userauthService.userSignup(userSingup);
 
     const expectedResponse = {
       id: resp.id,
@@ -126,6 +132,7 @@ describe('test UserauthService', () => {
       lastName: resp.lastName,
       active: resp.active,
       updatedDate: users[0].updatedDate,
+      origin: 'simple',
     };
 
     expect(expectedResponse).toEqual(users[0]);
@@ -142,14 +149,19 @@ describe('test UserauthService', () => {
         lastName: 'Test2',
         active: true,
         updatedDate: new Date(),
+        origin: 'simple',
       },
     ];
+    const userSingup: UserSignupInput = {
+      ...existUsers[0],
+      password: 's3cr3t',
+    };
 
     userService
       .getUserDetailsByEmailOrPhone(existUsers[0].email, existUsers[0].phone)
       .resolves(existUsers[0]);
 
-    const resp = userauthService.userSignup(existUsers[0]);
+    const resp = userauthService.userSignup(userSingup);
 
     await expect(resp).rejects.toThrowError(
       new UserExistsException(existUsers[0].email || existUsers[0].phone || ''),
