@@ -37,6 +37,9 @@ class User {
   @Column({ nullable: true })
   public externalUserId?: string;
 
+  @Column({ nullable: true })
+  public refreshToken?: string;
+
   @UpdateDateColumn()
   updatedDate!: Date;
 }

@@ -31,6 +31,14 @@ export interface UserPasswordInput {
     newPassword: string;
 }
 
+export interface RefreshTokenInput {
+    refreshToken: string;
+}
+
+export interface LogoutInput {
+    userId: string;
+}
+
 export interface NewEntityInput {
     name: string;
 }
@@ -90,6 +98,8 @@ export interface IMutation {
     login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
     signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
+    refresh(input?: RefreshTokenInput): TokenResponse | Promise<TokenResponse>;
+    logout(input?: LogoutInput): string | Promise<string>;
     createEntity(input: NewEntityInput): Entity | Promise<Entity>;
     updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;
@@ -108,8 +118,8 @@ export interface IMutation {
 }
 
 export interface TokenResponse {
-    expiresInSeconds: number;
-    token: string;
+    refreshToken: string;
+    accessToken: string;
 }
 
 export interface UserSignupResponse {

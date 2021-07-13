@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   TokenResponse,
   UserLoginInput,
@@ -66,8 +66,7 @@ export default class UserauthService {
           hashedPassword,
         )
       ) {
-        const tokenData = this.authenticationHelper.createToken(userRecord);
-        return tokenData;
+        return this.authenticationHelper.generateTokenForUser(userRecord);
       }
       throw new InvalidCredentialsException();
     }
@@ -103,5 +102,20 @@ export default class UserauthService {
       throw new InvalidPayloadException('Current password is incorrect');
     }
     throw new UserNotFoundException(username);
+  }
+
+  async refresh(token: string): Promise<TokenResponse> {
+    const response = this.authenticationHelper.validateAuthToken(token);
+    const userRecord: User | undefined = await this.userService.getUserById(
+      response.sub,
+    );
+    if (userRecord.refreshToken !== token) {
+      throw new UnauthorizedException();
+    }
+    return this.authenticationHelper.generateTokenForUser(userRecord);
+  }
+
+  async logout(id: string): Promise<void> {
+    await this.userService.updateField(id, 'password', '');
   }
 }

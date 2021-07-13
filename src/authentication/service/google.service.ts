@@ -41,7 +41,7 @@ export class GoogleAuthService {
         } else return existingUserDetails;
       })
       .then((user) => {
-        return this.authenticationHelper.createToken(user);
+        return this.authenticationHelper.generateTokenForUser(user);
       });
   }
 }
