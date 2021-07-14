@@ -2,7 +2,7 @@ type Mutation {
     login(input: UserLoginInput!): TokenResponse
     signup(input: UserSignupInput!): UserSignupResponse
     changePassword(input: UserPasswordInput!): User
-    refresh(input: RefreshTokenInput): TokenResponse
+    refresh(input: RefreshTokenInput!): TokenResponse
     logout: String
 }
 
@@ -42,8 +42,4 @@ input UserPasswordInput {
 
 input RefreshTokenInput {
   refreshToken: String!
-}
-
-input LogoutInput {
-  userId: String!
 }

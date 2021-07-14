@@ -1,7 +1,6 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
-  LogoutInput,
   RefreshTokenInput,
   TokenResponse,
   UserLoginInput,

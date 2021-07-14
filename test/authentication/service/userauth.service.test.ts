@@ -67,7 +67,6 @@ describe('test UserauthService', () => {
         origin: 'simple',
       },
     ];
-
   });
 
   it('should login a user', async () => {

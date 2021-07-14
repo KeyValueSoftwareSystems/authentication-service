@@ -125,6 +125,6 @@ export default class UserauthService {
   }
 
   async logout(id: string): Promise<void> {
-    await this.userService.updateField(id, 'password', '');
+    await this.userService.updateField(id, 'refreshToken', '');
   }
 }
