@@ -157,7 +157,7 @@ describe('Userauth Module', () => {
 
       configService.get('JWT_SECRET').returns('s3cr3t1234567890');
 
-      const tokenResponse = authenticationHelper.createToken(users[0]);
+      const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
       const token = tokenResponse.token;
 
       userauthService

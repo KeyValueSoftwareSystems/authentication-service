@@ -90,7 +90,7 @@ describe('User Module', () => {
     describe('users', () => {
       it('should get the user array', () => {
         configService.get('JWT_SECRET').returns('s3cr3t1234567890');
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         userService.getAllUsers().returns(Promise.resolve(users));
@@ -107,7 +107,7 @@ describe('User Module', () => {
       });
 
       it('should get single user', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
         userService
           .getUserById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
@@ -126,7 +126,7 @@ describe('User Module', () => {
       });
 
       it('should update a user', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         const input: UpdateUserInput = {
@@ -154,7 +154,7 @@ describe('User Module', () => {
       });
 
       it('should delete a user', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
         userService
           .deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
@@ -176,7 +176,7 @@ describe('User Module', () => {
         const input: UpdateUserPermissionInput = {
           permissions: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
         };
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
         const obj = Object.create(null);
         userService
@@ -203,7 +203,7 @@ describe('User Module', () => {
         const input: UpdateUserGroupInput = {
           groups: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
         };
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
         const obj = Object.create(null);
         userService

@@ -76,7 +76,7 @@ describe('Group Module', () => {
     describe('groups', () => {
       it('should get the groups', () => {
         configService.get('JWT_SECRET').returns('s3cr3t1234567890');
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         groupService.getAllGroups().returns(Promise.resolve(groups));
@@ -91,7 +91,7 @@ describe('Group Module', () => {
       });
 
       it('should get single group', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         groupService
@@ -115,7 +115,7 @@ describe('Group Module', () => {
           name: 'Test1',
         };
         const obj = Object.create(null);
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         groupService
@@ -139,7 +139,7 @@ describe('Group Module', () => {
           name: 'Test1',
         };
         const obj = Object.create(null);
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         groupService
@@ -162,7 +162,7 @@ describe('Group Module', () => {
       });
 
       it('should delete a group', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
+        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
         const token = tokenResponse.token;
 
         groupService
@@ -194,7 +194,7 @@ describe('Group Module', () => {
         )
         .resolves(permissions);
 
-      const tokenResponse = authenticationHelper.createToken(users[0]);
+      const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
       const token = tokenResponse.token;
 
       return request(app.getHttpServer())
