@@ -53,7 +53,7 @@ export default class UserauthResolver {
 
   @Mutation('logout')
   @UseGuards(AuthGaurd)
-  async logout(@Args('input') request: LogoutInput): Promise<void> {
-    return this.userauthService.logout(request.userId);
+  async logout(@Context('user') user: any): Promise<void> {
+    return this.userauthService.logout(user.id);
   }
 }

@@ -66,7 +66,15 @@ export default class UserauthService {
           hashedPassword,
         )
       ) {
-        return this.authenticationHelper.generateTokenForUser(userRecord);
+        const token = this.authenticationHelper.generateTokenForUser(
+          userRecord,
+        );
+        await this.userService.updateField(
+          userRecord.id,
+          'refreshToken',
+          token.refreshToken,
+        );
+        return token;
       }
       throw new InvalidCredentialsException();
     }
@@ -99,15 +107,21 @@ export default class UserauthService {
     throw new UserNotFoundException(userId);
   }
 
-  async refresh(token: string): Promise<TokenResponse> {
-    const response = this.authenticationHelper.validateAuthToken(token);
+  async refresh(refreshToken: string): Promise<TokenResponse> {
+    const response = this.authenticationHelper.validateAuthToken(refreshToken);
     const userRecord: User | undefined = await this.userService.getUserById(
       response.sub,
     );
-    if (userRecord.refreshToken !== token) {
+    if (userRecord.refreshToken !== refreshToken) {
       throw new UnauthorizedException();
     }
-    return this.authenticationHelper.generateTokenForUser(userRecord);
+    const token = this.authenticationHelper.generateTokenForUser(userRecord);
+    await this.userService.updateField(
+      userRecord.id,
+      'refreshToken',
+      token.refreshToken,
+    );
+    return token;
   }
 
   async logout(id: string): Promise<void> {

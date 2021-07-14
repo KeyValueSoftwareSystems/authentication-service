@@ -175,5 +175,40 @@ describe('Userauth Module', () => {
           expect(res.body.data.changePassword).toEqual(usersResponse[0]);
         });
     });
+
+    it('should refresh the token', () => {
+      const token = authenticationHelper.generateTokenForUser(users[0]);
+
+      userauthService
+        .refresh(token.refreshToken)
+        .returns(Promise.resolve(token));
+
+      return request(app.getHttpServer())
+        .post(gql)
+        .send({
+          query: `mutation { refresh(input: { refreshToken: "${token.refreshToken}"}) { accessToken refreshToken }}`,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.refresh).toEqual(token);
+        });
+    });
+
+    it('should logout the user', () => {
+      const token = authenticationHelper.generateTokenForUser(users[0]);
+
+      userauthService.logout(users[0].id).returns(Promise.resolve());
+
+      return request(app.getHttpServer())
+        .post(gql)
+        .set('Authorization', `Bearer ${token.accessToken}`)
+        .send({
+          query: `mutation { logout }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.logout).toEqual(null);
+        });
+    });
   });
 });
