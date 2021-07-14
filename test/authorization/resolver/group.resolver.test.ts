@@ -51,6 +51,7 @@ describe('Group Module', () => {
   let app: INestApplication;
 
   const configService = Substitute.for<ConfigService>();
+  configService.get('ENV').returns('local');
   let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -76,8 +77,7 @@ describe('Group Module', () => {
     describe('groups', () => {
       it('should get the groups', () => {
         configService.get('JWT_SECRET').returns('s3cr3t1234567890');
-        const tokenResponse = authenticationHelper.createToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         groupService.getAllGroups().returns(Promise.resolve(groups));
         return request(app.getHttpServer())
@@ -91,8 +91,7 @@ describe('Group Module', () => {
       });
 
       it('should get single group', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         groupService
           .getGroupById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
@@ -115,8 +114,7 @@ describe('Group Module', () => {
           name: 'Test1',
         };
         const obj = Object.create(null);
-        const tokenResponse = authenticationHelper.createToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         groupService
           .createGroup(Object.assign(obj, input))
@@ -139,8 +137,7 @@ describe('Group Module', () => {
           name: 'Test1',
         };
         const obj = Object.create(null);
-        const tokenResponse = authenticationHelper.createToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         groupService
           .updateGroup(
@@ -162,8 +159,7 @@ describe('Group Module', () => {
       });
 
       it('should delete a group', () => {
-        const tokenResponse = authenticationHelper.createToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         groupService
           .deleteGroup('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
@@ -194,8 +190,7 @@ describe('Group Module', () => {
         )
         .resolves(permissions);
 
-      const tokenResponse = authenticationHelper.createToken(users[0]);
-      const token = tokenResponse.token;
+      const token = authenticationHelper.generateAccessToken(users[0]);
 
       return request(app.getHttpServer())
         .post(gql)

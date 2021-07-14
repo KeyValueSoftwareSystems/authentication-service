@@ -2,6 +2,8 @@ type Mutation {
     login(input: UserLoginInput!): TokenResponse
     signup(input: UserSignupInput!): UserSignupResponse
     changePassword(input: UserPasswordInput!): User
+    refresh(input: RefreshTokenInput!): TokenResponse
+    logout: String
 }
 
 input UserSignupInput {
@@ -19,8 +21,8 @@ input UserLoginInput {
 }
 
 type TokenResponse {
-  expiresInSeconds: Int!,
-  token: String!
+  refreshToken: String!
+  accessToken: String!
 }
 
 type UserSignupResponse {
@@ -36,4 +38,8 @@ type UserSignupResponse {
 input UserPasswordInput {
   currentPassword: String!
   newPassword: String!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
 }

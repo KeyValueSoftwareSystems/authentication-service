@@ -2,13 +2,13 @@ import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import User from '../authorization/entity/user.entity';
 import { ConfigService } from '@nestjs/config';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthenticationHelper {
   constructor(private configService: ConfigService) {}
 
-  createToken(userDetails: User) {
+  generateAccessToken(userDetails: User) {
     const expiresIn =
       this.configService.get('JWT_TOKEN_EXPTIME') * 1 || 60 * 60;
     const secret = this.configService.get('JWT_SECRET') as string;
@@ -16,18 +16,40 @@ export class AuthenticationHelper {
 
     const dataStoredInToken = {
       username: username,
+      sub: userDetails.id,
+      env: this.configService.get('ENV') || 'local',
     };
-    return {
-      expiresInSeconds: expiresIn,
-      token: jwt.sign(dataStoredInToken, secret, { expiresIn }),
-    };
+    return jwt.sign(dataStoredInToken, secret, { expiresIn });
   }
 
-  validateAuthToken(request: { headers: { authorization: string } }) {
+  generateRefreshToken(userDetails: User) {
+    const expiresIn =
+      this.configService.get('JWT_REFRESH_TOKEN_EXP_TIME') * 1 || 60 * 60;
+    const secret = this.configService.get('JWT_SECRET') as string;
+
+    const dataStoredInToken = {
+      sub: userDetails.id,
+      env: this.configService.get('ENV') || 'local',
+    };
+    return jwt.sign(dataStoredInToken, secret, { expiresIn });
+  }
+
+  generateTokenForUser(userDetails: User) {
+    const accessToken = this.generateAccessToken(userDetails);
+    const refreshToken = this.generateRefreshToken(userDetails);
+    return { accessToken, refreshToken };
+  }
+
+  validateAuthToken(authorization: string) {
     const secret = this.configService.get('JWT_SECRET') || '';
-    const reqAuthToken = request.headers.authorization.split(' ')[1];
+    const reqAuthToken = authorization;
     const verificationResponse: any = jwt.verify(reqAuthToken, secret);
-    return verificationResponse;
+    const env = this.configService.get('ENV') || 'local';
+    if (verificationResponse.env !== env) {
+      throw new UnauthorizedException();
+    }
+    const user = { ...verificationResponse, id: verificationResponse.sub };
+    return user;
   }
 
   isPasswordValid(plainTextPassword: string, hashedPassword: string) {

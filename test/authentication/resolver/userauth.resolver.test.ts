@@ -43,6 +43,7 @@ describe('Userauth Module', () => {
   let app: INestApplication;
   let authenticationHelper: AuthenticationHelper;
   const configService = Substitute.for<ConfigService>();
+  configService.get('ENV').returns('local');
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
@@ -77,8 +78,11 @@ describe('Userauth Module', () => {
           password: 's3cr3t1234567890',
         };
         const tokenResponse = {
-          expiresInSeconds: 3600,
-          token: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+          accessToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+          eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zI
+          iwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMT
+          V9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo`,
+          refreshToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
           eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zI
           iwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMT
           V9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo`,
@@ -91,15 +95,12 @@ describe('Userauth Module', () => {
           .post(gql)
           .send({
             query:
-              'mutation { login(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { expiresInSeconds token }}',
+              'mutation { login(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken }}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.login).toHaveProperty(
-              'expiresInSeconds',
-              3600,
-            );
-            expect(res.body.data.login).toHaveProperty('token');
+            expect(res.body.data.login).toHaveProperty('accessToken');
+            expect(res.body.data.login).toHaveProperty('refreshToken');
           });
       });
     });
@@ -157,8 +158,7 @@ describe('Userauth Module', () => {
 
       configService.get('JWT_SECRET').returns('s3cr3t1234567890');
 
-      const tokenResponse = authenticationHelper.createToken(users[0]);
-      const token = tokenResponse.token;
+      const token = authenticationHelper.generateAccessToken(users[0]);
 
       userauthService
         .updatePassword(Arg.any(), Arg.any())
@@ -173,6 +173,41 @@ describe('Userauth Module', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.data.changePassword).toEqual(usersResponse[0]);
+        });
+    });
+
+    it('should refresh the token', () => {
+      const token = authenticationHelper.generateTokenForUser(users[0]);
+
+      userauthService
+        .refresh(token.refreshToken)
+        .returns(Promise.resolve(token));
+
+      return request(app.getHttpServer())
+        .post(gql)
+        .send({
+          query: `mutation { refresh(input: { refreshToken: "${token.refreshToken}"}) { accessToken refreshToken }}`,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.refresh).toEqual(token);
+        });
+    });
+
+    it('should logout the user', () => {
+      const token = authenticationHelper.generateTokenForUser(users[0]);
+
+      userauthService.logout(users[0].id).returns(Promise.resolve());
+
+      return request(app.getHttpServer())
+        .post(gql)
+        .set('Authorization', `Bearer ${token.accessToken}`)
+        .send({
+          query: `mutation { logout }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.logout).toEqual(null);
         });
     });
   });

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   TokenResponse,
   UserLoginInput,
@@ -66,21 +66,23 @@ export default class UserauthService {
           hashedPassword,
         )
       ) {
-        const tokenData = this.authenticationHelper.createToken(userRecord);
-        return tokenData;
+        const token = this.authenticationHelper.generateTokenForUser(
+          userRecord,
+        );
+        await this.userService.updateField(
+          userRecord.id,
+          'refreshToken',
+          token.refreshToken,
+        );
+        return token;
       }
       throw new InvalidCredentialsException();
     }
     throw new UserNotFoundException(userDetails.username);
   }
 
-  async updatePassword(username: string, passwordDetails: any): Promise<User> {
-    const userRecord:
-      | User
-      | undefined = await this.userService.getUserDetailsByUsername(
-      username,
-      username,
-    );
+  async updatePassword(userId: string, passwordDetails: any): Promise<User> {
+    const userRecord: User = await this.userService.getUserById(userId);
 
     if (userRecord) {
       if (
@@ -102,6 +104,27 @@ export default class UserauthService {
       }
       throw new InvalidPayloadException('Current password is incorrect');
     }
-    throw new UserNotFoundException(username);
+    throw new UserNotFoundException(userId);
+  }
+
+  async refresh(refreshToken: string): Promise<TokenResponse> {
+    const response = this.authenticationHelper.validateAuthToken(refreshToken);
+    const userRecord: User | undefined = await this.userService.getUserById(
+      response.sub,
+    );
+    if (userRecord.refreshToken !== refreshToken) {
+      throw new UnauthorizedException();
+    }
+    const token = this.authenticationHelper.generateTokenForUser(userRecord);
+    await this.userService.updateField(
+      userRecord.id,
+      'refreshToken',
+      token.refreshToken,
+    );
+    return token;
+  }
+
+  async logout(id: string): Promise<void> {
+    await this.userService.updateField(id, 'refreshToken', '');
   }
 }

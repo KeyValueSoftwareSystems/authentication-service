@@ -1,6 +1,7 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
+  RefreshTokenInput,
   TokenResponse,
   UserLoginInput,
   UserSignupResponse,
@@ -39,6 +40,19 @@ export default class UserauthResolver {
     @Args('input', new ValidationPipe(UserPasswordInputSchema)) request: any,
     @Context('user') user: any,
   ): Promise<User> {
-    return this.userauthService.updatePassword(user.username, request);
+    return this.userauthService.updatePassword(user.id, request);
+  }
+
+  @Mutation('refresh')
+  async refresh(
+    @Args('input') request: RefreshTokenInput,
+  ): Promise<TokenResponse> {
+    return this.userauthService.refresh(request.refreshToken);
+  }
+
+  @Mutation('logout')
+  @UseGuards(AuthGaurd)
+  async logout(@Context('user') user: any): Promise<void> {
+    return this.userauthService.logout(user.id);
   }
 }
