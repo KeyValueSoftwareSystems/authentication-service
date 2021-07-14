@@ -9,7 +9,7 @@ export class AuthGaurd implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const ctx = GqlExecutionContext.create(context).getContext();
     if (ctx) {
-      const reqAuthToken = ctx.request.headers.authorization.split(' ')[1];
+      const reqAuthToken = ctx.headers.authorization.split(' ')[1];
       ctx.user = this.authenticationHelper.validateAuthToken(reqAuthToken);
       return true;
     }

@@ -17,7 +17,7 @@ export class AuthenticationHelper {
     const dataStoredInToken = {
       username: username,
       sub: userDetails.id,
-      env: this.configService.get('ENV'),
+      env: this.configService.get('ENV') || 'local',
     };
     return jwt.sign(dataStoredInToken, secret, { expiresIn });
   }
@@ -29,7 +29,7 @@ export class AuthenticationHelper {
 
     const dataStoredInToken = {
       sub: userDetails.id,
-      env: this.configService.get('ENV'),
+      env: this.configService.get('ENV') || 'local',
     };
     return jwt.sign(dataStoredInToken, secret, { expiresIn });
   }
@@ -44,10 +44,12 @@ export class AuthenticationHelper {
     const secret = this.configService.get('JWT_SECRET') || '';
     const reqAuthToken = authorization;
     const verificationResponse: any = jwt.verify(reqAuthToken, secret);
-    if (verificationResponse.env !== this.configService.get('ENV')) {
+    const env = this.configService.get('ENV') || 'local';
+    if (verificationResponse.env !== env) {
       throw new UnauthorizedException();
     }
-    return verificationResponse;
+    const user = { ...verificationResponse, id: verificationResponse.sub };
+    return user;
   }
 
   isPasswordValid(plainTextPassword: string, hashedPassword: string) {

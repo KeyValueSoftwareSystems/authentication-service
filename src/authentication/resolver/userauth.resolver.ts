@@ -41,7 +41,7 @@ export default class UserauthResolver {
     @Args('input', new ValidationPipe(UserPasswordInputSchema)) request: any,
     @Context('user') user: any,
   ): Promise<User> {
-    return this.userauthService.updatePassword(user.username, request);
+    return this.userauthService.updatePassword(user.id, request);
   }
 
   @Mutation('refresh')

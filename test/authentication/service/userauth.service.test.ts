@@ -80,8 +80,8 @@ describe('test UserauthService', () => {
     configService.get('JWT_TOKEN_EXPTIME').returns(3600);
 
     const resp = await userauthService.userLogin(input);
-    expect(resp).toHaveProperty('expiresInSeconds', 3600);
-    expect(resp).toHaveProperty('token');
+    expect(resp).toHaveProperty('accessToken');
+    expect(resp).toHaveProperty('refreshToken');
   });
 
   it('should not login user since the user password is wrong', async () => {
@@ -174,16 +174,29 @@ describe('test UserauthService', () => {
       currentPassword: 's3cr3t',
       newPassword: 'n3ws3cr3t',
     };
+    const hashedPassword = authenticationHelper.generatePasswordHash('s3cr3t');
+
+    const users: User[] = [
+      {
+        id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        email: 'user@test.com',
+        phone: '9112345678910',
+        password: hashedPassword,
+        firstName: 'Test1',
+        lastName: 'Test2',
+        active: true,
+        updatedDate: new Date(2020, 1, 1),
+        origin: 'simple',
+      },
+    ];
 
     userService
       .updateField(users[0].id, 'password', Arg.any())
       .returns(Promise.resolve(users[0]));
 
-    userService
-      .getUserDetailsByUsername(Arg.any())
-      .returns(Promise.resolve(users[0]));
+    userService.getUserById(Arg.any()).returns(Promise.resolve(users[0]));
 
-    const resp = await userauthService.updatePassword(input.username, input);
+    const resp = await userauthService.updatePassword(users[0].id, input);
     expect(resp).toHaveReturned;
   });
 
@@ -194,7 +207,7 @@ describe('test UserauthService', () => {
       newPassword: 'n3ws3cr3t',
     };
 
-    const resp = userauthService.updatePassword(input.username, input);
+    const resp = userauthService.updatePassword(users[0].id, input);
     await expect(resp).rejects.toThrowError(
       new InvalidPayloadException('Current password is incorrect'),
     );

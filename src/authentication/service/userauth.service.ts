@@ -73,13 +73,8 @@ export default class UserauthService {
     throw new UserNotFoundException(userDetails.username);
   }
 
-  async updatePassword(username: string, passwordDetails: any): Promise<User> {
-    const userRecord:
-      | User
-      | undefined = await this.userService.getUserDetailsByUsername(
-      username,
-      username,
-    );
+  async updatePassword(userId: string, passwordDetails: any): Promise<User> {
+    const userRecord: User = await this.userService.getUserById(userId);
 
     if (userRecord) {
       if (
@@ -101,7 +96,7 @@ export default class UserauthService {
       }
       throw new InvalidPayloadException('Current password is incorrect');
     }
-    throw new UserNotFoundException(username);
+    throw new UserNotFoundException(userId);
   }
 
   async refresh(token: string): Promise<TokenResponse> {

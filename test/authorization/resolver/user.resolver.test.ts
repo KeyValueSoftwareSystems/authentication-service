@@ -66,6 +66,7 @@ describe('User Module', () => {
   const configService = Substitute.for<ConfigService>();
   let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
+    configService.get('ENV').returns('local');
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
       providers: [
@@ -90,8 +91,7 @@ describe('User Module', () => {
     describe('users', () => {
       it('should get the user array', () => {
         configService.get('JWT_SECRET').returns('s3cr3t1234567890');
-        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         userService.getAllUsers().returns(Promise.resolve(users));
         return request(app.getHttpServer())
@@ -107,8 +107,7 @@ describe('User Module', () => {
       });
 
       it('should get single user', () => {
-        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
         userService
           .getUserById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
@@ -126,8 +125,7 @@ describe('User Module', () => {
       });
 
       it('should update a user', () => {
-        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
 
         const input: UpdateUserInput = {
           firstName: 'Test1',
@@ -154,8 +152,7 @@ describe('User Module', () => {
       });
 
       it('should delete a user', () => {
-        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
         userService
           .deleteUser('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
           .returns(Promise.resolve(users[0]));
@@ -176,8 +173,7 @@ describe('User Module', () => {
         const input: UpdateUserPermissionInput = {
           permissions: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
         };
-        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
         const obj = Object.create(null);
         userService
           .updateUserPermissions(
@@ -203,8 +199,7 @@ describe('User Module', () => {
         const input: UpdateUserGroupInput = {
           groups: ['5824f3b8-ca41-4af6-8d5f-10e6266d6ddf'],
         };
-        const tokenResponse = authenticationHelper.generateAccessToken(users[0]);
-        const token = tokenResponse.token;
+        const token = authenticationHelper.generateAccessToken(users[0]);
         const obj = Object.create(null);
         userService
           .updateUserGroups(
