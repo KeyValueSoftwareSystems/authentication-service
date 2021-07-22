@@ -1,5 +1,8 @@
 # authentication-service
 
+# CI
+Dummy commit to start the CI
+
 ## Description
 
 [Auth] To provide all authentication and authorization related APIs
