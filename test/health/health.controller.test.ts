@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { INestApplication, ServiceUnavailableException } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import {
   HealthCheckResult,
@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 
 const healthIndicator = Substitute.for<TypeOrmHealthIndicator>();
 const healthCheckService = Substitute.for<HealthCheckService>();
-const response: unknown = {
+const response: HealthCheckResult = {
   status: 'ok',
   info: {
     nest: {
@@ -27,10 +27,10 @@ const response: unknown = {
   },
 };
 
-const errorResponse: unknown = {
-  statusCode: 503,
-  message: 'Service Unavailable Exception',
-  error: {
+const errorResponse: HealthCheckResult = {
+  status: 'error',
+  error: {},
+  details: {
     nest: {
       status: 'down',
     },
@@ -59,25 +59,27 @@ describe('Health Module (e2e)', () => {
   });
 
   describe('Health controller', () => {
+    healthCheckService
+      .check(Arg.any())
+      .returns(Promise.resolve(response), Promise.resolve(errorResponse));
+
     it('should return the ok status when active', () => {
-      healthCheckService
-        .check(Arg.any())
-        .returns(Promise.resolve(response as HealthCheckResult));
-      return request(app.getHttpServer()).get('/health').send().expect(200);
+      return request(app.getHttpServer())
+        .get('/health')
+        .send()
+        .expect(200)
+        .expect((res) => {
+          expect(JSON.parse(res.text)).toEqual(response);
+        });
     });
 
     it('should return the service unavailable status when down', () => {
-      healthCheckService
-        .check(Arg.any())
-        .returns(
-          Promise.reject(new ServiceUnavailableException(errorResponse)),
-        );
-      request(app.getHttpServer())
+      return request(app.getHttpServer())
         .get('/health')
         .send()
-        .expect(503)
-        .end(function (err) {
-          if (err) throw err;
+        .expect(200)
+        .expect((res) => {
+          expect(JSON.parse(res.text)).toEqual(errorResponse);
         });
     });
   });
