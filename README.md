@@ -1,7 +1,8 @@
 # authentication-service
 
-# CI
-Dummy commit to start the CI
+<p align="center">
+<a href="https://gitlab.com/keyvalue-systems/authentication-service/-/pipelines" target="_blank"><img src="https://gitlab.com/keyvalue-systems/authentication-service/badges/master/pipeline.svg?key_text=build" alt="build status"/></a>
+</p>
 
 ## Description
 
