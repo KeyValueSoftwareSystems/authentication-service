@@ -12,6 +12,7 @@ import {
 import Permission from '../entity/permission.entity';
 import UserPermission from '../entity/userPermission.entity';
 import GroupPermission from '../entity/groupPermission.entity';
+import PermissionCacheService from './permissioncache.service';
 
 @Injectable()
 export class PermissionService {
@@ -22,6 +23,7 @@ export class PermissionService {
     private userPermissionsRepository: Repository<UserPermission>,
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: Repository<GroupPermission>,
+    private permissionCacheService: PermissionCacheService,
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
@@ -63,9 +65,13 @@ export class PermissionService {
     if (await this.checkPermissionUsage(id)) {
       throw new PermissionDeleteNotAllowedException(id);
     }
-    await this.permissionsRepository.update(id, { active: false });
     const deletedPermission = await this.permissionsRepository.findOne(id);
+    await this.permissionsRepository.update(id, { active: false });
+
     if (deletedPermission) {
+      await this.permissionCacheService.invalidatePermissionsCache(
+        deletedPermission.name,
+      );
       return deletedPermission;
     }
     throw new PermissionNotFoundException(id);
