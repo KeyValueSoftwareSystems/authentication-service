@@ -11,8 +11,8 @@ import {
   UserSignupInput,
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
-import UserauthService from '../../../src/authentication/service/userauth.service';
-import UserauthResolver from '../../../src/authentication/resolver/userauth.resolver';
+import UserAuthService from '../../../src/authentication/service/user.auth.service';
+import UserAuthResolver from '../../../src/authentication/resolver/user.auth.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
@@ -35,7 +35,7 @@ const users: User[] = [
 const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
-const userauthService = Substitute.for<UserauthService>();
+const userauthService = Substitute.for<UserAuthService>();
 const userCacheService = Substitute.for<UserCacheService>();
 const redisCacheService = Substitute.for<RedisCacheService>();
 
@@ -49,11 +49,11 @@ describe('Userauth Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         UserResolver,
-        UserauthResolver,
+        UserAuthResolver,
         ConfigService,
         AuthenticationHelper,
         { provide: 'UserService', useValue: userService },
-        { provide: 'UserauthService', useValue: userauthService },
+        { provide: 'UserAuthService', useValue: userauthService },
         { provide: 'ConfigService', useValue: configService },
         { provide: 'UserCacheService', useValue: userCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },

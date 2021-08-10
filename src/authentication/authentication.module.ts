@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { GoogleAuthService } from './service/google.service';
 import { GoogleAuthController } from './controller/google.controller';
-import UserauthService from './service/userauth.service';
-import UserauthResolver from './resolver/userauth.resolver';
+import UserAuthService from './service/user.auth.service';
+import UserAuthResolver from './resolver/user.auth.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import UserService from 'src/authorization/service/user.service';
 import User from 'src/authorization/entity/user.entity';
@@ -18,6 +18,11 @@ import UserCacheService from 'src/authorization/service/usercache.service';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import GroupCacheService from 'src/authorization/service/groupcache.service';
 import { LoggerService } from 'src/logger/logger.service';
+import { OtpGeneratorService } from './service/otp.generator.service';
+import SmsService from '../notification/service/sms.service';
+import { TwilioImplModule } from '../notification/twilio/twilio.module';
+import { TwilioModule } from 'nestjs-twilio';
+import { TwoFAController } from './controller/two.FA.controller';
 
 @Module({
   imports: [
@@ -29,10 +34,12 @@ import { LoggerService } from 'src/logger/logger.service';
     TypeOrmModule.forFeature([GroupPermission]),
     ConfigModule,
     RedisCacheModule,
+    TwilioModule,
+    TwilioImplModule,
   ],
   providers: [
-    UserauthResolver,
-    UserauthService,
+    UserAuthResolver,
+    UserAuthService,
     UserService,
     GoogleAuthController,
     GoogleAuthService,
@@ -44,7 +51,10 @@ import { LoggerService } from 'src/logger/logger.service';
     UserCacheService,
     GroupCacheService,
     LoggerService,
+    OtpGeneratorService,
+    SmsService,
+    TwoFAController,
   ],
-  controllers: [GoogleAuthController],
+  controllers: [GoogleAuthController, TwoFAController],
 })
-export class UserauthModule {}
+export class UserAuthModule {}

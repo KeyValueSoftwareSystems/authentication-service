@@ -40,6 +40,12 @@ class User {
   @Column({ nullable: true })
   public refreshToken?: string;
 
+  @Column({ nullable: true })
+  public twoFASecret?: string;
+
+  @Column({ nullable: true, default: false })
+  public twoFAEnabled?: boolean;
+
   @UpdateDateColumn()
   updatedDate!: Date;
 }

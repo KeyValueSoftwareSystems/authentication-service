@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InvalidPayloadException } from '../exception/userauth.exception';
 import User from 'src/authorization/entity/user.entity';
-import { GoogleUserSchema } from '../validation/userauthschema.validation';
+import { GoogleUserSchema } from '../validation/user.auth.schema.validation';
 import UserService from 'src/authorization/service/user.service';
 import { AuthenticationHelper } from '../authentication.helper';
 import { GoogleLoginUser } from '../passport/googleStrategy';
