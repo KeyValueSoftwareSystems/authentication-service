@@ -19,7 +19,6 @@ input UserSignupInput {
 input UserLoginInput {
     username: String!
     password: String!
-    otp: String!
 }
 
 type TokenResponse {

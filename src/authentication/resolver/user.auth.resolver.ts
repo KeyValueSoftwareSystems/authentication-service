@@ -21,20 +21,20 @@ import ValidationPipe from '../../validation/validation.pipe';
 
 @Resolver('Userauth')
 export default class UserAuthResolver {
-  constructor(private readonly userAuthService: UserAuthService) {}
+  constructor(private readonly userauthService: UserAuthService) {}
 
   @Mutation('login')
   @UsePipes(new ValidationPipe(UserLoginInputSchema))
   async userLogin(
     @Args('input') request: UserLoginInput,
   ): Promise<TokenResponse> {
-    return this.userAuthService.userLogin(request);
+    return this.userauthService.userLogin(request);
   }
 
   @Mutation('signup')
   @UsePipes(new ValidationPipe(UserSignupInputSchema))
   async userSignup(@Args('input') request: any): Promise<UserSignupResponse> {
-    return this.userAuthService.userSignup(request);
+    return this.userauthService.userSignup(request);
   }
 
   @Mutation('changePassword')
@@ -43,25 +43,25 @@ export default class UserAuthResolver {
     @Args('input', new ValidationPipe(UserPasswordInputSchema)) request: any,
     @Context('user') user: any,
   ): Promise<User> {
-    return this.userAuthService.updatePassword(user.id, request);
+    return this.userauthService.updatePassword(user.id, request);
   }
 
   @Mutation('refresh')
   async refresh(
     @Args('input') request: RefreshTokenInput,
   ): Promise<TokenResponse> {
-    return this.userAuthService.refresh(request.refreshToken);
+    return this.userauthService.refresh(request.refreshToken);
   }
 
   @Mutation('logout')
   @UseGuards(AuthGuard)
   async logout(@Context('user') user: any): Promise<void> {
-    return this.userAuthService.logout(user.id);
+    return this.userauthService.logout(user.id);
   }
 
   @Mutation('generateOtp')
   @UsePipes(new ValidationPipe(GenerateOtpInputSchema))
   async generateOtp(@Args('input') request: GenerateOtpInput) {
-    return this.userAuthService.generateOtpAndSendMessage(request.phone);
+    return this.userauthService.generateOtpAndSendMessage(request.phone);
   }
 }

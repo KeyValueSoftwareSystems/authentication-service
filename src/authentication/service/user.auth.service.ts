@@ -63,19 +63,29 @@ export default class UserAuthService {
       userDetails.username,
     );
 
-    let token;
-    if (!userRecord) {
-      throw new UserNotFoundException(userDetails.username);
-    }
-    if (userRecord?.twoFAEnabled && this.configService.get('ENFORCE_2FA')) {
-      token = await this.loginWith2FA(userDetails.otp, userRecord);
-    } else {
-      token = this.loginWithPassword(userRecord, userDetails);
-    }
-    if (!token) {
+    if (userRecord && userRecord.active) {
+      const hashedPassword = userRecord.password as string;
+      const plainTextPassword = userDetails.password as string;
+      if (
+        hashedPassword != null &&
+        this.authenticationHelper.isPasswordValid(
+          plainTextPassword,
+          hashedPassword,
+        )
+      ) {
+        const token = this.authenticationHelper.generateTokenForUser(
+          userRecord,
+        );
+        await this.userService.updateField(
+          userRecord.id,
+          'refreshToken',
+          token.refreshToken,
+        );
+        return token;
+      }
       throw new InvalidCredentialsException();
     }
-    return token as TokenResponse;
+    throw new UserNotFoundException(userDetails.username);
   }
 
   async updatePassword(userId: string, passwordDetails: any): Promise<User> {
@@ -129,7 +139,9 @@ export default class UserAuthService {
     const user = await this.userService.getActiveUserByPhoneNumber(phoneNumber);
     if (user && user.active) {
       //Found an active user, generating OTP and sending the message to the user
-      const otp = this.otpService.generateOTP(`${user.id}${user.twoFASecret}`);
+      const otp = this.otpService.generateOTP(
+        `${user.id}${this.configService.get('OTP_SECRET')}`,
+      );
       const message = `${messages.TOTP_MESSAGE}${otp}`;
       await this.smsService.sendMessageWithTwilio(
         user.phone as string,
@@ -153,7 +165,11 @@ export default class UserAuthService {
     return false;
   }
 
-  async loginWith2FA(code: string, user: User) {
+  async loginWith2FA(code: string, username: string) {
+    const user = await this.userService.getUserDetailsByEmailOrPhone(
+      username,
+      username,
+    );
     const isValidCode = this.otpService.verify2FACode(code, user);
     if (isValidCode) {
       const token = this.authenticationHelper.generateTokenForUser(user);
@@ -164,31 +180,6 @@ export default class UserAuthService {
       );
       return token;
     }
-  }
-
-  private async loginWithPassword(
-    userRecord: User | undefined,
-    userDetails: UserLoginInput,
-  ) {
-    let token;
-    if (userRecord && userRecord.active) {
-      const hashedPassword = userRecord.password as string;
-      const plainTextPassword = userDetails.password as string;
-      if (
-        hashedPassword != null &&
-        this.authenticationHelper.isPasswordValid(
-          plainTextPassword,
-          hashedPassword,
-        )
-      ) {
-        token = this.authenticationHelper.generateTokenForUser(userRecord);
-        await this.userService.updateField(
-          userRecord.id,
-          'refreshToken',
-          token.refreshToken,
-        );
-      }
-      return token;
-    }
+    throw new UnauthorizedException(messages.INVALID_OTP);
   }
 }

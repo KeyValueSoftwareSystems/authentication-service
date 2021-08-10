@@ -13,12 +13,12 @@ export const UserSignupInputSchema = Joi.object({
 
 export const UserLoginInputSchema = Joi.object({
   username: Joi.string().required(),
-  password: Joi.string().min(10),
-  otp: Joi.string(),
-}).xor('password', 'otp').options({ abortEarly: false });
+  password: Joi.string().required().min(10),
+}).options({ abortEarly: false });
 
 export const UserOtpLoginInputSchema = Joi.object({
   username: Joi.string().required(),
+  otp: Joi.string().required(),
 }).options({ abortEarly: false });
 
 export const UserPasswordInputSchema = Joi.object({
