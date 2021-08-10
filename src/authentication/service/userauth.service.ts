@@ -14,18 +14,11 @@ import {
   InvalidPayloadException,
   UserExistsException,
 } from '../exception/userauth.exception';
-import { ConfigService } from '@nestjs/config';
-import { OtpGeneratorService } from './otp.generator.service';
-import messages from '../../constants/messages';
-import SmsService from '../../notification/service/sms.service';
 
 @Injectable()
-export default class UserAuthService {
+export default class UserauthService {
   constructor(
     private userService: UserService,
-    private configService: ConfigService,
-    private otpService: OtpGeneratorService,
-    private smsService: SmsService,
     private authenticationHelper: AuthenticationHelper,
   ) {}
 
@@ -133,53 +126,5 @@ export default class UserAuthService {
 
   async logout(id: string): Promise<void> {
     await this.userService.updateField(id, 'refreshToken', '');
-  }
-
-  async generateOtpAndSendMessage(phoneNumber: string): Promise<void> {
-    const user = await this.userService.getActiveUserByPhoneNumber(phoneNumber);
-    if (user && user.active) {
-      //Found an active user, generating OTP and sending the message to the user
-      const otp = this.otpService.generateOTP(
-        `${user.id}${this.configService.get('OTP_SECRET')}`,
-      );
-      const message = `${messages.TOTP_MESSAGE}${otp}`;
-      await this.smsService.sendMessageWithTwilio(
-        user.phone as string,
-        message,
-      );
-    }
-  }
-
-  async generate2FACode(id: string) {
-    const user = await this.userService.getUserById(id);
-    const data = await this.otpService.generateTotpSecret(user);
-    return data.otpUri;
-  }
-
-  async enable2FA(code: string, id: string) {
-    const user = await this.userService.getUserById(id);
-    if (this.otpService.verify2FACode(code, user)) {
-      await this.userService.updateField(id, 'twoFAEnabled', true);
-      return true;
-    }
-    return false;
-  }
-
-  async loginWith2FA(code: string, username: string) {
-    const user = await this.userService.getUserDetailsByEmailOrPhone(
-      username,
-      username,
-    );
-    const isValidCode = this.otpService.verify2FACode(code, user);
-    if (isValidCode) {
-      const token = this.authenticationHelper.generateTokenForUser(user);
-      await this.userService.updateField(
-        user.id,
-        'refreshToken',
-        token.refreshToken,
-      );
-      return token;
-    }
-    throw new UnauthorizedException(messages.INVALID_OTP);
   }
 }

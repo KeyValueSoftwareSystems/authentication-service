@@ -276,10 +276,7 @@ export default class UserService {
     const nullCheckedPhone = phone ? phone : null;
 
     return this.usersRepository.findOne({
-      where: [
-        { email: nullCheckedEmail, active: true },
-        { phone: nullCheckedPhone, active: true },
-      ],
+      where: [{ email: nullCheckedEmail }, { phone: nullCheckedPhone }],
     });
   }
 
@@ -290,15 +287,5 @@ export default class UserService {
       return updatedUser;
     }
     throw new UserNotFoundException(id);
-  }
-
-  async getActiveUserByPhoneNumber(phone: string) {
-    return await this.usersRepository.findOne({
-      where: { phone, active: true },
-    });
-  }
-
-  async setOtpSecret(user: User, twoFASecret: string) {
-    await this.usersRepository.update(user.id, { twoFASecret });
   }
 }

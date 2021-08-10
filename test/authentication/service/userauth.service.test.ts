@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
-import UserAuthService from '../../../src/authentication/service/user.auth.service';
+import UserauthService from '../../../src/authentication/service/userauth.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { UserLoginInput, UserSignupInput } from 'src/schema/graphql.schema';
 import {
@@ -27,8 +27,8 @@ let users: User[] = [
   },
 ];
 
-describe('test UserAuthService', () => {
-  let userauthService: UserAuthService;
+describe('test UserauthService', () => {
+  let userauthService: UserauthService;
   let authenticationHelper: AuthenticationHelper;
   const userService = Substitute.for<UserService>();
   const configService = Substitute.for<ConfigService>();
@@ -42,11 +42,11 @@ describe('test UserAuthService', () => {
       providers: [
         { provide: 'UserService', useValue: userService },
         { provide: 'ConfigService', useValue: configService },
-        UserAuthService,
+        UserauthService,
         AuthenticationHelper,
       ],
     }).compile();
-    userauthService = moduleRef.get<UserAuthService>(UserAuthService);
+    userauthService = moduleRef.get<UserauthService>(UserauthService);
     authenticationHelper = moduleRef.get<AuthenticationHelper>(
       AuthenticationHelper,
     );

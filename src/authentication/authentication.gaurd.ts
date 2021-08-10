@@ -3,18 +3,15 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthenticationHelper } from './authentication.helper';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthGaurd implements CanActivate {
   constructor(private authenticationHelper: AuthenticationHelper) {}
 
   canActivate(context: ExecutionContext): boolean {
     const ctx = GqlExecutionContext.create(context).getContext();
     if (ctx) {
-      const token = ctx.headers.authorization;
-      if (token) {
-        const reqAuthToken = token.split(' ')[1];
-        ctx.user = this.authenticationHelper.validateAuthToken(reqAuthToken);
-        return true;
-      }
+      const reqAuthToken = ctx.headers.authorization.split(' ')[1];
+      ctx.user = this.authenticationHelper.validateAuthToken(reqAuthToken);
+      return true;
     }
     return false;
   }

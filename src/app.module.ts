@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { DatabaseModule } from './database/database.module';
 import { AppGraphQLModule } from './graphql/graphql.module';
-import { UserAuthModule } from './authentication/authentication.module';
+import { UserauthModule } from './authentication/authentication.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { HealthModule } from './health/health.module';
 
@@ -24,7 +24,7 @@ import { HealthModule } from './health/health.module';
     }),
     AppGraphQLModule,
     DatabaseModule,
-    UserAuthModule,
+    UserauthModule,
     AuthorizationModule,
     HealthModule,
   ],
