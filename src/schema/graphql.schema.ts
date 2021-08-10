@@ -24,6 +24,7 @@ export interface UserSignupInput {
 export interface UserLoginInput {
     username: string;
     password: string;
+    otp: string;
 }
 
 export interface UserPasswordInput {
