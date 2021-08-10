@@ -70,12 +70,12 @@ export default class UserAuthService {
     if (userRecord?.twoFAEnabled && this.configService.get('ENFORCE_2FA')) {
       token = await this.loginWith2FA(userDetails.otp, userRecord);
     } else {
-      token = this.loginWithPassword(userRecord, userDetails);
+      token = await this.loginWithPassword(userRecord, userDetails);
     }
     if (!token) {
       throw new InvalidCredentialsException();
     }
-    return token as TokenResponse;
+    return token;
   }
 
   async updatePassword(userId: string, passwordDetails: any): Promise<User> {
@@ -156,7 +156,9 @@ export default class UserAuthService {
   async loginWith2FA(code: string, user: User) {
     const isValidCode = this.otpService.verify2FACode(code, user);
     if (isValidCode) {
-      const token = this.authenticationHelper.generateTokenForUser(user);
+      const token: TokenResponse = this.authenticationHelper.generateTokenForUser(
+        user,
+      );
       await this.userService.updateField(
         user.id,
         'refreshToken',
@@ -167,27 +169,27 @@ export default class UserAuthService {
   }
 
   private async loginWithPassword(
-    userRecord: User | undefined,
+    userRecord: User,
     userDetails: UserLoginInput,
   ) {
-    let token;
-    if (userRecord && userRecord.active) {
-      const hashedPassword = userRecord.password as string;
-      const plainTextPassword = userDetails.password as string;
-      if (
-        hashedPassword != null &&
-        this.authenticationHelper.isPasswordValid(
-          plainTextPassword,
-          hashedPassword,
-        )
-      ) {
-        token = this.authenticationHelper.generateTokenForUser(userRecord);
-        await this.userService.updateField(
-          userRecord.id,
-          'refreshToken',
-          token.refreshToken,
-        );
-      }
+    const hashedPassword = userRecord.password as string;
+    const plainTextPassword = userDetails.password as string;
+    if (
+      userRecord.active &&
+      hashedPassword != null &&
+      this.authenticationHelper.isPasswordValid(
+        plainTextPassword,
+        hashedPassword,
+      )
+    ) {
+      const token: TokenResponse = this.authenticationHelper.generateTokenForUser(
+        userRecord,
+      );
+      await this.userService.updateField(
+        userRecord.id,
+        'refreshToken',
+        token.refreshToken,
+      );
       return token;
     }
   }
