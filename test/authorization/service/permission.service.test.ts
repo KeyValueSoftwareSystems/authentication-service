@@ -11,6 +11,7 @@ import Permission from '../../../src/authorization/entity/permission.entity';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 import { PermissionDeleteNotAllowedException } from '../../../src/authorization/exception/permission.exception';
+import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
 
 const permissions: Permission[] = [
   {
@@ -27,6 +28,7 @@ describe('test Permission service', () => {
     Repository<GroupPermission>
   >();
   const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
+  const permissionCacheService = Substitute.for<PermissionCacheService>();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -44,6 +46,10 @@ describe('test Permission service', () => {
         {
           provide: getRepositoryToken(GroupPermission),
           useValue: groupPermissionRepository,
+        },
+        {
+          provide: PermissionCacheService,
+          useValue: permissionCacheService,
         },
       ],
     }).compile();
@@ -117,7 +123,7 @@ describe('test Permission service', () => {
         where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
       })
       .returns(Promise.resolve(0));
-
+    permissionCacheService.invalidatePermissionsCache(Arg.any()).resolves();
     const resp = await permissionService.deletePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );

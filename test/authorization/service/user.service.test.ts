@@ -16,6 +16,7 @@ import UserCacheService from '../../../src/authorization/service/usercache.servi
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import GroupCacheService from 'src/authorization/service/groupcache.service';
 import { ConfigService } from '@nestjs/config';
+import PermissionCacheService from 'src/authorization/service/permissioncache.service';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -59,6 +60,7 @@ describe('test UserService', () => {
   >();
   const userCacheService = Substitute.for<UserCacheService>();
   const groupCacheService = Substitute.for<GroupCacheService>();
+  const permissionCacheService = Substitute.for<PermissionCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
   const permissionQueryBuilder = Substitute.for<
@@ -101,6 +103,7 @@ describe('test UserService', () => {
         { provide: 'UserCacheService', useValue: userCacheService },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
+        { provide: 'PermissionCacheService', useValue: permissionCacheService },
         {
           provide: Connection,
           useValue: connectionMock,
@@ -354,6 +357,9 @@ describe('test UserService', () => {
     groupCacheService
       .getGroupPermissionsFromGroupId('91742290-4049-45c9-9c27-c9f6200fef4c')
       .resolves(groupPermissions.map((x) => x.permissionId));
+    permissionCacheService
+      .getPermissionsFromCache('CreateUser')
+      .resolves(permissions[0]);
     const resp = await userService.verifyUserPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       ['CreateUser'],

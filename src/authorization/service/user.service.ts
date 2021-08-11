@@ -20,6 +20,7 @@ import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
+import PermissionCacheService from './permissioncache.service';
 
 @Injectable()
 export default class UserService {
@@ -38,6 +39,7 @@ export default class UserService {
     private groupPermissionRepository: Repository<GroupPermission>,
     private userCacheService: UserCacheService,
     private groupCacheService: GroupCacheService,
+    private permissionCacheService: PermissionCacheService,
     private cacheManager: RedisCacheService,
     private connection: Connection,
   ) {}
@@ -219,16 +221,20 @@ export default class UserService {
 
   async verifyUserPermissions(
     id: string,
-    permissionToVerify: string[],
+    permissionsToVerify: string[],
     operation: OperationType = OperationType.AND,
   ): Promise<boolean> {
-    const permissionsRequired = await this.permissionRepository.find({
-      where: { name: In(permissionToVerify) },
-    });
-    if (permissionsRequired.length !== permissionToVerify.length) {
+    const permissionsRequired = (
+      await Promise.all(
+        permissionsToVerify.map((p) =>
+          this.permissionCacheService.getPermissionsFromCache(p),
+        ),
+      )
+    ).flat(1);
+    if (permissionsRequired.length !== permissionsToVerify.length) {
       const validPermissions = new Set(permissionsRequired.map((p) => p.name));
       throw new PermissionNotFoundException(
-        permissionToVerify.filter((p) => !validPermissions.has(p)).toString(),
+        permissionsToVerify.filter((p) => !validPermissions.has(p)).toString(),
       );
     }
     const allPermissionsOfUser = await this.getAllUserpermissionIds(id);

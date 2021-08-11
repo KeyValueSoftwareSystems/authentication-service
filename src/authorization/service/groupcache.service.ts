@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import GroupPermission from '../entity/groupPermission.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Group from '../entity/group.entity';
 
 @Injectable()
 export default class GroupCacheService {
@@ -10,6 +11,8 @@ export default class GroupCacheService {
     private cacheManager: RedisCacheService,
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: Repository<GroupPermission>,
+    @InjectRepository(Group)
+    private groupRepository: Repository<Group>,
   ) {}
 
   async getGroupPermissionsFromGroupId(groupId: string): Promise<string[]> {
@@ -19,9 +22,13 @@ export default class GroupCacheService {
     const permissions =
       permissionsFromCache ||
       (
-        await this.groupPermissionRepository.find({
-          where: { groupId: groupId },
-        })
+        await this.groupRepository
+          .findOneOrFail({ where: { id: groupId, active: true } })
+          .then(() =>
+            this.groupPermissionRepository.find({
+              where: { groupId: groupId },
+            }),
+          )
       ).map((x) => x.permissionId);
     permissionsFromCache ||
       (await this.cacheManager.set(
