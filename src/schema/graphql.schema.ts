@@ -23,8 +23,8 @@ export interface UserSignupInput {
 
 export interface UserLoginInput {
     username: string;
-    password: string;
-    otp: string;
+    password?: string;
+    otp?: string;
 }
 
 export interface UserPasswordInput {
@@ -38,6 +38,10 @@ export interface RefreshTokenInput {
 
 export interface GenerateOtpInput {
     phone: string;
+}
+
+export interface Enable2FAInput {
+    code: string;
 }
 
 export interface NewEntityInput {
@@ -102,6 +106,7 @@ export interface IMutation {
     refresh(input: RefreshTokenInput): TokenResponse | Promise<TokenResponse>;
     logout(): string | Promise<string>;
     generateOtp(input?: GenerateOtpInput): string | Promise<string>;
+    enable2FA(input?: Enable2FAInput): string | Promise<string>;
     createEntity(input: NewEntityInput): Entity | Promise<Entity>;
     updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;

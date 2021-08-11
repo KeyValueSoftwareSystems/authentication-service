@@ -1,6 +1,7 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
+  Enable2FAInput,
   GenerateOtpInput,
   RefreshTokenInput,
   TokenResponse,
@@ -11,6 +12,7 @@ import User from 'src/authorization/entity/user.entity';
 import { AuthGuard } from '../authentication.guard';
 import UserAuthService from '../service/user.auth.service';
 import {
+  Enable2FAInputSchema,
   EnableUser2FASchema,
   GenerateOtpInputSchema,
   UserLoginInputSchema,
@@ -18,6 +20,7 @@ import {
   UserSignupInputSchema,
 } from '../validation/user.auth.schema.validation';
 import ValidationPipe from '../../validation/validation.pipe';
+import { InvalidCredentialsException } from '../exception/userauth.exception';
 
 @Resolver('Userauth')
 export default class UserAuthResolver {
@@ -63,5 +66,15 @@ export default class UserAuthResolver {
   @UsePipes(new ValidationPipe(GenerateOtpInputSchema))
   async generateOtp(@Args('input') request: GenerateOtpInput) {
     return this.userAuthService.generateOtpAndSendMessage(request.phone);
+  }
+
+  @Mutation('enable2FA')
+  @UseGuards(AuthGuard)
+  async enable2FA(
+    @Args('input', new ValidationPipe(Enable2FAInputSchema))
+    request: Enable2FAInput,
+    @Context('user') user: any,
+  ) {
+    return await this.userAuthService.enable2FA(request.code, user.id);
   }
 }

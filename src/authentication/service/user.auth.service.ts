@@ -67,8 +67,12 @@ export default class UserAuthService {
     if (!userRecord) {
       throw new UserNotFoundException(userDetails.username);
     }
-    if (userRecord?.twoFAEnabled && this.configService.get('ENFORCE_2FA')) {
-      token = await this.loginWith2FA(userDetails.otp, userRecord);
+    if (
+      userRecord?.twoFAEnabled &&
+      this.configService.get('ENFORCE_2FA') &&
+      userDetails.otp
+    ) {
+      token = await this.loginWith2FA(userDetails?.otp, userRecord);
     } else {
       token = await this.loginWithPassword(userRecord, userDetails);
     }
@@ -129,7 +133,7 @@ export default class UserAuthService {
     const user = await this.userService.getActiveUserByPhoneNumber(phoneNumber);
     if (user && user.active) {
       //Found an active user, generating OTP and sending the message to the user
-      const otp = this.otpService.generateOTP(`${user.id}${user.twoFASecret}`);
+      const otp = this.otpService.generateOTP(`${user.twoFASecret}`);
       const message = `${messages.TOTP_MESSAGE}${otp}`;
       await this.smsService.sendMessageWithTwilio(
         user.phone as string,
@@ -148,9 +152,8 @@ export default class UserAuthService {
     const user = await this.userService.getUserById(id);
     if (this.otpService.verify2FACode(code, user)) {
       await this.userService.updateField(id, 'twoFAEnabled', true);
-      return true;
     }
-    return false;
+    throw new InvalidCredentialsException();
   }
 
   async loginWith2FA(code: string, user: User) {

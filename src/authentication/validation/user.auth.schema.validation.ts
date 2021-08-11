@@ -15,7 +15,9 @@ export const UserLoginInputSchema = Joi.object({
   username: Joi.string().required(),
   password: Joi.string().min(10),
   otp: Joi.string(),
-}).xor('password', 'otp').options({ abortEarly: false });
+})
+  .xor('password', 'otp')
+  .options({ abortEarly: false });
 
 export const UserOtpLoginInputSchema = Joi.object({
   username: Joi.string().required(),
@@ -41,6 +43,10 @@ export const GoogleUserSchema = Joi.object({
 
 export const GenerateOtpInputSchema = Joi.object({
   phone: Joi.string().trim().required(),
+});
+
+export const Enable2FAInputSchema = Joi.object({
+  code: Joi.string().trim().required(),
 });
 
 export const EnableUser2FASchema = Joi.object({
