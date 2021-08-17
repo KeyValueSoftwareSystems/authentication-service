@@ -22,6 +22,9 @@ import { TwilioModule } from 'nestjs-twilio';
 import { TwoFAController } from './controller/two.FA.controller';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
 import UserService from '../authorization/service/user.service';
+import GroupCacheService from '../authorization/service/groupcache.service';
+import UserCacheService from '../authorization/service/usercache.service';
+import PermissionCacheService from '../authorization/service/permissioncache.service';
 
 @Module({
   imports: [
@@ -50,6 +53,9 @@ import UserService from '../authorization/service/user.service';
     GoogleStrategy,
     AuthenticationHelper,
     ConfigService,
+    UserCacheService,
+    GroupCacheService,
+    PermissionCacheService,
     LoggerService,
     OtpGeneratorService,
     SmsService,
