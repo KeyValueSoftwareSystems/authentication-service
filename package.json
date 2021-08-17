@@ -50,6 +50,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6",
+    "speakeasy": "^2.0.0",
     "twilio": "^3.66.1",
     "typeorm": "^0.2.32",
     "winston": "^3.3.3"
@@ -70,6 +71,7 @@
     "@types/node": "^14.14.36",
     "@types/passport-google-oauth20": "^2.0.8",
     "@types/qrcode": "^1.4.1",
+    "@types/speakeasy": "^2.0.6",
     "@types/supertest": "^2.0.10",
     "@types/totp-generator": "0.0.2",
     "@typescript-eslint/eslint-plugin": "^4.19.0",

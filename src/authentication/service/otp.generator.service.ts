@@ -1,41 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import User from '../../authorization/entity/user.entity';
-import { authenticator, totp } from 'otplib';
-import UserService from '../../authorization/service/user.service';
-import { HashAlgorithms, KeyEncodings } from '@otplib/core';
+import { authenticator } from 'otplib';
+import * as speakeasy from 'speakeasy';
+import { GeneratedSecret } from 'speakeasy';
 
 @Injectable()
 export class OtpGeneratorService {
   private authenticator = authenticator;
-  constructor(
-    private configService: ConfigService,
-    private userService: UserService,
-  ) {
+  constructor(private configService: ConfigService) {
     this.authenticator.options = {
       step: Number(configService.get('OTP_STEP')),
       window: Number(configService.get('OTP_WINDOW')),
-      encoding: KeyEncodings.HEX,
-      algorithm: HashAlgorithms.SHA1,
     };
   }
 
-  generateOTP(secret: string) {
+  generateOTP(keyString: string) {
+    const secret = (keyString + this.configService.get('OTP_SECRET')) as string;
     return this.authenticator.generate(secret);
   }
 
-  validate(input: string, secret: string) {
-    return this.authenticator.verify({ token: input, secret });
+  validate2FAOTP(token: string, secret: string) {
+    return speakeasy.totp.verify({
+      secret,
+      encoding: 'base32',
+      token,
+    });
+  }
+
+  validateOTP(token: string, keyString: string | undefined) {
+    const secret = (keyString + this.configService.get('OTP_SECRET')) as string;
+    return this.authenticator.verify({ token, secret });
   }
 
   public async generateTotpSecret(user: User) {
-    const twoFASecret = this.authenticator.generateSecret();
-    const otpUri = authenticator.keyuri(
+    const twoFASecret = speakeasy.generateSecret({ length: 20 });
+    const otpUri = this.authenticator.keyuri(
       user.id,
       <string>this.configService.get('2FA_APP_NAME'),
-      twoFASecret,
+      twoFASecret.base32,
     );
-    await this.userService.setOtpSecret(user, twoFASecret);
     return {
       secret: twoFASecret,
       otpUri,
@@ -44,7 +48,8 @@ export class OtpGeneratorService {
 
   public verify2FACode(code: string, user: User) {
     if (user.twoFASecret) {
-      return this.validate(code, user.twoFASecret);
+      const secret = JSON.parse(user.twoFASecret) as GeneratedSecret;
+      return this.validate2FAOTP(code, secret.base32);
     }
   }
 }
