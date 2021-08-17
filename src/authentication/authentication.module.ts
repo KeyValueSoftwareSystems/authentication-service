@@ -21,6 +21,7 @@ import { TwilioImplModule } from '../notification/twilio/twilio.module';
 import { TwilioModule } from 'nestjs-twilio';
 import { TwoFAController } from './controller/two.FA.controller';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
+import UserService from '../authorization/service/user.service';
 
 @Module({
   imports: [
@@ -36,15 +37,12 @@ import { AuthorizationModule } from 'src/authorization/authorization.module';
     RedisCacheModule,
     TwilioModule,
     TwilioImplModule,
-  ],
-  AuthorizationModule,
+    AuthorizationModule,
   ],
   providers: [
     UserAuthResolver,
     UserAuthService,
     UserService,
-    UserauthResolver,
-    UserauthService,
     GoogleAuthController,
     GoogleAuthService,
     AuthenticationHelper,
