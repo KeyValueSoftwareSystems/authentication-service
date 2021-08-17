@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
+import User from '../entity/user.entity';
 
 @Injectable()
 export default class UserCacheService {
@@ -13,6 +14,8 @@ export default class UserCacheService {
     private userGroupRepository: Repository<UserGroup>,
     @InjectRepository(UserPermission)
     private userPermissionRepository: Repository<UserPermission>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async getUserGroupsByUserId(userId: string): Promise<string[]> {
@@ -21,9 +24,13 @@ export default class UserCacheService {
     );
     const groups =
       groupsFromCache ||
-      (await this.userGroupRepository.find({ where: { userId: userId } })).map(
-        (x) => x.groupId,
-      );
+      (
+        await this.userRepository
+          .findOneOrFail({ where: { id: userId, active: true } })
+          .then(() =>
+            this.userGroupRepository.find({ where: { userId: userId } }),
+          )
+      ).map((x) => x.groupId);
     groupsFromCache ||
       (await this.cacheManager.set(`USER:${userId}:GROUPS`, groups));
     return groupsFromCache || groups;
@@ -36,7 +43,11 @@ export default class UserCacheService {
     const permissions =
       permissionsFromCache ||
       (
-        await this.userPermissionRepository.find({ where: { userId: userId } })
+        await this.userRepository
+          .findOneOrFail({ where: { id: userId, active: true } })
+          .then(() =>
+            this.userPermissionRepository.find({ where: { userId: userId } }),
+          )
       ).map((x) => x.permissionId);
     permissionsFromCache ||
       (await this.cacheManager.set(`USER:${userId}:PERMISSIONS`, permissions));
