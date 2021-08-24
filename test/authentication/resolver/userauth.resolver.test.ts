@@ -17,6 +17,7 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import { ConfigService } from '@nestjs/config';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { OtpGeneratorService } from '../../../src/authentication/service/otp.generator.service';
 
 const users: User[] = [
   {
@@ -36,6 +37,7 @@ const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
 const userauthService = Substitute.for<UserAuthService>();
+const otpGeneratorService = Substitute.for<OtpGeneratorService>();
 const userCacheService = Substitute.for<UserCacheService>();
 const redisCacheService = Substitute.for<RedisCacheService>();
 

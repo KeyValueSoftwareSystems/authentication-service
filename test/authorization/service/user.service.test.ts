@@ -17,6 +17,7 @@ import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.se
 import GroupCacheService from 'src/authorization/service/groupcache.service';
 import { ConfigService } from '@nestjs/config';
 import PermissionCacheService from 'src/authorization/service/permissioncache.service';
+import { OtpGeneratorService } from '../../../src/authentication/service/otp.generator.service';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -67,6 +68,7 @@ describe('test UserService', () => {
     SelectQueryBuilder<Permission>
   >();
   const connectionMock = Substitute.for<Connection>();
+  const otpGeneratorService = Substitute.for<OtpGeneratorService>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
