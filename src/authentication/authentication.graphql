@@ -4,6 +4,8 @@ type Mutation {
     changePassword(input: UserPasswordInput!): User
     refresh(input: RefreshTokenInput!): TokenResponse
     logout: String
+    generateOtp(input: GenerateOtpInput): String
+    enable2FA(input: Enable2FAInput): String
 }
 
 input UserSignupInput {
@@ -17,7 +19,8 @@ input UserSignupInput {
 
 input UserLoginInput {
     username: String!
-    password: String!
+    password: String
+    otp: String
 }
 
 type TokenResponse {
@@ -42,4 +45,12 @@ input UserPasswordInput {
 
 input RefreshTokenInput {
   refreshToken: String!
+}
+
+input GenerateOtpInput {
+    phone: String!
+}
+
+input Enable2FAInput{
+    code: String!
 }
