@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
 import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
-import UserauthService from '../../../src/authentication/service/userauth.service';
+import UserAuthService from '../../../src/authentication/service/user.auth.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { UserLoginInput, UserSignupInput } from 'src/schema/graphql.schema';
 import {
@@ -12,6 +12,8 @@ import {
   InvalidPayloadException,
   UserExistsException,
 } from '../../../src/authentication/exception/userauth.exception';
+import { OtpGeneratorService } from '../../../src/authentication/service/otp.generator.service';
+import SmsService from '../../../src/notification/service/sms.service';
 
 let users: User[] = [
   {
@@ -27,11 +29,13 @@ let users: User[] = [
   },
 ];
 
-describe('test UserauthService', () => {
-  let userauthService: UserauthService;
+describe('test UserAuthService', () => {
+  let userauthService: UserAuthService;
   let authenticationHelper: AuthenticationHelper;
   const userService = Substitute.for<UserService>();
   const configService = Substitute.for<ConfigService>();
+  const otpGeneratorService = Substitute.for<OtpGeneratorService>();
+  const smsService = Substitute.for<SmsService>();
   configService.get('ENV').returns('local');
   configService.get('JWT_SECRET').returns('s3cr3t1234567890');
   configService.get('JWT_TOKEN_EXPTIME').returns(3600);
@@ -42,11 +46,13 @@ describe('test UserauthService', () => {
       providers: [
         { provide: 'UserService', useValue: userService },
         { provide: 'ConfigService', useValue: configService },
-        UserauthService,
+        { provide: 'OtpGeneratorService', useValue: otpGeneratorService },
+        { provide: 'SmsService', useValue: smsService },
+        UserAuthService,
         AuthenticationHelper,
       ],
     }).compile();
-    userauthService = moduleRef.get<UserauthService>(UserauthService);
+    userauthService = moduleRef.get<UserAuthService>(UserAuthService);
     authenticationHelper = moduleRef.get<AuthenticationHelper>(
       AuthenticationHelper,
     );
