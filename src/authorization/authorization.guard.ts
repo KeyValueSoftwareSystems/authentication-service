@@ -12,7 +12,7 @@ export class AuthorizationGaurd implements CanActivate {
       'permissions',
       context.getHandler(),
     );
-    const userId = ctx.req.user.id;
+    const userId = ctx.user.id;
     const verified = await this.userService.verifyUserPermissions(
       userId,
       permissionsRequired,
