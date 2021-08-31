@@ -1,0 +1,17 @@
+export enum PermissionsType {
+  CreateEntities = 'create-entities',
+  EditEntities = 'edit-entities',
+  ViewEntities = 'view-entities',
+  DeleteEntities = 'delete-entities',
+  CreateGroups = 'create-groups',
+  EditGroups = 'edit-groups',
+  ViewGroups = 'view-groups',
+  DeleteGroups = 'delete-groups',
+  CreatePermissions = 'create-permissions',
+  EditPermissions = 'edit-permissions',
+  ViewPermissions = 'view-permissions',
+  DeletePermissions = 'delete-permissions',
+  EditUser = 'edit-user',
+  ViewUser = 'view-user',
+  DeleteUser = 'delete-user',
+}
