@@ -27,7 +27,7 @@ export class EntityResolver {
   }
 
   @Mutation()
-  @Permissions('create-entities')
+  @Permissions(PermissionsType.CreateEntities)
   async createEntity(
     @Args('input') entityInput: NewEntityInput,
   ): Promise<Entity> {
