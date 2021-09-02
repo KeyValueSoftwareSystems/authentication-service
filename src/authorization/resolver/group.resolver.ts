@@ -1,6 +1,5 @@
-import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { AuthGuard } from '../../authentication/authentication.guard';
 import {
   NewGroupInput,
   Permission,
@@ -9,30 +8,32 @@ import {
 } from 'src/schema/graphql.schema';
 import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
+import { Permissions } from '../permissions.decorator';
+import { PermissionsType } from '../constants/authorization.constants';
 
 @Resolver('Group')
 export class GroupResolver {
   constructor(private groupService: GroupService) {}
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewGroups)
   @Query()
   getGroups(): Promise<Group[]> {
     return this.groupService.getAllGroups();
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewGroups)
   @Query()
   getGroup(@Args('id', ParseUUIDPipe) id: string): Promise<Group> {
     return this.groupService.getGroupById(id);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.CreateGroups)
   @Mutation()
   async createGroup(@Args('input') groupInput: NewGroupInput): Promise<Group> {
     return this.groupService.createGroup(groupInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.EditGroups)
   @Mutation()
   async updateGroup(
     @Args('id', ParseUUIDPipe) id: string,
@@ -41,7 +42,7 @@ export class GroupResolver {
     return this.groupService.updateGroup(id, groupInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.EditGroups)
   @Mutation()
   async updateGroupPermissions(
     @Args('id', ParseUUIDPipe) id: string,
@@ -50,13 +51,13 @@ export class GroupResolver {
     return this.groupService.updateGroupPermissions(id, groupInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.DeleteGroups)
   @Mutation()
   async deleteGroup(@Args('id', ParseUUIDPipe) id: string): Promise<Group> {
     return this.groupService.deleteGroup(id);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewGroups)
   @Query()
   async getGroupPermissions(
     @Args('id', ParseUUIDPipe) id: string,
