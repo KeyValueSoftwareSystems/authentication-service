@@ -44,7 +44,7 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
 
-    const plainTextPassword = userDetails.password;
+    const plainTextPassword = userDetails.password as string;
     userFromInput.password = this.authenticationHelper.generatePasswordHash(
       plainTextPassword,
     );

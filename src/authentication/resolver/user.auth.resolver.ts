@@ -7,15 +7,16 @@ import {
   TokenResponse,
   UserLoginInput,
   UserSignupResponse,
-} from 'src/schema/graphql.schema';
-import User from 'src/authorization/entity/user.entity';
+} from '../../schema/graphql.schema';
+import User from '../../authorization/entity/user.entity';
 import { AuthGuard } from '../authentication.guard';
-import UserAuthService from '../service/user.auth.service';
 import {
   GenerateOtpInputSchema,
   UserOTPLoginInputSchema,
   UserOTPSignupInputSchema,
   UserPasswordInputSchema,
+  UserPasswordLoginInputSchema,
+  UserPasswordSignupInputSchema,
 } from '../validation/user.auth.schema.validation';
 import ValidationPipe from '../../validation/validation.pipe';
 import PasswordAuthService from '../service/password.auth.service';
@@ -29,7 +30,7 @@ export default class UserAuthResolver {
     private readonly tokenService: TokenService) {}
 
   @Mutation('passwordLogin')
-  @UsePipes(new ValidationPipe(UserPasswordInputSchema))
+  @UsePipes(new ValidationPipe(UserPasswordLoginInputSchema))
   async passwordLogin(
     @Args('input') request: UserLoginInput,
   ): Promise<TokenResponse> {
@@ -37,7 +38,7 @@ export default class UserAuthResolver {
   }
 
   @Mutation('passwordSignup')
-  @UsePipes(new ValidationPipe(UserPasswordInputSchema))
+  @UsePipes(new ValidationPipe(UserPasswordSignupInputSchema))
   async passwordSignup(@Args('input') request: any): Promise<UserSignupResponse> {
     return this.passwordAuthService.userSignup(request);
   }

@@ -15,7 +15,7 @@ export enum OperationType {
 export interface UserSignupInput {
     email?: string;
     phone?: string;
-    password: string;
+    password?: string;
     firstName: string;
     middleName?: string;
     lastName: string;

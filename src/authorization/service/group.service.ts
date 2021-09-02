@@ -4,7 +4,7 @@ import {
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
-} from 'src/schema/graphql.schema';
+} from '../../schema/graphql.schema';
 import { createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';

@@ -6,7 +6,7 @@ import {
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
-} from 'src/schema/graphql.schema';
+} from '../../../src/schema/graphql.schema';
 import Group from '../../../src/authorization/entity/group.entity';
 import { GroupService } from '../../../src/authorization/service/group.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
@@ -16,7 +16,7 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import { ConfigService } from '@nestjs/config';
-import GroupCacheService from 'src/authorization/service/groupcache.service';
+import GroupCacheService from '../../../src/authorization/service/groupcache.service';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

@@ -12,7 +12,7 @@ import {
   UpdateUserPermissionInput,
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
-import Group from 'src/authorization/entity/group.entity';
+import Group from '../../../src/authorization/entity/group.entity';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
 

@@ -5,7 +5,7 @@ import {
   Permission,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
-} from 'src/schema/graphql.schema';
+} from '../../schema/graphql.schema';
 import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
 import { Permissions } from '../permissions.decorator';
