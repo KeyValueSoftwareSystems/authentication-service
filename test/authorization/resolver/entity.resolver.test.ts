@@ -1,4 +1,4 @@
-import Substitute from '@fluffy-spoon/substitute';
+import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
@@ -11,8 +11,28 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { EntityService } from '../../../src/authorization/service/entity.service';
 import { EntityResolver } from '../../../src/authorization/resolver/entity.resolver';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import UserService from '../../../src/authorization/service/user.service';
+import { ConfigService } from '@nestjs/config';
+import User from '../../../src/authorization/entity/user.entity';
+import { AuthorizationGaurd } from '../../../src/authorization/authorization.guard';
+import { mockedConfigService } from 'test/utils/mocks/config.service';
 
 const gql = '/graphql';
+
+const users: User[] = [
+  {
+    id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    email: 'user@test.com',
+    phone: '9112345678910',
+    password: 's3cr3t1234567890',
+    firstName: 'Test1',
+    lastName: 'Test2',
+    active: true,
+    updatedDate: new Date(),
+    origin: 'simple',
+  },
+];
 
 const entities: Entity[] = [
   {
@@ -30,20 +50,32 @@ const permissions = [
   },
 ];
 const entityService = Substitute.for<EntityService>();
+const userService = Substitute.for<UserService>();
 describe('Entity Module', () => {
   let app: INestApplication;
+  userService
+    .verifyUserPermissions(Arg.any(), Arg.any(), Arg.any())
+    .resolves(true);
 
+  let token: string;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
       providers: [
         EntityResolver,
         { provide: 'EntityService', useValue: entityService },
+        { provide: 'UserService', useValue: userService },
+        { provide: 'ConfigService', useValue: mockedConfigService },
+        AuthenticationHelper,
       ],
     }).compile();
 
+    const authenticationHelper = moduleFixture.get<AuthenticationHelper>(
+      AuthenticationHelper,
+    );
     app = moduleFixture.createNestApplication();
     await app.init();
+    token = authenticationHelper.generateAccessToken(users[0]);
   });
 
   afterAll(async () => {
@@ -55,6 +87,7 @@ describe('Entity Module', () => {
         entityService.getAllEntities().returns(Promise.resolve(entities));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({ query: '{getEntities {id name active }}' })
           .expect(200)
           .expect((res) => {
@@ -68,6 +101,7 @@ describe('Entity Module', () => {
           .returns(Promise.resolve(entities[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               '{getEntity(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
@@ -88,6 +122,7 @@ describe('Entity Module', () => {
           .returns(Promise.resolve(entities[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { createEntity(input: {name: "Test1"}) {id name active }}',
@@ -111,6 +146,7 @@ describe('Entity Module', () => {
           .returns(Promise.resolve(entities[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { updateEntity(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {name: "Test1"}) {id name active }}',
@@ -127,6 +163,7 @@ describe('Entity Module', () => {
           .returns(Promise.resolve(entities[0]));
         return request(app.getHttpServer())
           .post(gql)
+          .set('Authorization', `Bearer ${token}`)
           .send({
             query:
               'mutation { deleteEntity(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
@@ -152,6 +189,7 @@ describe('Entity Module', () => {
 
       return request(app.getHttpServer())
         .post(gql)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           query:
             'mutation { updateEntityPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
