@@ -13,26 +13,26 @@ import {
 import UserService from '../service/user.service';
 import ValidationPipe from '../../validation/validation.pipe';
 import * as UserSchema from '../validation/user.validation.schema';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../../authentication/authentication.guard';
+import { Permissions } from '../permissions.decorator';
+import { PermissionsType } from '../constants/authorization.constants';
 
 @Resolver('User')
 export class UserResolver {
   constructor(private userService: UserService) {}
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewUser)
   @Query()
   getUsers(): Promise<User[]> {
     return this.userService.getAllUsers();
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewUser)
   @Query()
   getUser(@Args('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.userService.getUserById(id);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.EditUser)
   @Mutation()
   async updateUser(
     @Args('id', ParseUUIDPipe) id: string,
@@ -42,7 +42,7 @@ export class UserResolver {
     return this.userService.updateUser(id, userInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.EditUser)
   @Mutation()
   async updateUserGroups(
     @Args('id', ParseUUIDPipe) id: string,
@@ -52,7 +52,7 @@ export class UserResolver {
     return this.userService.updateUserGroups(id, userInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.EditUser)
   @Mutation()
   async updateUserPermissions(
     @Args('id', ParseUUIDPipe) id: string,
@@ -62,13 +62,13 @@ export class UserResolver {
     return this.userService.updateUserPermissions(id, userInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.DeleteUser)
   @Mutation()
   async deleteUser(@Args('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.userService.deleteUser(id);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewUser)
   @Query()
   async verifyUserPermission(
     @Args('id', ParseUUIDPipe) id: string,
@@ -82,7 +82,7 @@ export class UserResolver {
     );
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewUser)
   @Query()
   async getUserPermissions(
     @Args('id', ParseUUIDPipe) id: string,
@@ -90,7 +90,7 @@ export class UserResolver {
     return this.userService.getUserPermissions(id);
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions(PermissionsType.ViewUser)
   @Query()
   async getUserGroups(
     @Args('id', ParseUUIDPipe) id: string,
