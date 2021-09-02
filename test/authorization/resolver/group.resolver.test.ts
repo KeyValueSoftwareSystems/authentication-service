@@ -1,4 +1,4 @@
-import Substitute from '@fluffy-spoon/substitute';
+import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
@@ -14,6 +14,8 @@ import {
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
 import User from '../../../src/authorization/entity/user.entity';
+import UserService from 'src/authorization/service/user.service';
+import { mockedConfigService } from 'test/utils/mocks/config.service';
 
 const gql = '/graphql';
 
@@ -50,17 +52,20 @@ const groupService = Substitute.for<GroupService>();
 describe('Group Module', () => {
   let app: INestApplication;
 
-  const configService = Substitute.for<ConfigService>();
-  configService.get('ENV').returns('local');
+  const userService = Substitute.for<UserService>();
   let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
+    userService
+      .verifyUserPermissions(Arg.any(), Arg.any(), Arg.any())
+      .resolves(true);
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppGraphQLModule],
       providers: [
         AuthenticationHelper,
         GroupResolver,
-        { provide: 'ConfigService', useValue: configService },
         { provide: 'GroupService', useValue: groupService },
+        { provide: 'UserService', useValue: userService },
+        { provide: 'ConfigService', useValue: mockedConfigService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(
@@ -76,7 +81,6 @@ describe('Group Module', () => {
   describe(gql, () => {
     describe('groups', () => {
       it('should get the groups', () => {
-        configService.get('JWT_SECRET').returns('s3cr3t1234567890');
         const token = authenticationHelper.generateAccessToken(users[0]);
 
         groupService.getAllGroups().returns(Promise.resolve(groups));
