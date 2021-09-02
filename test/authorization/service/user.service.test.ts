@@ -358,7 +358,7 @@ describe('test UserService', () => {
       .getGroupPermissionsFromGroupId('91742290-4049-45c9-9c27-c9f6200fef4c')
       .resolves(groupPermissions.map((x) => x.permissionId));
     permissionCacheService
-      .getPermissionsFromCache('CreateUser')
+      .getPermissionsFromCache(Arg.any())
       .resolves(permissions[0]);
     const resp = await userService.verifyUserPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

@@ -1,42 +1,36 @@
-import { Module } from '@nestjs/common';
-import { GoogleAuthService } from './service/google.service';
-import { GoogleAuthController } from './controller/google.controller';
-import UserAuthResolver from './resolver/user.auth.resolver';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import User from '../authorization/entity/user.entity';
+import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthenticationHelper } from './authentication.helper';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthorizationModule } from '../authorization/authorization.module';
 import Group from '../authorization/entity/group.entity';
 import GroupPermission from '../authorization/entity/groupPermission.entity';
 import Permission from '../authorization/entity/permission.entity';
+import User from '../authorization/entity/user.entity';
 import UserGroup from '../authorization/entity/userGroup.entity';
 import UserPermission from '../authorization/entity/userPermission.entity';
-import { GoogleStrategy } from './passport/googleStrategy';
-import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
-import { LoggerService } from '../logger/logger.service';
-import { TwoFactorAuthService } from './service/otp.generator.service';
-import SmsService from '../notification/service/twilio.sms.service';
-import { TwilioImplModule } from '../twilio/twilio.module';
-import { AuthorizationModule } from '../authorization/authorization.module';
-import UserService from '../authorization/service/user.service';
 import GroupCacheService from '../authorization/service/groupcache.service';
-import UserCacheService from '../authorization/service/usercache.service';
 import PermissionCacheService from '../authorization/service/permissioncache.service';
-import PasswordAuthService from './service/password.auth.service';
-import { NotificationModule } from '../notification/notification.module';
-import OTPAuthService from './service/otp.auth.service';
-import TwilioOTPService from './service/twilio.otp.service';
-import { OTPVerifiable } from './interfaces/otp.verifiable';
-import { TokenService } from './service/token.service';
-import {
-  OTPVerifyToolEnum,
-  SMSIntegrationEnum,
-} from '../constants/integrations.enum';
-import { DefaultOTPService } from './service/default.otp.service';
-import { SMSInterface } from '../notification/interfaces/sms.interface';
-import TwilioSmsService from '../notification/service/twilio.sms.service';
-import AWSSMSService from '../notification/service/aws.sms.service';
+import UserService from '../authorization/service/user.service';
+import UserCacheService from '../authorization/service/usercache.service';
+import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import { ProviderFactory } from '../factory/provider.factory';
+import { LoggerService } from '../logger/logger.service';
+import { NotificationModule } from '../notification/notification.module';
+import AWSSMSService from '../notification/service/aws.sms.service';
+import { default as SmsService, default as TwilioSmsService } from '../notification/service/twilio.sms.service';
+import { TwilioImplModule } from '../twilio/twilio.module';
+import { AuthenticationHelper } from './authentication.helper';
+import { GoogleAuthController } from './controller/google.controller';
+import { GoogleStrategy } from './passport/googleStrategy';
+import UserAuthResolver from './resolver/user.auth.resolver';
+import { DefaultOTPService } from './service/default.otp.service';
+import { GoogleAuthService } from './service/google.service';
+import OTPAuthService from './service/otp.auth.service';
+import { TwoFactorAuthService } from './service/otp.generator.service';
+import PasswordAuthService from './service/password.auth.service';
+import { RecaptchaService } from './service/recaptcha.service';
+import { TokenService } from './service/token.service';
+import TwilioOTPService from './service/twilio.otp.service';
 
 @Module({
   imports: [
@@ -53,6 +47,7 @@ import { ProviderFactory } from '../factory/provider.factory';
     NotificationModule,
     AuthorizationModule,
     TwilioImplModule,
+    HttpModule,
   ],
   providers: [
     UserAuthResolver,
@@ -80,6 +75,7 @@ import { ProviderFactory } from '../factory/provider.factory';
     TwilioSmsService,
     AWSSMSService,
     LoggerService,
+    RecaptchaService,
   ],
   controllers: [GoogleAuthController],
 })
