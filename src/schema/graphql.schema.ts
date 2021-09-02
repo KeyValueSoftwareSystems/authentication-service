@@ -100,13 +100,14 @@ export interface UserPermissionsVerification {
 }
 
 export interface IMutation {
-    login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
-    signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    passwordLogin(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
+    passwordSignup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    otpLogin(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
+    otpSignup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
     refresh(input: RefreshTokenInput): TokenResponse | Promise<TokenResponse>;
     logout(): string | Promise<string>;
     generateOtp(input?: GenerateOtpInput): string | Promise<string>;
-    enable2FA(input?: Enable2FAInput): string | Promise<string>;
     createEntity(input: NewEntityInput): Entity | Promise<Entity>;
     updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;

@@ -15,16 +15,30 @@ import UserPermission from 'src/authorization/entity/userPermission.entity';
 import { GoogleStrategy } from './passport/googleStrategy';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import { LoggerService } from 'src/logger/logger.service';
-import { OtpGeneratorService } from './service/otp.generator.service';
-import SmsService from '../notification/service/sms.service';
-import { TwilioImplModule } from '../notification/twilio/twilio.module';
-import { TwilioModule } from 'nestjs-twilio';
+import { TwoFactorAuthService } from './service/otp.generator.service';
+import SmsService from '../notification/service/twilio.sms.service';
+import { TwilioImplModule } from '../twilio/twilio.module';
 import { TwoFAController } from './controller/two.FA.controller';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
 import UserService from '../authorization/service/user.service';
 import GroupCacheService from '../authorization/service/groupcache.service';
 import UserCacheService from '../authorization/service/usercache.service';
 import PermissionCacheService from '../authorization/service/permissioncache.service';
+import PasswordAuthService from './service/password.auth.service';
+import { NotificationModule } from '../notification/notification.module';
+import OTPAuthService from './service/otp.auth.service';
+import TwilioOTPService from './service/twilio.otp.service';
+import { OTPVerifiable } from './interfaces/otp.verifiable';
+import { TokenService } from './service/token.service';
+import {
+  OTPVerifyToolEnum,
+  SMSIntegrationEnum,
+} from '../constants/integrations.enum';
+import { DefaultOTPService } from './service/default.otp.service';
+import { SMSInterface } from '../notification/interfaces/sms.interface';
+import TwilioSmsService from '../notification/service/twilio.sms.service';
+import AWSSMSService from '../notification/service/aws.sms.service';
+import { ProviderFactory } from '../factory/provider.factory';
 
 @Module({
   imports: [
@@ -38,9 +52,9 @@ import PermissionCacheService from '../authorization/service/permissioncache.ser
     ]),
     ConfigModule,
     RedisCacheModule,
-    TwilioModule,
-    TwilioImplModule,
+    NotificationModule,
     AuthorizationModule,
+    TwilioImplModule,
   ],
   providers: [
     UserAuthResolver,
@@ -57,9 +71,19 @@ import PermissionCacheService from '../authorization/service/permissioncache.ser
     GroupCacheService,
     PermissionCacheService,
     LoggerService,
-    OtpGeneratorService,
+    TwoFactorAuthService,
     SmsService,
     TwoFAController,
+    PasswordAuthService,
+    OTPAuthService,
+    TwilioOTPService,
+    DefaultOTPService,
+    TokenService,
+    ProviderFactory.getOTPVerifierFactory(),
+    ProviderFactory.getSMSFactory(),
+    TwilioSmsService,
+    AWSSMSService,
+    LoggerService,
   ],
   controllers: [GoogleAuthController, TwoFAController],
 })
