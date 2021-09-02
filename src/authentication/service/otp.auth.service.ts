@@ -67,6 +67,8 @@ export default class OTPAuthService implements Authenticatable {
     if (user && user.active && user.phone) {
       //Found an active user, generating OTP and sending the message to the user
       await this.otpService.sendOTP(user);
+    } else {
+      throw new UserNotFoundException(phoneNumber);
     }
   }
 

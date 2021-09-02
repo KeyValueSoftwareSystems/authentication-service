@@ -13,11 +13,7 @@ import TwilioSmsService from './service/twilio.sms.service';
     ConfigModule,
     TwilioImplModule,
   ],
-  providers: [
-    TwilioSmsService,
-    AWSSMSService,
-    LoggerService,
-    ProviderFactory.getSMSFactory()],
+  providers: [],
   exports: [],
   controllers: [],
 })
