@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { GoogleAuthService } from './service/google.service';
 import { GoogleAuthController } from './controller/google.controller';
 import UserAuthService from './service/user.auth.service';
@@ -25,6 +25,7 @@ import UserService from '../authorization/service/user.service';
 import GroupCacheService from '../authorization/service/groupcache.service';
 import UserCacheService from '../authorization/service/usercache.service';
 import PermissionCacheService from '../authorization/service/permissioncache.service';
+import { RecaptchaService } from './service/recaptcha.service';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import PermissionCacheService from '../authorization/service/permissioncache.ser
     TwilioModule,
     TwilioImplModule,
     AuthorizationModule,
+    HttpModule,
   ],
   providers: [
     UserAuthResolver,
@@ -60,6 +62,7 @@ import PermissionCacheService from '../authorization/service/permissioncache.ser
     OtpGeneratorService,
     SmsService,
     TwoFAController,
+    RecaptchaService,
   ],
   controllers: [GoogleAuthController, TwoFAController],
 })
