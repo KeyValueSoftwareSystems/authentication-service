@@ -4,13 +4,11 @@ services:
     container_name: auth-service
     build:
       context: .
-      target: development
     volumes:
       - .:/app
-      - /app/node_modules
     ports:
-      - '${PORT}:${PORT}'
-    command: npm run start:dev
+      - '4000:4000'
+    command: [sh, -c, "npm run run-migrations && npm run start:dev"]
     env_file:
       - .env
     networks:
@@ -22,9 +20,9 @@ services:
     container_name: postgres
     image: postgres:12
     expose:
-      - '${POSTGRES_PORT}'
+      - '5432'
     ports:
-      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+      - '5432:5432'
     volumes:
       - /data/postgres:/var/lib/postgresql/data
     env_file:
@@ -50,9 +48,9 @@ services:
     container_name: cache
     image: 'redis'
     expose:
-      - '${REDIS_PORT}'
+      - '6379'
     ports:
-      - '${REDIS_PORT}:${REDIS_PORT}'
+      - '6379:6379'
     env_file:
       - docker.env
     networks:

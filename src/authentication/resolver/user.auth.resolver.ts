@@ -84,6 +84,8 @@ export default class UserAuthResolver {
   async generateOtp(@Args('input') request: GenerateOtpInput) {
     return this.otpAuthService.sendOTP(request.phone);
   }
+  // Its commented as of now. This should be part of Two factor authentication.
+  // Implementation is not yet completed.
 
   // @Mutation('enable2FA')
   // @UseGuards(AuthGuard)
@@ -92,6 +94,6 @@ export default class UserAuthResolver {
   //   request: Enable2FAInput,
   //   @Context('user') user: any,
   // ) {
-  //   return await this.userAuthService.enable2FA(request.code, user.id);
+  //   return await this.twoFactorAuthService.enable2FA(request.code, user.id);
   // }
 }
