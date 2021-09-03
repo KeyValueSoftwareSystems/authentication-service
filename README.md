@@ -62,6 +62,7 @@ Developers can customise this as per their requirement.
 |POSTGRES_USER  | postgres |
 |POSTGRES_PASSWORD  | postgres |
 |POSTGRES_DB  | auth_service |
+
 &nbsp;
 |Redis Cache configuration(Required)  |  |
 |--|--|
@@ -69,6 +70,7 @@ Developers can customise this as per their requirement.
 |REDIS_PORT |6379  |
 |REDIS_CACHE_TTL | 3600 |
 |REDIS_MAX_ITEM_IN_CACHE  |1000  |
+
 &nbsp;
 | Authentication Configuration(Required) |  |
 |--|--|
@@ -76,23 +78,27 @@ Developers can customise this as per their requirement.
 |JWT_TOKEN_EXPTIME|3600  |
 |JWT_REFRESH_TOKEN_EXP_TIME| 36000 |
 |ENV  |  local|
+
   &nbsp;
 | Other Configuration(Required) |  |
 |--|--|
 |PORT|4000  |
 |DEFAULT_ADMIN_PASSWORD|adminKeyvalue|
+
   &nbsp;
 |Google social login Configuration(Optional)|  |
 |--|--|
 |GOOGLE_CLIENT_ID  |  |
 |GOOGLE_SECRET  |  |
 |APP_URL  | the URL of the application to which the redirect should happen |
+
 &nbsp;
 |Google recaptcha Configuration(Optional) |  |
 |--|--|
 |RECAPTCHA_SECRET_KEY | secret |
 |RECAPTCHA_VERIFY_URL  | https://www.google.com/recaptcha/api/siteverify |
 |MIN_RECAPTCHA_SCORE  |Required for Recaptcha V3  |
+
   &nbsp;
 |Twilio OTP Configuration(Optional)  |  |
 |--|--|
@@ -100,6 +106,7 @@ Developers can customise this as per their requirement.
 |TWILIO_ACC_SID  |  |
 |TWILIO_AUTH_TOKEN  |  |
 |TWILIO_SENDING_NUMBER  |  |
+
  &nbsp;
 |Two Factor Authentication(Optional)  |  |
 |--|--|
