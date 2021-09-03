@@ -85,7 +85,7 @@ Developers can customise this as per their requirement.
 | Other Configuration(Required) |  |
 |--|--|
 |PORT|4000  |
-|DEFAULT_ADMIN_PASSWORD|adminKeyvalue|
+|DEFAULT_ADMIN_PASSWORD|Should be atleast 10 characters|
 
   &nbsp;
 |Google social login Configuration(Optional)|  |
@@ -102,24 +102,21 @@ Developers can customise this as per their requirement.
 |MIN_RECAPTCHA_SCORE  |Required for Recaptcha V3  |
 
   &nbsp;
-|Twilio OTP Configuration(Optional)  |  |
+|OTP Sender Configuration(Optional)  |  |
 |--|--|
-|IS_TWILIO_PRIMARY  | false |
+|IS_TWILIO_INTEGRATED  | false |
 |TWILIO_ACC_SID  |  |
 |TWILIO_AUTH_TOKEN  |  |
 |TWILIO_SENDING_NUMBER  |  |
-
- &nbsp;
-|Two Factor Authentication(Optional)  |  |
-|--|--|
-| 2FA_APP_NAME | auth-sevice |
-| OTP_WINDOW | 10  |
-| OTP_STEP |  |
-| ENFORCE_2FA | false |
+|OTP_VERIFY_TOOL| twilio or default|
+|SMS_INTEGRATION|twilio or aws|
+| OTP_WINDOW | 300  |
+| OTP_STEP | 1 |
 
 -   Run `npm run run-migrations`
 -   Run `npm run start`
 -   Service should be up and running in http://localhost:${PORT}.
+- A default admin user with email **test@dummy.com** and password given in `DEFAULT_ADMIN_PASSWORD` will already be available in the application. This user will be associated to the default `Admin` group which will have the permissions to create/update permissions, create/update groups, create/update entities and update a user
     
 
 We can ensure the health of the service by accessing http://localhost:${PORT}/auth/api/health.
