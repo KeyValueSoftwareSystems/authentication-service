@@ -2,7 +2,9 @@
 # Authentication Service
 
 A standalone service to handle authentication and authorization.
+<p  align="center">
 <img src="https://www.keyvalue.systems/logo.png" width="290" height="100">
+</p>
 &nbsp;
 <p  align="center">
 <a  href="https://gitlab.com/keyvalue-systems/authentication-service/-/pipelines"  target="_blank"><img  src="https://gitlab.com/keyvalue-systems/authentication-service/badges/master/pipeline.svg?key_text=build"  alt="build status"/></a>
