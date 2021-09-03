@@ -3,14 +3,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import {
-  InvalidCredentialsException, UserExistsException
+  InvalidCredentialsException,
+  UserExistsException,
 } from '../../../src/authentication/exception/userauth.exception';
 import OTPAuthService from '../../../src/authentication/service/otp.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import TwilioOTPService from '../../../src/authentication/service/twilio.otp.service';
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
-import { UserLoginInput, UserSignupInput } from '../../../src/schema/graphql.schema';
+import {
+  UserOTPLoginInput,
+  UserOTPSignupInput,
+} from '../../../src/schema/graphql.schema';
 
 let users: User[] = [
   {
@@ -88,7 +92,7 @@ describe('test OTPAuthService', () => {
       },
     ];
 
-    const input: UserLoginInput = {
+    const input: UserOTPLoginInput = {
       username: '9112345678910',
       otp: '123456',
     };
@@ -117,7 +121,7 @@ describe('test OTPAuthService', () => {
         origin: 'simple',
       },
     ];
-    const input: UserLoginInput = {
+    const input: UserOTPLoginInput = {
       username: '9112345678910',
       otp: '999999',
     };
@@ -144,16 +148,17 @@ describe('test OTPAuthService', () => {
         origin: 'simple',
       },
     ];
-    const userSingup: UserSignupInput = {
-      ...users[0],
-      password: users[0].password as string,
+    const userSignup: UserOTPSignupInput = {
+      phone: users[0].phone as string,
+      firstName: users[0].firstName,
+      lastName: users[0].lastName,
     };
     userService
-      .getUserDetailsByEmailOrPhone(users[0].email, users[0].phone)
+      .getUserDetailsByEmailOrPhone(undefined, users[0].phone)
       .returns(Promise.resolve(undefined));
     userService.createUser(Arg.any()).returns(Promise.resolve(userResponse[0]));
 
-    const resp = await otpAuthService.userSignup(userSingup);
+    const resp = await otpAuthService.userSignup(userSignup);
 
     const receivedResponse = {
       id: resp.id,
@@ -176,9 +181,7 @@ describe('test OTPAuthService', () => {
     const existUsers: User[] = [
       {
         id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-        email: 'user2@test.com',
         phone: '91123456789101',
-        password: 's3cr3t',
         firstName: 'Test1',
         lastName: 'Test2',
         active: true,
@@ -186,16 +189,17 @@ describe('test OTPAuthService', () => {
         origin: 'simple',
       },
     ];
-    const userSingup: UserSignupInput = {
-      ...existUsers[0],
-      password: 's3cr3t',
+    const userSignup: UserOTPSignupInput = {
+      phone: existUsers[0].phone as string,
+      firstName: existUsers[0].firstName,
+      lastName: existUsers[0].lastName,
     };
 
     userService
       .getUserDetailsByEmailOrPhone(existUsers[0].email, existUsers[0].phone)
       .resolves(existUsers[0]);
 
-    const resp = otpAuthService.userSignup(userSingup);
+    const resp = otpAuthService.userSignup(userSignup);
 
     await expect(resp).rejects.toThrowError(
       new UserExistsException(existUsers[0].email || existUsers[0].phone || ''),

@@ -5,13 +5,16 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import {
   InvalidCredentialsException,
   InvalidPayloadException,
-  UserExistsException
+  UserExistsException,
 } from '../../../src/authentication/exception/userauth.exception';
 import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
-import { UserLoginInput, UserSignupInput } from '../../../src/schema/graphql.schema';
+import {
+  UserPasswordLoginInput,
+  UserPasswordSignupInput,
+} from '../../../src/schema/graphql.schema';
 
 let users: User[] = [
   {
@@ -48,7 +51,9 @@ describe('test PasswordAuthService', () => {
         AuthenticationHelper,
       ],
     }).compile();
-    passwordAuthService = moduleRef.get<PasswordAuthService>(PasswordAuthService);
+    passwordAuthService = moduleRef.get<PasswordAuthService>(
+      PasswordAuthService,
+    );
     authenticationHelper = moduleRef.get<AuthenticationHelper>(
       AuthenticationHelper,
     );
@@ -88,7 +93,7 @@ describe('test PasswordAuthService', () => {
       },
     ];
 
-    const input: UserLoginInput = {
+    const input: UserPasswordLoginInput = {
       username: 'user@test.com',
       password: 's3cr3t',
     };
@@ -105,7 +110,7 @@ describe('test PasswordAuthService', () => {
   });
 
   it('should not login user since the user password is wrong', async () => {
-    const input: UserLoginInput = {
+    const input: UserPasswordLoginInput = {
       username: 'user@test.com',
       password: 's3cr3tWrong',
     };
@@ -132,7 +137,7 @@ describe('test PasswordAuthService', () => {
         origin: 'simple',
       },
     ];
-    const userSingup: UserSignupInput = {
+    const userSingup: UserPasswordSignupInput = {
       ...users[0],
       password: users[0].password as string,
     };
@@ -174,7 +179,7 @@ describe('test PasswordAuthService', () => {
         origin: 'simple',
       },
     ];
-    const userSingup: UserSignupInput = {
+    const userSingup: UserPasswordSignupInput = {
       ...existUsers[0],
       password: 's3cr3t',
     };

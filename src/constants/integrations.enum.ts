@@ -1,9 +1,9 @@
 export enum OTPVerifyToolEnum {
   TWILIO = 'TWILIO',
-  DEFAULT = 'DEFAULT'
+  DEFAULT = 'DEFAULT',
 }
 
 export enum SMSIntegrationEnum {
   TWILIO = 'TWILIO',
-  AWS = 'AWS'
+  AWS = 'AWS',
 }

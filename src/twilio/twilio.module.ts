@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TwilioModule } from 'nestjs-twilio';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { config } from 'rxjs';
 
 @Module({
   imports: [
     TwilioModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (async (cfg: ConfigService) => {
+      useFactory: async (cfg: ConfigService) => {
         if (cfg.get('IS_TWILIO_INTEGRATED') !== 'true') {
           // Dummy value passing to account initialization to avoid failing the service
           return {
@@ -25,7 +24,7 @@ import { config } from 'rxjs';
             accountSid: cfg.get('TWILIO_ACC_SID'),
           },
         };
-      }),
+      },
       inject: [ConfigService],
     }),
   ],

@@ -2,7 +2,10 @@ import { ConfigService } from '@nestjs/config';
 import { OTPVerifiable } from '../authentication/interfaces/otp.verifiable';
 import { DefaultOTPService } from '../authentication/service/default.otp.service';
 import TwilioOTPService from '../authentication/service/twilio.otp.service';
-import { OTPVerifyToolEnum, SMSIntegrationEnum } from '../constants/integrations.enum';
+import {
+  OTPVerifyToolEnum,
+  SMSIntegrationEnum,
+} from '../constants/integrations.enum';
 import { SMSInterface } from '../notification/interfaces/sms.interface';
 import AWSSMSService from '../notification/service/aws.sms.service';
 import TwilioSmsService from '../notification/service/twilio.sms.service';

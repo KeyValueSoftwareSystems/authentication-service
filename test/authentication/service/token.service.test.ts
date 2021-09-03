@@ -6,7 +6,7 @@ import { TokenService } from '../../../src/authentication/service/token.service'
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 
-let users: User[] = [
+const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     email: 'user@test.com',
@@ -45,7 +45,7 @@ describe('test TokenService', () => {
     );
   });
 
-   it('should refresh jwt token', async () => {
+  it('should refresh jwt token', async () => {
     const users: User[] = [
       {
         id: 'a2413b29-1b8b-4c83-aaff-3a5a977e0a1a',
@@ -113,6 +113,4 @@ describe('test TokenService', () => {
       .returns(Promise.resolve(users[0]));
     await tokenService.resetToken(users[0].id);
   });
-
-  
 });

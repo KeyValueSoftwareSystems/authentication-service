@@ -9,7 +9,7 @@ export class TokenService {
   constructor(
     private userService: UserService,
     private authenticationHelper: AuthenticationHelper,
-  ) {} 
+  ) {}
 
   async refresh(refreshToken: string): Promise<TokenResponse> {
     const response = this.authenticationHelper.validateAuthToken(refreshToken);

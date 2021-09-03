@@ -56,7 +56,7 @@ type Query {
   getUser(id: ID!): User
   getUserGroups(id: ID!): [UserGroupResponse]
   getUserPermissions(id: ID!): [UserPermissions]
-  verifyUserPermission(id: ID!, params: UserPermissionsVerification!): Boolean
+  verifyUserPermission(params: UserPermissionsVerification!): Boolean
 }
 
 type Mutation {

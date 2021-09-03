@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   UpdateUserGroupInput,
   UpdateUserInput,
@@ -71,12 +71,12 @@ export class UserResolver {
   @Permissions(PermissionsType.ViewUser)
   @Query()
   async verifyUserPermission(
-    @Args('id', ParseUUIDPipe) id: string,
     @Args('params')
     params: UserPermissionsVerification,
+    @Context('user') user: any,
   ) {
     return this.userService.verifyUserPermissions(
-      id,
+      user.id,
       params.permissions,
       params.operation || OperationType.AND,
     );

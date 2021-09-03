@@ -1,5 +1,4 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectTwilio, TwilioClient } from 'nestjs-twilio';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SMSInterface } from '../interfaces/sms.interface';
 import { LoggerService } from '../../logger/logger.service';

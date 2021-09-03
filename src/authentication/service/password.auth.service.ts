@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   TokenResponse,
   UserPasswordLoginInput,
@@ -23,10 +23,11 @@ export default class PasswordAuthService implements Authenticatable {
     private userService: UserService,
     private tokenService: TokenService,
     private authenticationHelper: AuthenticationHelper,
-  ) {
-  }
+  ) {}
 
-  async userSignup(userDetails: UserPasswordSignupInput): Promise<UserSignupResponse> {
+  async userSignup(
+    userDetails: UserPasswordSignupInput,
+  ): Promise<UserSignupResponse> {
     const existingUserDetails = await this.userService.getUserDetailsByEmailOrPhone(
       userDetails.email,
       userDetails.phone,
@@ -50,7 +51,7 @@ export default class PasswordAuthService implements Authenticatable {
     );
 
     return this.userService.createUser(userFromInput);
-  };
+  }
 
   async userLogin(userDetails: UserPasswordLoginInput): Promise<TokenResponse> {
     const userRecord:
@@ -62,7 +63,7 @@ export default class PasswordAuthService implements Authenticatable {
     if (!userRecord) {
       throw new UserNotFoundException(userDetails.username);
     }
-    let token = await this.loginWithPassword(userRecord, userDetails);
+    const token = await this.loginWithPassword(userRecord, userDetails);
     if (!token) {
       throw new InvalidCredentialsException();
     }

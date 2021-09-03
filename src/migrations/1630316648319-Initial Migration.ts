@@ -8,7 +8,7 @@ export class InitialMigration1630316648319 implements MigrationInterface {
       `CREATE TABLE "entity_model" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "active" boolean NOT NULL DEFAULT true, CONSTRAINT "UQ_11a0e33570270c3de3233b34a2a" UNIQUE ("name"), CONSTRAINT "PK_ea7e5d0ca6a0d6221f78cea499a" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "entity_permission" ("permission_id" character varying NOT NULL, "entity_id" character varying NOT NULL, CONSTRAINT "PK_ac18341de235a9dddb822c35892" PRIMARY KEY ("permission_id"))`,
+      `CREATE TABLE "entity_permission" ("permission_id" uuid NOT NULL, "entity_id" uuid NOT NULL, CONSTRAINT "PK_ac18341de235a9dddb822c35892" PRIMARY KEY ("permission_id", "entity_id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "group" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "active" boolean NOT NULL DEFAULT true, CONSTRAINT "UQ_8a45300fd825918f3b40195fbdc" UNIQUE ("name"), CONSTRAINT "PK_256aa0fda9b1de1a73ee0b7106b" PRIMARY KEY ("id"))`,

@@ -6,10 +6,11 @@ import {
   TokenResponse,
   UserOTPLoginInput,
   UserOTPSignupInput,
-  UserSignupResponse
+  UserSignupResponse,
 } from '../../schema/graphql.schema';
 import {
-  InvalidCredentialsException, UserExistsException
+  InvalidCredentialsException,
+  UserExistsException,
 } from '../exception/userauth.exception';
 import { Authenticatable } from '../interfaces/authenticatable';
 import { OTPVerifiable } from '../interfaces/otp.verifiable';
@@ -21,10 +22,11 @@ export default class OTPAuthService implements Authenticatable {
     private userService: UserService,
     private tokenService: TokenService,
     private otpService: OTPVerifiable,
-  ) {
-  }
+  ) {}
 
-  async userSignup(userDetails: UserOTPSignupInput): Promise<UserSignupResponse> {
+  async userSignup(
+    userDetails: UserOTPSignupInput,
+  ): Promise<UserSignupResponse> {
     const existingUserDetails = await this.userService.getUserDetailsByEmailOrPhone(
       userDetails.email,
       userDetails.phone,
@@ -43,7 +45,7 @@ export default class OTPAuthService implements Authenticatable {
     userFromInput.lastName = userDetails.lastName;
 
     return this.userService.createUser(userFromInput);
-  };
+  }
 
   async userLogin(userDetails: UserOTPLoginInput): Promise<TokenResponse> {
     const userRecord:
@@ -55,7 +57,10 @@ export default class OTPAuthService implements Authenticatable {
     if (!userRecord) {
       throw new UserNotFoundException(userDetails.username);
     }
-    let token = await this.loginWithOTP(userDetails.otp as string, userRecord);
+    const token = await this.loginWithOTP(
+      userDetails.otp as string,
+      userRecord,
+    );
     if (!token) {
       throw new InvalidCredentialsException();
     }

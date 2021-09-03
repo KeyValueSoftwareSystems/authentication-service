@@ -62,7 +62,6 @@ export interface NewEntityInput {
 
 export interface UpdateEntityInput {
     name: string;
-    active?: boolean;
 }
 
 export interface UpdateEntityPermissionInput {
@@ -75,7 +74,6 @@ export interface NewGroupInput {
 
 export interface UpdateGroupInput {
     name: string;
-    active?: boolean;
 }
 
 export interface UpdateGroupPermissionInput {
@@ -88,7 +86,6 @@ export interface NewPermissionInput {
 
 export interface UpdatePermissionInput {
     name: string;
-    active?: boolean;
 }
 
 export interface UpdateUserInput {
@@ -177,7 +174,7 @@ export interface IQuery {
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
-    verifyUserPermission(id: string, params: UserPermissionsVerification): boolean | Promise<boolean>;
+    verifyUserPermission(params: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
 export interface Group {

@@ -7,8 +7,8 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
-  UserLoginInput,
-  UserSignupInput,
+  UserPasswordLoginInput,
+  UserPasswordSignupInput,
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
 import UserAuthResolver from '../../../src/authentication/resolver/user.auth.resolver';
@@ -79,7 +79,7 @@ describe('Userauth Module', () => {
   describe('/graphql', () => {
     describe('userauth', () => {
       it('should login a user via password', () => {
-        const input: UserLoginInput = {
+        const input: UserPasswordLoginInput = {
           username: 'user@test.com',
           password: 's3cr3t1234567890',
         };
@@ -112,7 +112,7 @@ describe('Userauth Module', () => {
     });
 
     it('should signup a user by password', () => {
-      const userInput: UserSignupInput[] = [
+      const userInput: UserPasswordSignupInput[] = [
         {
           email: users[0].email,
           phone: users[0].phone,
@@ -185,9 +185,7 @@ describe('Userauth Module', () => {
     it('should refresh the token', () => {
       const token = authenticationHelper.generateTokenForUser(users[0]);
 
-      tokenService
-        .refresh(token.refreshToken)
-        .returns(Promise.resolve(token));
+      tokenService.refresh(token.refreshToken).returns(Promise.resolve(token));
 
       return request(app.getHttpServer())
         .post(gql)
