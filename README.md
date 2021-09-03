@@ -90,6 +90,7 @@ Developers can customise this as per their requirement.
   &nbsp;
 |Google social login Configuration(Optional)|  |
 |--|--|
+|IS_GOOGLE_SOCIAL_LOGIN_ENBALED|false |
 |GOOGLE_CLIENT_ID  |  |
 |GOOGLE_SECRET  |  |
 |APP_URL  | the URL of the application to which the redirect should happen |
@@ -121,8 +122,13 @@ Developers can customise this as per their requirement.
 
 We can ensure the health of the service by accessing http://localhost:${PORT}/auth/api/health.
 
+## Google Social login
+
+Inorder to login by Google, access the following URL in browser http://localhost:4000/auth/api/google 
 ## GraphQL API reference
 
 GraphQL endpoint
 
 http://localhost:${PORT}/auth/api/graphql
+
+[API Documentation](https://documenter.getpostman.com/view/10091423/U16ev8cG)
