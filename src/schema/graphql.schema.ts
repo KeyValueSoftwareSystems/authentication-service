@@ -12,19 +12,31 @@ export enum OperationType {
     OR = "OR"
 }
 
-export interface UserSignupInput {
+export interface UserPasswordSignupInput {
     email?: string;
     phone?: string;
-    password?: string;
+    password: string;
     firstName: string;
     middleName?: string;
     lastName: string;
 }
 
-export interface UserLoginInput {
+export interface UserOTPSignupInput {
+    email?: string;
+    phone: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+}
+
+export interface UserPasswordLoginInput {
     username: string;
-    password?: string;
-    otp?: string;
+    password: string;
+}
+
+export interface UserOTPLoginInput {
+    username: string;
+    otp: string;
 }
 
 export interface UserPasswordInput {
@@ -100,10 +112,10 @@ export interface UserPermissionsVerification {
 }
 
 export interface IMutation {
-    passwordLogin(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
-    passwordSignup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
-    otpLogin(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
-    otpSignup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    passwordLogin(input: UserPasswordLoginInput): TokenResponse | Promise<TokenResponse>;
+    passwordSignup(input: UserPasswordSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    otpLogin(input: UserOTPLoginInput): TokenResponse | Promise<TokenResponse>;
+    otpSignup(input: UserOTPSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
     refresh(input: RefreshTokenInput): TokenResponse | Promise<TokenResponse>;
     logout(): string | Promise<string>;

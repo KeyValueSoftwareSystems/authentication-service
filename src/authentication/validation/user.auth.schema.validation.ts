@@ -5,7 +5,7 @@ export const UserPasswordSignupInputSchema = Joi.object({
   phone: Joi.number(),
   password: Joi.string().required().min(10),
   firstName: Joi.string().required(),
-  middleName: Joi.string(),
+  middleName: Joi.string().allow('', null),
   lastName: Joi.string().required(),
 })
   .options({ abortEarly: false })

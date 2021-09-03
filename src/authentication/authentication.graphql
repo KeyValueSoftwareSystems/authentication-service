@@ -1,27 +1,39 @@
 type Mutation {
-    passwordLogin(input: UserLoginInput!): TokenResponse
-    passwordSignup(input: UserSignupInput!): UserSignupResponse
-    otpLogin(input: UserLoginInput!): TokenResponse
-    otpSignup(input: UserSignupInput!): UserSignupResponse
+    passwordLogin(input: UserPasswordLoginInput!): TokenResponse
+    passwordSignup(input: UserPasswordSignupInput!): UserSignupResponse
+    otpLogin(input: UserOTPLoginInput!): TokenResponse
+    otpSignup(input: UserOTPSignupInput!): UserSignupResponse
     changePassword(input: UserPasswordInput!): User
     refresh(input: RefreshTokenInput!): TokenResponse
     logout: String
     generateOtp(input: GenerateOtpInput): String
 }
 
-input UserSignupInput {
+input UserPasswordSignupInput {
   email: String
   phone: String
-  password: String
+  password: String!
   firstName: String!
   middleName: String
   lastName: String!
 }
 
-input UserLoginInput {
-    username: String!
-    password: String
-    otp: String
+input UserOTPSignupInput {
+  email: String
+  phone: String!
+  firstName: String!
+  middleName: String
+  lastName: String!
+}
+
+input UserPasswordLoginInput {
+  username: String!
+  password: String!
+}
+
+input UserOTPLoginInput {
+  username: String!
+  otp: String!
 }
 
 type TokenResponse {

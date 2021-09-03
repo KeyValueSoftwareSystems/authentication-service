@@ -4,8 +4,8 @@ import { UserNotFoundException } from '../../authorization/exception/user.except
 import UserService from '../../authorization/service/user.service';
 import {
   TokenResponse,
-  UserLoginInput,
-  UserSignupInput,
+  UserOTPLoginInput,
+  UserOTPSignupInput,
   UserSignupResponse
 } from '../../schema/graphql.schema';
 import {
@@ -24,7 +24,7 @@ export default class OTPAuthService implements Authenticatable {
   ) {
   }
 
-  async userSignup(userDetails: UserSignupInput): Promise<UserSignupResponse> {
+  async userSignup(userDetails: UserOTPSignupInput): Promise<UserSignupResponse> {
     const existingUserDetails = await this.userService.getUserDetailsByEmailOrPhone(
       userDetails.email,
       userDetails.phone,
@@ -45,7 +45,7 @@ export default class OTPAuthService implements Authenticatable {
     return this.userService.createUser(userFromInput);
   };
 
-  async userLogin(userDetails: UserLoginInput): Promise<TokenResponse> {
+  async userLogin(userDetails: UserOTPLoginInput): Promise<TokenResponse> {
     const userRecord:
       | User
       | undefined = await this.userService.getUserDetailsByUsername(
