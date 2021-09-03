@@ -7,17 +7,18 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
-  UserLoginInput,
-  UserSignupInput,
+  UserPasswordLoginInput,
+  UserPasswordSignupInput,
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
-import UserAuthService from '../../../src/authentication/service/user.auth.service';
 import UserAuthResolver from '../../../src/authentication/resolver/user.auth.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
-import { OtpGeneratorService } from '../../../src/authentication/service/otp.generator.service';
+import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
+import OTPAuthService from '../../../src/authentication/service/otp.auth.service';
+import { TokenService } from '../../../src/authentication/service/token.service';
 
 const users: User[] = [
   {
@@ -36,8 +37,9 @@ const users: User[] = [
 const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
-const userauthService = Substitute.for<UserAuthService>();
-const otpGeneratorService = Substitute.for<OtpGeneratorService>();
+const passwordAuthService = Substitute.for<PasswordAuthService>();
+const otpAuthService = Substitute.for<OTPAuthService>();
+const tokenService = Substitute.for<TokenService>();
 const userCacheService = Substitute.for<UserCacheService>();
 const redisCacheService = Substitute.for<RedisCacheService>();
 
@@ -55,7 +57,9 @@ describe('Userauth Module', () => {
         ConfigService,
         AuthenticationHelper,
         { provide: 'UserService', useValue: userService },
-        { provide: 'UserAuthService', useValue: userauthService },
+        { provide: 'TokenService', useValue: tokenService },
+        { provide: 'PasswordAuthService', useValue: passwordAuthService },
+        { provide: 'OTPAuthService', useValue: otpAuthService },
         { provide: 'ConfigService', useValue: configService },
         { provide: 'UserCacheService', useValue: userCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
@@ -72,10 +76,10 @@ describe('Userauth Module', () => {
     await app.close();
   });
 
-  describe(gql, () => {
+  describe('/graphql', () => {
     describe('userauth', () => {
-      it('should login a user', () => {
-        const input: UserLoginInput = {
+      it('should login a user via password', () => {
+        const input: UserPasswordLoginInput = {
           username: 'user@test.com',
           password: 's3cr3t1234567890',
         };
@@ -90,25 +94,25 @@ describe('Userauth Module', () => {
           V9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo`,
         };
         const obj = Object.create(null);
-        userauthService
+        passwordAuthService
           .userLogin(Object.assign(obj, input))
           .returns(Promise.resolve(tokenResponse));
         return request(app.getHttpServer())
           .post(gql)
           .send({
             query:
-              'mutation { login(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken }}',
+              'mutation { passwordLogin(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken }}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.login).toHaveProperty('accessToken');
-            expect(res.body.data.login).toHaveProperty('refreshToken');
+            expect(res.body.data.passwordLogin).toHaveProperty('accessToken');
+            expect(res.body.data.passwordLogin).toHaveProperty('refreshToken');
           });
       });
     });
 
-    it('should signup a user', () => {
-      const userInput: UserSignupInput[] = [
+    it('should signup a user by password', () => {
+      const userInput: UserPasswordSignupInput[] = [
         {
           email: users[0].email,
           phone: users[0].phone,
@@ -130,19 +134,19 @@ describe('Userauth Module', () => {
       ];
 
       const obj = Object.create(null);
-      userauthService
+      passwordAuthService
         .userSignup(Object.assign(obj, userInput[0]))
         .returns(Promise.resolve(usersResponse[0]));
       return request(app.getHttpServer())
         .post(gql)
         .send({
-          query: `mutation { signup(input: { email: "user@test.com" 
+          query: `mutation { passwordSignup(input: { email: "user@test.com" 
           phone: "9112345678910" password: "s3cr3t1234567890" 
           firstName: "Test1" lastName: "Test2" }) { id email phone firstName lastName active }}`,
         })
         .expect(200)
         .expect((res) => {
-          expect(res.body.data.signup).toEqual(usersResponse[0]);
+          expect(res.body.data.passwordSignup).toEqual(usersResponse[0]);
         });
     });
 
@@ -162,7 +166,7 @@ describe('Userauth Module', () => {
 
       const token = authenticationHelper.generateAccessToken(users[0]);
 
-      userauthService
+      passwordAuthService
         .updatePassword(Arg.any(), Arg.any())
         .returns(Promise.resolve(users[0]));
       return request(app.getHttpServer())
@@ -181,9 +185,7 @@ describe('Userauth Module', () => {
     it('should refresh the token', () => {
       const token = authenticationHelper.generateTokenForUser(users[0]);
 
-      userauthService
-        .refresh(token.refreshToken)
-        .returns(Promise.resolve(token));
+      tokenService.refresh(token.refreshToken).returns(Promise.resolve(token));
 
       return request(app.getHttpServer())
         .post(gql)
@@ -199,7 +201,7 @@ describe('Userauth Module', () => {
     it('should logout the user', () => {
       const token = authenticationHelper.generateTokenForUser(users[0]);
 
-      userauthService.logout(users[0].id).returns(Promise.resolve());
+      tokenService.resetToken(users[0].id).returns(Promise.resolve());
 
       return request(app.getHttpServer())
         .post(gql)

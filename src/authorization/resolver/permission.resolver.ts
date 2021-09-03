@@ -3,7 +3,7 @@ import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
-} from 'src/schema/graphql.schema';
+} from '../../schema/graphql.schema';
 import { PermissionsType } from '../constants/authorization.constants';
 import Permission from '../entity/permission.entity';
 import { Permissions } from '../permissions.decorator';

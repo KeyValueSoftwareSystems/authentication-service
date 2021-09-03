@@ -12,7 +12,7 @@ export enum OperationType {
     OR = "OR"
 }
 
-export interface UserSignupInput {
+export interface UserPasswordSignupInput {
     email?: string;
     phone?: string;
     password: string;
@@ -21,10 +21,22 @@ export interface UserSignupInput {
     lastName: string;
 }
 
-export interface UserLoginInput {
+export interface UserOTPSignupInput {
+    email?: string;
+    phone: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+}
+
+export interface UserPasswordLoginInput {
     username: string;
-    password?: string;
-    otp?: string;
+    password: string;
+}
+
+export interface UserOTPLoginInput {
+    username: string;
+    otp: string;
 }
 
 export interface UserPasswordInput {
@@ -50,7 +62,6 @@ export interface NewEntityInput {
 
 export interface UpdateEntityInput {
     name: string;
-    active?: boolean;
 }
 
 export interface UpdateEntityPermissionInput {
@@ -63,7 +74,6 @@ export interface NewGroupInput {
 
 export interface UpdateGroupInput {
     name: string;
-    active?: boolean;
 }
 
 export interface UpdateGroupPermissionInput {
@@ -76,14 +86,12 @@ export interface NewPermissionInput {
 
 export interface UpdatePermissionInput {
     name: string;
-    active?: boolean;
 }
 
 export interface UpdateUserInput {
     firstName?: string;
     middleName?: string;
     lastName?: string;
-    active?: boolean;
 }
 
 export interface UpdateUserPermissionInput {
@@ -100,13 +108,14 @@ export interface UserPermissionsVerification {
 }
 
 export interface IMutation {
-    login(input: UserLoginInput): TokenResponse | Promise<TokenResponse>;
-    signup(input: UserSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    passwordLogin(input: UserPasswordLoginInput): TokenResponse | Promise<TokenResponse>;
+    passwordSignup(input: UserPasswordSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    otpLogin(input: UserOTPLoginInput): TokenResponse | Promise<TokenResponse>;
+    otpSignup(input: UserOTPSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
     refresh(input: RefreshTokenInput): TokenResponse | Promise<TokenResponse>;
     logout(): string | Promise<string>;
     generateOtp(input?: GenerateOtpInput): string | Promise<string>;
-    enable2FA(input?: Enable2FAInput): string | Promise<string>;
     createEntity(input: NewEntityInput): Entity | Promise<Entity>;
     updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;
@@ -164,7 +173,7 @@ export interface IQuery {
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
-    verifyUserPermission(id: string, params: UserPermissionsVerification): boolean | Promise<boolean>;
+    verifyUserPermission(params: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
 export interface Group {

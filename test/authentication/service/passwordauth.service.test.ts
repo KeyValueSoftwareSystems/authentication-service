@@ -1,19 +1,20 @@
-import { Test } from '@nestjs/testing';
-import User from '../../../src/authorization/entity/user.entity';
-import { ConfigModule } from '@nestjs/config';
-import { ConfigService } from '@nestjs/config';
-import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
-import UserAuthService from '../../../src/authentication/service/user.auth.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Test } from '@nestjs/testing';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import { UserLoginInput, UserSignupInput } from 'src/schema/graphql.schema';
 import {
   InvalidCredentialsException,
   InvalidPayloadException,
   UserExistsException,
 } from '../../../src/authentication/exception/userauth.exception';
-import { OtpGeneratorService } from '../../../src/authentication/service/otp.generator.service';
-import SmsService from '../../../src/notification/service/sms.service';
+import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
+import { TokenService } from '../../../src/authentication/service/token.service';
+import User from '../../../src/authorization/entity/user.entity';
+import UserService from '../../../src/authorization/service/user.service';
+import {
+  UserPasswordLoginInput,
+  UserPasswordSignupInput,
+} from '../../../src/schema/graphql.schema';
 
 let users: User[] = [
   {
@@ -29,13 +30,12 @@ let users: User[] = [
   },
 ];
 
-describe('test UserAuthService', () => {
-  let userauthService: UserAuthService;
+describe('test PasswordAuthService', () => {
+  let passwordAuthService: PasswordAuthService;
   let authenticationHelper: AuthenticationHelper;
   const userService = Substitute.for<UserService>();
   const configService = Substitute.for<ConfigService>();
-  const otpGeneratorService = Substitute.for<OtpGeneratorService>();
-  const smsService = Substitute.for<SmsService>();
+  const tokenService = Substitute.for<TokenService>();
   configService.get('ENV').returns('local');
   configService.get('JWT_SECRET').returns('s3cr3t1234567890');
   configService.get('JWT_TOKEN_EXPTIME').returns(3600);
@@ -46,13 +46,14 @@ describe('test UserAuthService', () => {
       providers: [
         { provide: 'UserService', useValue: userService },
         { provide: 'ConfigService', useValue: configService },
-        { provide: 'OtpGeneratorService', useValue: otpGeneratorService },
-        { provide: 'SmsService', useValue: smsService },
-        UserAuthService,
+        { provide: 'TokenService', useValue: tokenService },
+        PasswordAuthService,
         AuthenticationHelper,
       ],
     }).compile();
-    userauthService = moduleRef.get<UserAuthService>(UserAuthService);
+    passwordAuthService = moduleRef.get<PasswordAuthService>(
+      PasswordAuthService,
+    );
     authenticationHelper = moduleRef.get<AuthenticationHelper>(
       AuthenticationHelper,
     );
@@ -92,7 +93,7 @@ describe('test UserAuthService', () => {
       },
     ];
 
-    const input: UserLoginInput = {
+    const input: UserPasswordLoginInput = {
       username: 'user@test.com',
       password: 's3cr3t',
     };
@@ -103,18 +104,18 @@ describe('test UserAuthService', () => {
     userService
       .updateField(users[0].id, 'refreshToken', Arg.any())
       .returns(Promise.resolve(users[0]));
-    const resp = await userauthService.userLogin(input);
+    const resp = await passwordAuthService.userLogin(input);
     expect(resp).toHaveProperty('accessToken');
     expect(resp).toHaveProperty('refreshToken');
   });
 
   it('should not login user since the user password is wrong', async () => {
-    const input: UserLoginInput = {
+    const input: UserPasswordLoginInput = {
       username: 'user@test.com',
       password: 's3cr3tWrong',
     };
 
-    const resp = userauthService.userLogin(input);
+    const resp = passwordAuthService.userLogin(input);
     expect(resp).rejects.toThrowError(new InvalidCredentialsException());
   });
 
@@ -136,7 +137,7 @@ describe('test UserAuthService', () => {
         origin: 'simple',
       },
     ];
-    const userSingup: UserSignupInput = {
+    const userSingup: UserPasswordSignupInput = {
       ...users[0],
       password: users[0].password as string,
     };
@@ -145,7 +146,7 @@ describe('test UserAuthService', () => {
       .returns(Promise.resolve(undefined));
     userService.createUser(Arg.any()).returns(Promise.resolve(userResponse[0]));
 
-    const resp = await userauthService.userSignup(userSingup);
+    const resp = await passwordAuthService.userSignup(userSingup);
 
     const receivedResponse = {
       id: resp.id,
@@ -178,7 +179,7 @@ describe('test UserAuthService', () => {
         origin: 'simple',
       },
     ];
-    const userSingup: UserSignupInput = {
+    const userSingup: UserPasswordSignupInput = {
       ...existUsers[0],
       password: 's3cr3t',
     };
@@ -187,7 +188,7 @@ describe('test UserAuthService', () => {
       .getUserDetailsByEmailOrPhone(existUsers[0].email, existUsers[0].phone)
       .resolves(existUsers[0]);
 
-    const resp = userauthService.userSignup(userSingup);
+    const resp = passwordAuthService.userSignup(userSingup);
 
     await expect(resp).rejects.toThrowError(
       new UserExistsException(existUsers[0].email || existUsers[0].phone || ''),
@@ -207,7 +208,7 @@ describe('test UserAuthService', () => {
 
     userService.getUserById(users[0].id).returns(Promise.resolve(users[0]));
 
-    const resp = await userauthService.updatePassword(users[0].id, input);
+    const resp = await passwordAuthService.updatePassword(users[0].id, input);
     expect(resp).toHaveReturned;
   });
 
@@ -218,35 +219,9 @@ describe('test UserAuthService', () => {
       newPassword: 'n3ws3cr3t',
     };
 
-    const resp = userauthService.updatePassword(users[0].id, input);
+    const resp = passwordAuthService.updatePassword(users[0].id, input);
     await expect(resp).rejects.toThrowError(
       new InvalidPayloadException('Current password is incorrect'),
     );
-  });
-
-  it('should refresh jwt token', async () => {
-    const users: User[] = [
-      {
-        id: 'a2413b29-1b8b-4c83-aaff-3a5a977e0a1a',
-        email: 'user@test.com',
-        phone: '9112345678910',
-        password: 's3cr3t',
-        firstName: 'Test1',
-        lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(),
-        origin: 'simple',
-      },
-    ];
-    const token = authenticationHelper.generateTokenForUser(users[0]);
-    users[0].refreshToken = token.refreshToken;
-    userService.getUserById(users[0].id).returns(Promise.resolve(users[0]));
-    userService
-      .updateField(users[0].id, 'refreshToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
-    const resp = await userauthService.refresh(users[0].refreshToken as string);
-
-    expect(resp).toHaveProperty('accessToken');
-    expect(resp).toHaveProperty('refreshToken');
   });
 });

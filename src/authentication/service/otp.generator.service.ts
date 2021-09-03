@@ -6,7 +6,7 @@ import * as speakeasy from 'speakeasy';
 import { GeneratedSecret } from 'speakeasy';
 
 @Injectable()
-export class OtpGeneratorService {
+export class TwoFactorAuthService {
   private authenticator = authenticator;
   constructor(private configService: ConfigService) {
     this.authenticator.options = {

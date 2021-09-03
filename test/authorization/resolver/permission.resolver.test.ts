@@ -10,10 +10,10 @@ import {
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
-import UserService from 'src/authorization/service/user.service';
-import { mockedConfigService } from 'test/utils/mocks/config.service';
-import { AuthenticationHelper } from 'src/authentication/authentication.helper';
-import User from 'src/authorization/entity/user.entity';
+import UserService from '../../../src/authorization/service/user.service';
+import { mockedConfigService } from '../../utils/mocks/config.service';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import User from '../../../src/authorization/entity/user.entity';
 
 const gql = '/graphql';
 const users: User[] = [
@@ -49,6 +49,7 @@ describe('Permission Module', () => {
         { provide: 'PermissionService', useValue: permissionService },
         { provide: 'UserService', useValue: userService },
         { provide: 'ConfigService', useValue: mockedConfigService },
+        AuthenticationHelper,
       ],
     }).compile();
 
