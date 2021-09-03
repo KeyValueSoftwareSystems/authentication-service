@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
-import { TokenResponse, UserLoginInput, UserSignupInput, UserSignupResponse } from '../../schema/graphql.schema';
+import { TokenResponse } from '../../schema/graphql.schema';
 import { AuthenticationHelper } from '../authentication.helper';
 
 @Injectable()

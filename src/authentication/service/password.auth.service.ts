@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   TokenResponse,
-  UserLoginInput,
-  UserSignupInput,
+  UserPasswordLoginInput,
+  UserPasswordSignupInput,
   UserSignupResponse,
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
@@ -26,7 +26,7 @@ export default class PasswordAuthService implements Authenticatable {
   ) {
   }
 
-  async userSignup(userDetails: UserSignupInput): Promise<UserSignupResponse> {
+  async userSignup(userDetails: UserPasswordSignupInput): Promise<UserSignupResponse> {
     const existingUserDetails = await this.userService.getUserDetailsByEmailOrPhone(
       userDetails.email,
       userDetails.phone,
@@ -52,7 +52,7 @@ export default class PasswordAuthService implements Authenticatable {
     return this.userService.createUser(userFromInput);
   };
 
-  async userLogin(userDetails: UserLoginInput): Promise<TokenResponse> {
+  async userLogin(userDetails: UserPasswordLoginInput): Promise<TokenResponse> {
     const userRecord:
       | User
       | undefined = await this.userService.getUserDetailsByUsername(
@@ -97,7 +97,7 @@ export default class PasswordAuthService implements Authenticatable {
 
   private async loginWithPassword(
     userRecord: User,
-    userDetails: UserLoginInput,
+    userDetails: UserPasswordLoginInput,
   ) {
     const hashedPassword = userRecord.password as string;
     const plainTextPassword = userDetails.password as string;

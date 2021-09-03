@@ -5,7 +5,8 @@ import {
   GenerateOtpInput,
   RefreshTokenInput,
   TokenResponse,
-  UserLoginInput,
+  UserOTPLoginInput,
+  UserPasswordLoginInput,
   UserSignupResponse,
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
@@ -32,7 +33,7 @@ export default class UserAuthResolver {
   @Mutation('passwordLogin')
   @UsePipes(new ValidationPipe(UserPasswordLoginInputSchema))
   async passwordLogin(
-    @Args('input') request: UserLoginInput,
+    @Args('input') request: UserPasswordLoginInput,
   ): Promise<TokenResponse> {
     return this.passwordAuthService.userLogin(request);
   }
@@ -46,7 +47,7 @@ export default class UserAuthResolver {
   @Mutation('otpLogin')
   @UsePipes(new ValidationPipe(UserOTPLoginInputSchema))
   async otpLogin(
-    @Args('input') request: UserLoginInput,
+    @Args('input') request: UserOTPLoginInput,
   ): Promise<TokenResponse> {
     return this.otpAuthService.userLogin(request);
   }
