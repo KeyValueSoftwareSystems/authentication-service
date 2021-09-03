@@ -5,7 +5,7 @@ import {
   NewEntityInput,
   UpdateEntityInput,
   UpdateEntityPermissionInput,
-} from 'src/schema/graphql.schema';
+} from '../../schema/graphql.schema';
 import { PermissionsType } from '../constants/authorization.constants';
 import { Permissions } from '../permissions.decorator';
 import { EntityService } from '../service/entity.service';

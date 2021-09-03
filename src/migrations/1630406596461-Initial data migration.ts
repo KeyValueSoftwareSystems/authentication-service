@@ -5,13 +5,10 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const rawPassword: string = process.env.DEFAULT_ADMIN_PASSWORD as string;
     const password = bcrypt.hashSync(rawPassword, 10);
-    await queryRunner.query(
-      `INSERT INTO public."user" ("email", "password", "first_name", "last_name", "origin") VALUES ('admin@keyvalue.systems', '${password}', 'Admin', 'Keyvalue', 'simple' )`,
-    );
 
     await queryRunner.query(` 
     WITH
-        usr AS (INSERT INTO public."user" ("email", "password", "first_name", "last_name", "origin") VALUES ('admin@keyvalue.systems', '${password}', 'Admin', 'Keyvalue', 'simple' ) RETURNING *),
+        usr AS (INSERT INTO public."user" ("email", "password", "first_name", "last_name", "origin") VALUES ('test@dummy.com', '${password}', 'Admin', 'Keyvalue', 'simple' ) RETURNING *),
         grp AS (INSERT INTO public.group (name) VALUES ('Admin') RETURNING *),
         permissions AS (INSERT INTO public.permission (name) VALUES 
             ('create-permissions'), ('edit-permissions'), ('delete-permissions'), ('view-permissions'), 
@@ -25,7 +22,7 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `DELETE FROM public."user" WHERE "email" = 'admin@keyvalue.systems'`,
+      `DELETE FROM public."user" WHERE "email" = 'test@dummy.com'`,
     );
 
     await queryRunner.query(

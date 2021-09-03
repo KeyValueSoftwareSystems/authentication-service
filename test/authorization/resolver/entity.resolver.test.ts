@@ -16,7 +16,7 @@ import UserService from '../../../src/authorization/service/user.service';
 import { ConfigService } from '@nestjs/config';
 import User from '../../../src/authorization/entity/user.entity';
 import { AuthorizationGaurd } from '../../../src/authorization/authorization.guard';
-import { mockedConfigService } from 'test/utils/mocks/config.service';
+import { mockedConfigService } from '../../utils/mocks/config.service';
 
 const gql = '/graphql';
 

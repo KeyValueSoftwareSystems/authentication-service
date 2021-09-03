@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthenticationHelper } from 'src/authentication/authentication.helper';
+import { AuthenticationHelper } from '../authentication/authentication.helper';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import { RedisCacheService } from '../cache/redis-cache/redis-cache.service';
 import EntityModel from './entity/entity.entity';

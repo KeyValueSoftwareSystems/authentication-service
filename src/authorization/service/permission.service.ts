@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
-} from 'src/schema/graphql.schema';
+} from '../../schema/graphql.schema';
 import { Repository } from 'typeorm';
 import {
   PermissionNotFoundException,

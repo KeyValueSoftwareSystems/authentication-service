@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { GqlExceptionFilter } from '@nestjs/graphql';
-import { LoggerService } from 'src/logger/logger.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Catch()
 export class CustomExceptionsFilter implements GqlExceptionFilter {

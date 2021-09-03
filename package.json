@@ -57,7 +57,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6",
     "speakeasy": "^2.0.0",
-    "twilio": "^3.66.1",
+    "twilio": "^3.67.1",
     "typeorm": "^0.2.32",
     "typeorm-naming-strategies": "^2.0.0",
     "winston": "^3.3.3"
@@ -110,6 +110,6 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "testRegex": ".*\\.ts$"
+    "testRegex": ".*\\.test.ts$"
   }
 }

@@ -1,6 +1,5 @@
 import { ConnectionOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-
 /**
  * Uses env params to configure TypeORM database library
  */
