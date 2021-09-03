@@ -92,7 +92,6 @@ export interface UpdateUserInput {
     firstName?: string;
     middleName?: string;
     lastName?: string;
-    active?: boolean;
 }
 
 export interface UpdateUserPermissionInput {

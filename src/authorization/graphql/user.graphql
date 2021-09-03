@@ -18,7 +18,6 @@ input UpdateUserInput {
   firstName: String
   middleName: String
   lastName: String
-  active: Boolean
 }
 
 input UpdateUserPermissionInput {
