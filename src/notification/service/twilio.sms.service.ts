@@ -1,4 +1,4 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectTwilio, TwilioClient } from 'nestjs-twilio';
 import { ConfigService } from '@nestjs/config';
 import { SMSInterface } from '../interfaces/sms.interface';
@@ -19,9 +19,13 @@ export default class TwilioSmsService implements SMSInterface {
         to,
         from: this.configService.get('TWILIO_SENDING_NUMBER'),
       });
-      this.loggerService.info(`Successfully send message to the user - ${to} with body - ${body} through twilio`);
+      this.loggerService.info(
+        `Successfully send message to the user - ${to} with body - ${body} through twilio`,
+      );
     } catch (e) {
-      throw new InternalServerErrorException(`Error on sending message through twilio - error: ${JSON.stringify(e)}`);
+      throw new InternalServerErrorException(
+        `Error on sending message through twilio - error: ${JSON.stringify(e)}`,
+      );
     }
   }
 }

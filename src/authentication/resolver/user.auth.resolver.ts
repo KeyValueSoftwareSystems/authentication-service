@@ -26,9 +26,11 @@ import { TokenService } from '../service/token.service';
 
 @Resolver('Userauth')
 export default class UserAuthResolver {
-  constructor(private readonly passwordAuthService: PasswordAuthService,
+  constructor(
+    private readonly passwordAuthService: PasswordAuthService,
     private readonly otpAuthService: OTPAuthService,
-    private readonly tokenService: TokenService) {}
+    private readonly tokenService: TokenService,
+  ) {}
 
   @Mutation('passwordLogin')
   @UsePipes(new ValidationPipe(UserPasswordLoginInputSchema))
@@ -40,7 +42,9 @@ export default class UserAuthResolver {
 
   @Mutation('passwordSignup')
   @UsePipes(new ValidationPipe(UserPasswordSignupInputSchema))
-  async passwordSignup(@Args('input') request: any): Promise<UserSignupResponse> {
+  async passwordSignup(
+    @Args('input') request: any,
+  ): Promise<UserSignupResponse> {
     return this.passwordAuthService.userSignup(request);
   }
 

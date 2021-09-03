@@ -10,7 +10,6 @@ input NewEntityInput {
 
 input UpdateEntityInput {
   name: String!
-  active: Boolean
 }
 
 input UpdateEntityPermissionInput {

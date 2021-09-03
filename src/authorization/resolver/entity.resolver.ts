@@ -7,6 +7,7 @@ import {
   UpdateEntityPermissionInput,
 } from '../../schema/graphql.schema';
 import { PermissionsType } from '../constants/authorization.constants';
+import Permission from '../entity/permission.entity';
 import { Permissions } from '../permissions.decorator';
 import { EntityService } from '../service/entity.service';
 
@@ -50,6 +51,14 @@ export class EntityResolver {
     @Args('input') entityInput: UpdateEntityPermissionInput,
   ): Promise<Entity[]> {
     return this.entityService.updateEntityPermissions(id, entityInput);
+  }
+
+  @Query()
+  @Permissions(PermissionsType.ViewEntities)
+  async getEntityPermissions(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<Permission[]> {
+    return this.entityService.getEntityPermissions(id);
   }
 
   @Mutation()

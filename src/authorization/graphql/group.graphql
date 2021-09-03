@@ -10,7 +10,6 @@ input NewGroupInput {
 
 input UpdateGroupInput {
   name: String!
-  active: Boolean
 }
 
 input UpdateGroupPermissionInput {

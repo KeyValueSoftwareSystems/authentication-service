@@ -1,13 +1,11 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 class EntityPermission {
-  @Column()
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'uuid' })
   public permissionId!: string;
 
-  @PrimaryColumn()
-  @Column()
+  @PrimaryColumn({ type: 'uuid' })
   public entityId!: string;
 }
 

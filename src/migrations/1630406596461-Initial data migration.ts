@@ -14,7 +14,7 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
             ('create-permissions'), ('edit-permissions'), ('delete-permissions'), ('view-permissions'), 
             ('create-groups'), ('edit-groups'), ('delete-groups'), ('view-groups'),
             ('create-entities'), ('edit-entities'), ('delete-entities'), ('view-entities'),
-            ('edit-user'), ('view-user') RETURNING *),
+            ('edit-user'), ('view-user'), ('delete-user') RETURNING *),
 		rnd AS (INSERT INTO public.group_permission SELECT permissions.id :: uuid, grp.id :: uuid FROM permissions, grp)
         INSERT INTO public.user_group("user_id", "group_id") SELECT usr.id :: uuid, grp.id :: uuid FROM usr, grp;
     `);
@@ -32,13 +32,13 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
     await queryRunner.query(
       `DELETE FROM public."group_permission" WHERE "group_permission"."permission_id" IN (SELECT "id" FROM public."permission" WHERE "name" IN ('create-permissions', 'edit-permissions', 'delete-permissions', 'view-permissions', 
       'create-groups', 'edit-groups', 'delete-groups', 'view-groups', 'create-entities', 'edit-entities', 'delete-entities', 'view-entities',
-       'edit-user', 'view-user'))`,
+       'edit-user', 'view-user', 'delete-user'))`,
     );
 
     await queryRunner.query(
       `DELETE FROM public."permission" WHERE "name" IN ('create-permissions', 'edit-permissions', 'delete-permissions', 'view-permissions', 
       'create-groups', 'edit-groups', 'delete-groups', 'view-groups', 'create-entities', 'edit-entities', 'delete-entities', 'view-entities',
-       'edit-user', 'view-user')`,
+       'edit-user', 'view-user', 'delete-user')`,
     );
   }
 }

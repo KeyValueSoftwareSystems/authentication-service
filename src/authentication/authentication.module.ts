@@ -17,7 +17,10 @@ import { ProviderFactory } from '../factory/provider.factory';
 import { LoggerService } from '../logger/logger.service';
 import { NotificationModule } from '../notification/notification.module';
 import AWSSMSService from '../notification/service/aws.sms.service';
-import { default as SmsService, default as TwilioSmsService } from '../notification/service/twilio.sms.service';
+import {
+  default as SmsService,
+  default as TwilioSmsService,
+} from '../notification/service/twilio.sms.service';
 import { TwilioImplModule } from '../twilio/twilio.module';
 import { AuthenticationHelper } from './authentication.helper';
 import { GoogleAuthController } from './controller/google.controller';
@@ -32,6 +35,37 @@ import { RecaptchaService } from './service/recaptcha.service';
 import { TokenService } from './service/token.service';
 import TwilioOTPService from './service/twilio.otp.service';
 
+const providers = [
+  UserAuthResolver,
+  UserService,
+  GoogleAuthService,
+  AuthenticationHelper,
+  ConfigService,
+  AuthenticationHelper,
+  ConfigService,
+  UserCacheService,
+  GroupCacheService,
+  PermissionCacheService,
+  LoggerService,
+  TwoFactorAuthService,
+  SmsService,
+  PasswordAuthService,
+  OTPAuthService,
+  TwilioOTPService,
+  DefaultOTPService,
+  TokenService,
+  ProviderFactory.getOTPVerifierFactory(),
+  ProviderFactory.getSMSFactory(),
+  TwilioSmsService,
+  AWSSMSService,
+  LoggerService,
+  RecaptchaService,
+];
+
+const providersWithGoogleStrategy =
+  process.env.IS_GOOGLE_SOCIAL_LOGIN_ENBALED === 'true'
+    ? providers.concat([GoogleStrategy as any])
+    : providers;
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -49,34 +83,7 @@ import TwilioOTPService from './service/twilio.otp.service';
     TwilioImplModule,
     HttpModule,
   ],
-  providers: [
-    UserAuthResolver,
-    UserService,
-    GoogleAuthController,
-    GoogleAuthService,
-    AuthenticationHelper,
-    ConfigService,
-    GoogleStrategy,
-    AuthenticationHelper,
-    ConfigService,
-    UserCacheService,
-    GroupCacheService,
-    PermissionCacheService,
-    LoggerService,
-    TwoFactorAuthService,
-    SmsService,
-    PasswordAuthService,
-    OTPAuthService,
-    TwilioOTPService,
-    DefaultOTPService,
-    TokenService,
-    ProviderFactory.getOTPVerifierFactory(),
-    ProviderFactory.getSMSFactory(),
-    TwilioSmsService,
-    AWSSMSService,
-    LoggerService,
-    RecaptchaService,
-  ],
+  providers: providersWithGoogleStrategy,
   controllers: [GoogleAuthController],
 })
 export class UserAuthModule {}

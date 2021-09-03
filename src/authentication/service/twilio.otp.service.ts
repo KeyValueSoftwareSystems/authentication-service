@@ -36,7 +36,9 @@ export default class TwilioOTPService implements OTPVerifiable {
         `Succesfully sent otp to the user - ${user.firstName} with id ${user.id}. OTP sent status is ${result.status}`,
       );
     } catch (err) {
-      throw new InternalServerErrorException(`Integration with twilio failed with error - ${JSON.stringify(err)}`);
+      throw new InternalServerErrorException(
+        `Integration with twilio failed with error - ${JSON.stringify(err)}`,
+      );
     }
   }
 }

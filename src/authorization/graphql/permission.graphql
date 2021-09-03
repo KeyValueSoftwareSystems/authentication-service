@@ -10,7 +10,6 @@ input NewPermissionInput {
 
 input UpdatePermissionInput {
   name: String!
-  active: Boolean
 }
 
 type Query {

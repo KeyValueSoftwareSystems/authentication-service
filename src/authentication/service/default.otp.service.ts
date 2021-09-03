@@ -1,11 +1,13 @@
-import { Injectable, InternalServerErrorException, PreconditionFailedException } from '@nestjs/common';
-import UserService from '../../authorization/service/user.service';
+import {
+  Injectable,
+  InternalServerErrorException,
+  PreconditionFailedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OTPVerifiable } from '../interfaces/otp.verifiable';
 import User from '../../authorization/entity/user.entity';
 import { authenticator } from 'otplib';
 import { SMSInterface } from '../../notification/interfaces/sms.interface';
-
 
 @Injectable()
 export class DefaultOTPService implements OTPVerifiable {
@@ -19,10 +21,12 @@ export class DefaultOTPService implements OTPVerifiable {
       window: Number(configService.get('OTP_WINDOW')),
     };
   }
-  async sendOTP (user: User) : Promise<void>{
+  async sendOTP(user: User): Promise<void> {
     const secretKeyConstant = this.configService.get('OTP_SECRET');
     if (!secretKeyConstant) {
-      throw new InternalServerErrorException("Secret key is not configured for otp generation");
+      throw new InternalServerErrorException(
+        'Secret key is not configured for otp generation',
+      );
     }
     if (!user.phone) {
       throw new PreconditionFailedException('User Phone number is not present');
@@ -30,16 +34,15 @@ export class DefaultOTPService implements OTPVerifiable {
     const secret = (user.id + secretKeyConstant) as string;
     const otp = this.authenticator.generate(secret);
     await this.smsService.sendSMS(user.phone, otp);
-
   }
-  async validateOTP(otp: string, user: User): Promise<boolean>{
+  async validateOTP(otp: string, user: User): Promise<boolean> {
     const secretKeyConstant = this.configService.get('OTP_SECRET');
     if (!secretKeyConstant) {
-      throw new InternalServerErrorException("Secret key is not configured for otp generation");
+      throw new InternalServerErrorException(
+        'Secret key is not configured for otp generation',
+      );
     }
     const secret = (user.id + secretKeyConstant) as string;
     return this.authenticator.verify({ token: otp, secret });
   }
-
-
 }
