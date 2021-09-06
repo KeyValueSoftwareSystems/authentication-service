@@ -8,7 +8,7 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
 
     await queryRunner.query(` 
     WITH
-        usr AS (INSERT INTO public."user" ("email", "password", "first_name", "last_name", "origin") VALUES ('test@dummy.com', '${password}', 'Admin', 'Keyvalue', 'simple' ) RETURNING *),
+        usr AS (INSERT INTO public."user" ("email", "password", "first_name", "last_name", "origin") VALUES ('admin@domain.com', '${password}', 'Admin', 'Keyvalue', 'simple' ) RETURNING *),
         grp AS (INSERT INTO public.group (name) VALUES ('Admin') RETURNING *),
         permissions AS (INSERT INTO public.permission (name) VALUES 
             ('create-permissions'), ('edit-permissions'), ('delete-permissions'), ('view-permissions'), 
@@ -22,7 +22,7 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `DELETE FROM public."user" WHERE "email" = 'test@dummy.com'`,
+      `DELETE FROM public."user" WHERE "email" = 'admin@domain.com'`,
     );
 
     await queryRunner.query(
