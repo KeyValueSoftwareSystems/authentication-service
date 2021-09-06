@@ -106,10 +106,11 @@ Developers can customise this as per their requirement.
 |OTP Sender Configuration(Optional)  |  |
 |--|--|
 |IS_TWILIO_INTEGRATED  | false |
-|TWILIO_ACC_SID  |  |
-|TWILIO_AUTH_TOKEN  |  |
-|TWILIO_SENDING_NUMBER  |  |
+|TWILIO_ACC_SID  | required only if you are using any twilio service(sms sender or verify tool) |
+|TWILIO_AUTH_TOKEN  | required only if you are using any twilio service(sms sender or verify tool) |
+|TWILIO_SENDING_NUMBER  | required only if you are using any twilio service(sms sender or verify tool) |
 |OTP_VERIFY_TOOL| twilio or default|
+|TWILIO_VERIFY_SID| required only if otp verify tool is twilio |
 |SMS_INTEGRATION|twilio or aws|
 | OTP_WINDOW | 300  |
 | OTP_STEP | 1 |
