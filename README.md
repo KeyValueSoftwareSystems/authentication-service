@@ -117,7 +117,7 @@ Developers can customise this as per their requirement.
 -   Run `npm run run-migrations`
 -   Run `npm run start`
 -   Service should be up and running in http://localhost:${PORT}.
-- A default admin user with email **test@dummy.com** and password given in `DEFAULT_ADMIN_PASSWORD` will already be available in the application. This user will be associated to the default `Admin` group which will have the permissions to create/update permissions, create/update groups, create/update entities and update a user
+- A default admin user with email **admin@domain.com** and password given in `DEFAULT_ADMIN_PASSWORD` will already be available in the application. This user will be associated to the default `Admin` group which will have the permissions to create/update permissions, create/update groups, create/update entities and update a user
     
 
 We can ensure the health of the service by accessing http://localhost:${PORT}/auth/api/health.
