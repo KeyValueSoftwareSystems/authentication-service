@@ -2,15 +2,15 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
+import BaseEntity from './base.entity';
 
 @Entity()
-class User {
+class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true})
   public email?: string;
 
   @Column({ nullable: true })
@@ -45,9 +45,6 @@ class User {
 
   @Column({ nullable: true, default: false })
   public twoFAEnabled?: boolean;
-
-  @UpdateDateColumn()
-  updatedDate!: Date;
 }
 
 export default User;
