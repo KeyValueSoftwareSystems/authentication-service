@@ -31,9 +31,7 @@ export class PermissionService {
   }
 
   async getPermissionById(id: string): Promise<Permission> {
-    const permission = await this.permissionsRepository.findOne(id, {
-      where: { active: true },
-    });
+    const permission = await this.permissionsRepository.findOne(id);
     if (permission) {
       return permission;
     }
@@ -42,39 +40,41 @@ export class PermissionService {
 
   async createPermission(permission: NewPermissionInput): Promise<Permission> {
     const newPermission = await this.permissionsRepository.create(permission);
-    const savedPermission = await this.permissionsRepository.save(
+    const result = await this.permissionsRepository.insert(
       newPermission,
     );
-    return savedPermission;
+    return { ...newPermission, id: result.raw[0].id };
   }
 
   async updatePermission(
     id: string,
     permission: UpdatePermissionInput,
   ): Promise<Permission> {
+    const existingPermission = await this.permissionsRepository.findOne(id);
+    if (!existingPermission) {
+      throw new PermissionNotFoundException(id);
+    }
     const permissionToUpdate = this.permissionsRepository.create(permission);
     await this.permissionsRepository.update(id, permissionToUpdate);
-    const updatedPermission = await this.permissionsRepository.findOne(id);
-    if (updatedPermission) {
-      return updatedPermission;
-    }
-    throw new PermissionNotFoundException(id);
+    return {
+      ...existingPermission,
+      ...permissionToUpdate,
+    };
   }
 
   async deletePermission(id: string): Promise<Permission> {
+    const existingPermission = await this.permissionsRepository.findOne(id);
+    if (!existingPermission) {
+      throw new PermissionNotFoundException(id);
+    }
     if (await this.checkPermissionUsage(id)) {
       throw new PermissionDeleteNotAllowedException(id);
     }
-    const deletedPermission = await this.permissionsRepository.findOne(id);
-    await this.permissionsRepository.update(id, { active: false });
-
-    if (deletedPermission) {
-      await this.permissionCacheService.invalidatePermissionsCache(
-        deletedPermission.name,
-      );
-      return deletedPermission;
-    }
-    throw new PermissionNotFoundException(id);
+    await this.permissionsRepository.softDelete(id);
+    await this.permissionCacheService.invalidatePermissionsCache(
+      existingPermission.name,
+    );
+    return existingPermission;
   }
 
   private async checkPermissionUsage(id: string) {
