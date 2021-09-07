@@ -4,9 +4,9 @@ export const UserPasswordSignupInputSchema = Joi.object({
   email: Joi.string().email({ tlds: { allow: false } }),
   phone: Joi.number(),
   password: Joi.string().required().min(10),
-  firstName: Joi.string().required(),
-  middleName: Joi.string().allow('', null),
-  lastName: Joi.string().required(),
+  firstName: Joi.string().regex(/^[a-zA-Z ]*$/).required(),
+  middleName: Joi.string().regex(/^[a-zA-Z ]*$/).allow('', null),
+  lastName: Joi.string().regex(/^[a-zA-Z ]*$/).required(),
 })
   .options({ abortEarly: false })
   .or('email', 'phone');
@@ -14,9 +14,9 @@ export const UserPasswordSignupInputSchema = Joi.object({
 export const UserOTPSignupInputSchema = Joi.object({
   email: Joi.string().email({ tlds: { allow: false } }),
   phone: Joi.number().required(),
-  firstName: Joi.string().required(),
-  middleName: Joi.string(),
-  lastName: Joi.string().required(),
+  firstName: Joi.string().regex(/^[a-zA-Z ]*$/).required(),
+  middleName: Joi.string().regex(/^[a-zA-Z ]*$/),
+  lastName: Joi.string().regex(/^[a-zA-Z ]*$/).required(),
 }).options({ abortEarly: false });
 
 export const UserPasswordLoginInputSchema = Joi.object({
@@ -45,9 +45,9 @@ export const GoogleUserSchema = Joi.object({
   email: Joi.string()
     .email({ tlds: { allow: false } })
     .required(),
-  firstName: Joi.string().required(),
-  middleName: Joi.string(),
-  lastName: Joi.string().required(),
+  firstName: Joi.string().regex(/^[a-zA-Z ]*$/).required(),
+  middleName: Joi.string().regex(/^[a-zA-Z ]*$/),
+  lastName: Joi.string().regex(/^[a-zA-Z ]*$/).required(),
   externalUserId: Joi.string().required(),
 }).options({ abortEarly: false });
 
