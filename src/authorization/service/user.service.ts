@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 
@@ -61,11 +61,9 @@ export default class UserService {
   }
 
   async createUser(user: User): Promise<User> {
-    const newUser = await this.usersRepository.create(user);
-    const createdUser = await this.usersRepository.save(newUser);
-    const savedUser = await this.usersRepository.findOne(createdUser.id, {
-      where: { active: true },
-    });
+    const newUser = this.usersRepository.create(user);
+    const result = await this.usersRepository.insert(newUser);
+    const savedUser = await this.usersRepository.findOne(result.raw[0].id);
     if (savedUser) {
       return savedUser;
     }
@@ -73,15 +71,13 @@ export default class UserService {
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
-    const newUser = await this.usersRepository.create(user);
-    await this.usersRepository.update(id, newUser);
-    const updatedUser = await this.usersRepository.findOne(id, {
-      where: { active: true },
-    });
-    if (updatedUser) {
-      return updatedUser;
+    const existingUser = await this.usersRepository.findOne(id);
+    if (!existingUser) {
+      throw new UserNotFoundException(id);
     }
-    throw new UserNotFoundException(id);
+    const newUser = this.usersRepository.create(user);
+    await this.usersRepository.update(id, newUser);
+    return { ...existingUser, ...newUser };
   }
 
   async updateUserGroups(
@@ -189,14 +185,18 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    await this.usersRepository.update(id, { active: false });
-    const deletedUser = await this.usersRepository.findOne(id);
-    if (deletedUser) {
-      await this.userCacheService.invalidateUserPermissionsCache(id);
-      await this.userCacheService.invalidateUserGroupsCache(id);
-      return deletedUser;
+    const user = await this.usersRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new UserNotFoundException(id);
     }
-    throw new UserNotFoundException(id);
+    await this.usersRepository.softDelete(id);
+    await this.userCacheService.invalidateUserPermissionsCache(id);
+    await this.userCacheService.invalidateUserGroupsCache(id);
+    return user;
   }
 
   private async getAllUserpermissionIds(id: string): Promise<Set<string>> {
@@ -260,9 +260,10 @@ export default class UserService {
   ): Promise<any> {
     let user;
     if (email) {
-      user = await this.usersRepository.findOne({
-        where: { email: email },
-      });
+      user = await this.usersRepository
+        .createQueryBuilder('user')
+        .where('lower(user.email) = lower(:email)', { email })
+        .getOne();
     }
 
     if (phone && !user) {
@@ -280,13 +281,21 @@ export default class UserService {
   ): Promise<User | undefined> {
     const nullCheckedEmail = email ? email : null;
     const nullCheckedPhone = phone ? phone : null;
-
-    return this.usersRepository.findOne({
-      where: [
-        { email: nullCheckedEmail, active: true },
-        { phone: nullCheckedPhone, active: true },
-      ],
-    });
+    if (!nullCheckedEmail && !nullCheckedPhone) {
+      throw new BadRequestException(
+        'Username should be provided with email or phone',
+      );
+    }
+    let query = this.usersRepository.createQueryBuilder('user');
+    if (email) {
+      query = query.orWhere('lower(user.email) = lower(:email)', {
+        email: nullCheckedEmail,
+      });
+    }
+    if (phone) {
+      query = query.orWhere('user.phone = :phone', { phone: nullCheckedPhone });
+    }
+    return query.getOne();
   }
 
   async updateField(id: string, field: string, value: any): Promise<User> {

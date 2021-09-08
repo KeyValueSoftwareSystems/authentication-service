@@ -15,7 +15,7 @@ export class InitialDataMigration1630406596461 implements MigrationInterface {
             ('create-groups'), ('edit-groups'), ('delete-groups'), ('view-groups'),
             ('create-entities'), ('edit-entities'), ('delete-entities'), ('view-entities'),
             ('edit-user'), ('view-user'), ('delete-user') RETURNING *),
-		rnd AS (INSERT INTO public.group_permission SELECT permissions.id :: uuid, grp.id :: uuid FROM permissions, grp)
+		rnd AS (INSERT INTO public.group_permission ("permission_id", "group_id") SELECT permissions.id :: uuid, grp.id :: uuid FROM permissions, grp)
         INSERT INTO public.user_group("user_id", "group_id") SELECT usr.id :: uuid, grp.id :: uuid FROM usr, grp;
     `);
   }

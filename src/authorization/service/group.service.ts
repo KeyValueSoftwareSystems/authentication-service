@@ -36,9 +36,7 @@ export class GroupService {
   }
 
   async getGroupById(id: string): Promise<Group> {
-    const group = await this.groupsRepository.findOne(id, {
-      where: { active: true },
-    });
+    const group = await this.groupsRepository.findOne(id);
     if (group) {
       return group;
     }
@@ -47,32 +45,36 @@ export class GroupService {
 
   async createGroup(group: NewGroupInput): Promise<Group> {
     const newGroup = await this.groupsRepository.create(group);
-    await this.groupsRepository.save(newGroup);
+    await this.groupsRepository.insert(newGroup);
     return newGroup;
   }
 
   async updateGroup(id: string, group: UpdateGroupInput): Promise<Group> {
+    const existingGroup = await this.groupsRepository.findOne(id);
+    if (!existingGroup) {
+      throw new GroupNotFoundException(id);
+    }
     const groupToUpdate = this.groupsRepository.create(group);
     await this.groupsRepository.update(id, groupToUpdate);
-    const updatedGroup = await this.groupsRepository.findOne(id);
-    if (updatedGroup) {
-      return updatedGroup;
-    }
-    throw new GroupNotFoundException(id);
+    return {
+      ...existingGroup,
+      ...groupToUpdate,
+    };
+    
   }
 
   async deleteGroup(id: string): Promise<Group> {
+    const existingGroup = await this.groupsRepository.findOne(id);
+    if (!existingGroup) {
+      throw new GroupNotFoundException(id);
+    }
     const usage = await this.checkGroupUsage(id);
     if (usage) {
       throw new GroupDeleteNotAllowedException(id);
     }
-    await this.groupsRepository.update(id, { active: false });
-    const deletedGroup = await this.groupsRepository.findOne(id);
-    if (deletedGroup) {
-      await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
-      return deletedGroup;
-    }
-    throw new GroupNotFoundException(id);
+    await this.groupsRepository.softDelete(id);
+    await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
+    return existingGroup;
   }
 
   async updateGroupPermissions(

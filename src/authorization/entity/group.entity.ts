@@ -1,11 +1,12 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import BaseEntity from './base.entity';
 
 @Entity()
-class Group {
+class Group extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ unique: true })
+  @Column()
   public name!: string;
 
   @Column({ default: true })

@@ -28,9 +28,7 @@ export class EntityService {
   }
 
   async getEntityById(id: string): Promise<EntityModel> {
-    const entity = await this.entityRepository.findOne(id, {
-      where: { active: true },
-    });
+    const entity = await this.entityRepository.findOne(id);
     if (entity) {
       return entity;
     }
@@ -39,7 +37,7 @@ export class EntityService {
 
   async createEntity(entity: NewEntityInput): Promise<EntityModel> {
     const newEntity = this.entityRepository.create(entity);
-    await this.entityRepository.save(newEntity);
+    await this.entityRepository.insert(newEntity);
     return newEntity;
   }
 
@@ -47,22 +45,26 @@ export class EntityService {
     id: string,
     entity: UpdateEntityInput,
   ): Promise<EntityModel> {
+    const existingEntity = await this.entityRepository.findOne(id);
+    if (!existingEntity) {
+      throw new EntityNotFoundException(id);
+    }
     const entityToUpdate = this.entityRepository.create(entity);
     await this.entityRepository.update(id, entityToUpdate);
-    const updatedEntity = await this.entityRepository.findOne(id);
-    if (updatedEntity) {
-      return updatedEntity;
-    }
-    throw new EntityNotFoundException(id);
+    
+    return {
+      ...existingEntity,
+      ...entityToUpdate,
+    };
   }
 
   async deleteEntity(id: string): Promise<EntityModel> {
-    await this.entityRepository.update(id, { active: false });
-    const deletedEntity = await this.entityRepository.findOne(id);
-    if (deletedEntity) {
-      return deletedEntity;
+    const existingEntity = await this.entityRepository.findOne(id);
+    if (!existingEntity) {
+      throw new EntityNotFoundException(id);
     }
-    throw new EntityNotFoundException(id);
+    await this.entityRepository.softDelete(id);
+    return existingEntity;
   }
 
   async updateEntityPermissions(

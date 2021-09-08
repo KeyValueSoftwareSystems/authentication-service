@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn } from 'typeorm';
+import BaseEntity from './base.entity';
 @Entity()
-class UserGroup {
+class UserGroup extends BaseEntity {
   @PrimaryColumn({ type: 'uuid' })
   public groupId!: string;
 
