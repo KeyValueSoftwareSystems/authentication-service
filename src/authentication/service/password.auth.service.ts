@@ -103,7 +103,6 @@ export default class PasswordAuthService implements Authenticatable {
     const hashedPassword = userRecord.password as string;
     const plainTextPassword = userDetails.password as string;
     if (
-      userRecord.active &&
       hashedPassword != null &&
       this.authenticationHelper.isPasswordValid(
         plainTextPassword,

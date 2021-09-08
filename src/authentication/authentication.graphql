@@ -48,7 +48,6 @@ type UserSignupResponse {
   firstName: String!
   middleName: String
   lastName: String!
-  active: Boolean!
 }
 
 input UserPasswordInput {

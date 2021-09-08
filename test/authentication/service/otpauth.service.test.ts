@@ -24,8 +24,6 @@ let users: User[] = [
     password: 's3cr3t',
     firstName: 'Test1',
     lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
     origin: 'simple',
   },
 ];
@@ -68,8 +66,6 @@ describe('test OTPAuthService', () => {
         password: hashedPassword,
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(2020, 1, 1),
         refreshToken: token.refreshToken,
         origin: 'simple',
       },
@@ -86,8 +82,6 @@ describe('test OTPAuthService', () => {
         phone: '9112345678910',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(2020, 1, 1),
         origin: 'simple',
       },
     ];
@@ -116,8 +110,6 @@ describe('test OTPAuthService', () => {
         phone: '9112345678910',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(2020, 1, 1),
         origin: 'simple',
       },
     ];
@@ -143,8 +135,6 @@ describe('test OTPAuthService', () => {
         password: hashedPassword,
         firstName: users[0].firstName,
         lastName: users[0].lastName,
-        active: users[0].active,
-        updatedDate: users[0].updatedDate,
         origin: 'simple',
       },
     ];
@@ -167,8 +157,6 @@ describe('test OTPAuthService', () => {
       password: users[0].password,
       firstName: resp.firstName,
       lastName: resp.lastName,
-      active: resp.active,
-      updatedDate: users[0].updatedDate,
       origin: 'simple',
     };
 
@@ -184,8 +172,6 @@ describe('test OTPAuthService', () => {
         phone: '91123456789101',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(),
         origin: 'simple',
       },
     ];

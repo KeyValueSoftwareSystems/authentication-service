@@ -17,7 +17,6 @@ const permissions: Permission[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     name: 'Test1',
-    active: true,
   },
 ];
 
@@ -57,18 +56,14 @@ describe('test Permission service', () => {
   });
 
   it('should get all permissions', async () => {
-    permissionRepository
-      .find({ where: { active: true } })
-      .returns(Promise.resolve(permissions));
+    permissionRepository.find().returns(Promise.resolve(permissions));
     const resp = await permissionService.getAllPermissions();
     expect(resp).toEqual(permissions);
   });
 
   it('should get a permission by id', async () => {
     permissionRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8', {
-        where: { active: true },
-      })
+      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .returns(Promise.resolve(permissions[0]));
     const resp = await permissionService.getPermissionById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -81,10 +76,11 @@ describe('test Permission service', () => {
       name: 'Test1',
     };
     permissionRepository.create(input).returns(permissions[0]);
+    const insertRes = { raw: permissions, identifiers: [], generatedMaps: [] };
 
     permissionRepository
-      .save(permissions[0])
-      .returns(Promise.resolve(permissions[0]));
+      .insert(permissions[0])
+      .returns(Promise.resolve(insertRes));
 
     const resp = await permissionService.createPermission(input);
     expect(resp).toEqual(permissions[0]);
@@ -98,10 +94,6 @@ describe('test Permission service', () => {
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
       .returns(Promise.resolve(Arg.any()));
 
-    permissionRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-      .returns(Promise.resolve(permissions[0]));
-
     const resp = await permissionService.updatePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       input,
@@ -111,7 +103,7 @@ describe('test Permission service', () => {
 
   it('should delete a permission', async () => {
     permissionRepository
-      .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', { active: false })
+      .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .resolves(Arg.any());
     userPermissionRepository
       .count({

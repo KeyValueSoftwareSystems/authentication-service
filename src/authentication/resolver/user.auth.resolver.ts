@@ -1,12 +1,12 @@
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
-  Enable2FAInput,
   GenerateOtpInput,
   RefreshTokenInput,
   TokenResponse,
   UserOTPLoginInput,
   UserPasswordLoginInput,
+  UserPasswordSignupInput,
   UserSignupResponse,
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
@@ -33,17 +33,17 @@ export default class UserAuthResolver {
   ) {}
 
   @Mutation('passwordLogin')
-  @UsePipes(new ValidationPipe(UserPasswordLoginInputSchema))
   async passwordLogin(
-    @Args('input') request: UserPasswordLoginInput,
+    @Args('input', new ValidationPipe(UserPasswordLoginInputSchema))
+    request: UserPasswordLoginInput,
   ): Promise<TokenResponse> {
     return this.passwordAuthService.userLogin(request);
   }
 
   @Mutation('passwordSignup')
-  @UsePipes(new ValidationPipe(UserPasswordSignupInputSchema))
   async passwordSignup(
-    @Args('input') request: any,
+    @Args('input', new ValidationPipe(UserPasswordSignupInputSchema))
+    request: UserPasswordSignupInput,
   ): Promise<UserSignupResponse> {
     return this.passwordAuthService.userSignup(request);
   }

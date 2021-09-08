@@ -45,15 +45,11 @@ export default class UserService {
   ) {}
 
   getAllUsers(): Promise<User[]> {
-    return this.usersRepository.find({
-      where: { active: true },
-    });
+    return this.usersRepository.find();
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne(id, {
-      where: { active: true },
-    });
+    const user = await this.usersRepository.findOne(id);
     if (user) {
       return user;
     }
@@ -134,7 +130,6 @@ export default class UserService {
     );
     const permissionsInRequest: Permission[] = await this.permissionRepository.findByIds(
       request.permissions,
-      { where: { active: true } },
     );
     const validPermissions = new Set(permissionsInRequest.map((p) => p.id));
     if (permissionsInRequest.length !== request.permissions.length) {
@@ -262,6 +257,7 @@ export default class UserService {
     if (email) {
       user = await this.usersRepository
         .createQueryBuilder('user')
+        .where('deletedAt IS NULL')
         .where('lower(user.email) = lower(:email)', { email })
         .getOne();
     }
@@ -286,7 +282,9 @@ export default class UserService {
         'Username should be provided with email or phone',
       );
     }
-    let query = this.usersRepository.createQueryBuilder('user');
+    let query = this.usersRepository
+      .createQueryBuilder('user')
+      .where('deletedAt IS NULL');
     if (email) {
       query = query.orWhere('lower(user.email) = lower(:email)', {
         email: nullCheckedEmail,
@@ -309,7 +307,7 @@ export default class UserService {
 
   async getActiveUserByPhoneNumber(phone: string) {
     return await this.usersRepository.findOne({
-      where: { phone, active: true },
+      where: { phone },
     });
   }
 

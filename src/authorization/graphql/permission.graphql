@@ -1,7 +1,6 @@
 type Permission {
   id: ID!
   name: String!
-  active: Boolean!
 }
 
 input NewPermissionInput {

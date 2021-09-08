@@ -32,7 +32,7 @@ export class GroupService {
   ) {}
 
   getAllGroups(): Promise<Group[]> {
-    return this.groupsRepository.find({ where: { active: true } });
+    return this.groupsRepository.find();
   }
 
   async getGroupById(id: string): Promise<Group> {
@@ -60,7 +60,6 @@ export class GroupService {
       ...existingGroup,
       ...groupToUpdate,
     };
-    
   }
 
   async deleteGroup(id: string): Promise<Group> {

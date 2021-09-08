@@ -6,20 +6,6 @@ import { TokenService } from '../../../src/authentication/service/token.service'
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 
-const users: User[] = [
-  {
-    id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-    email: 'user@test.com',
-    phone: '9112345678910',
-    password: 's3cr3t',
-    firstName: 'Test1',
-    lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
-    origin: 'simple',
-  },
-];
-
 describe('test TokenService', () => {
   let tokenService: TokenService;
   let authenticationHelper: AuthenticationHelper;
@@ -54,8 +40,6 @@ describe('test TokenService', () => {
         password: 's3cr3t',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(),
         origin: 'simple',
       },
     ];
@@ -80,8 +64,6 @@ describe('test TokenService', () => {
         password: 's3cr3t',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(),
         origin: 'simple',
       },
     ];
@@ -103,8 +85,6 @@ describe('test TokenService', () => {
         password: 's3cr3t',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(),
         origin: 'simple',
       },
     ];

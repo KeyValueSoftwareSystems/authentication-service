@@ -26,7 +26,7 @@ export default class UserCacheService {
       groupsFromCache ||
       (
         await this.userRepository
-          .findOneOrFail({ where: { id: userId, active: true } })
+          .findOneOrFail({ where: { id: userId } })
           .then(() =>
             this.userGroupRepository.find({ where: { userId: userId } }),
           )
@@ -44,7 +44,7 @@ export default class UserCacheService {
       permissionsFromCache ||
       (
         await this.userRepository
-          .findOneOrFail({ where: { id: userId, active: true } })
+          .findOneOrFail({ where: { id: userId } })
           .then(() =>
             this.userPermissionRepository.find({ where: { userId: userId } }),
           )

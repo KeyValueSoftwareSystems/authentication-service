@@ -26,10 +26,8 @@ const users: User[] = [
     email: 'user@test.com',
     phone: '9112345678910',
     password: 's3cr3t1234567890',
-    firstName: 'Test1',
-    lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
+    firstName: 'Test',
+    lastName: 'User',
     origin: 'simple',
   },
 ];
@@ -129,7 +127,6 @@ describe('Userauth Module', () => {
           phone: users[0].phone,
           firstName: users[0].firstName,
           lastName: users[0].lastName,
-          active: users[0].active,
         },
       ];
 
@@ -142,7 +139,7 @@ describe('Userauth Module', () => {
         .send({
           query: `mutation { passwordSignup(input: { email: "user@test.com" 
           phone: "9112345678910" password: "s3cr3t1234567890" 
-          firstName: "Test1" lastName: "Test2" }) { id email phone firstName lastName active }}`,
+          firstName: "Test" lastName: "User" }) { id email phone firstName lastName }}`,
         })
         .expect(200)
         .expect((res) => {
@@ -158,7 +155,6 @@ describe('Userauth Module', () => {
           phone: users[0].phone,
           firstName: users[0].firstName,
           lastName: users[0].lastName,
-          active: users[0].active,
         },
       ];
 
@@ -174,7 +170,7 @@ describe('Userauth Module', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           query: `mutation { changePassword(input: { currentPassword: "s3cr3t1234567890" 
-          newPassword: "1234567890s3cr3t" }) { id email phone firstName lastName active }}`,
+          newPassword: "1234567890s3cr3t" }) { id email phone firstName lastName }}`,
         })
         .expect(200)
         .expect((res) => {

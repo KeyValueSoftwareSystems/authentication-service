@@ -24,7 +24,7 @@ export class EntityService {
   ) {}
 
   getAllEntities(): Promise<EntityModel[]> {
-    return this.entityRepository.find({ where: { active: true } });
+    return this.entityRepository.find();
   }
 
   async getEntityById(id: string): Promise<EntityModel> {
@@ -51,7 +51,7 @@ export class EntityService {
     }
     const entityToUpdate = this.entityRepository.create(entity);
     await this.entityRepository.update(id, entityToUpdate);
-    
+
     return {
       ...existingEntity,
       ...entityToUpdate,

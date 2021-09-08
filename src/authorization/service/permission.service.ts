@@ -27,7 +27,7 @@ export class PermissionService {
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
-    return this.permissionsRepository.find({ where: { active: true } });
+    return this.permissionsRepository.find();
   }
 
   async getPermissionById(id: string): Promise<Permission> {
@@ -40,9 +40,7 @@ export class PermissionService {
 
   async createPermission(permission: NewPermissionInput): Promise<Permission> {
     const newPermission = await this.permissionsRepository.create(permission);
-    const result = await this.permissionsRepository.insert(
-      newPermission,
-    );
+    const result = await this.permissionsRepository.insert(newPermission);
     return { ...newPermission, id: result.raw[0].id };
   }
 
