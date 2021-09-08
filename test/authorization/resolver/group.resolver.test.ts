@@ -26,8 +26,6 @@ const users: User[] = [
     password: 's3cr3t1234567890',
     firstName: 'Test1',
     lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
     origin: 'simple',
   },
 ];
@@ -36,7 +34,6 @@ const groups: Group[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
-    active: true,
   },
 ];
 
@@ -44,7 +41,6 @@ const permissions = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
-    active: true,
   },
 ];
 const groupService = Substitute.for<GroupService>();
@@ -86,7 +82,7 @@ describe('Group Module', () => {
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
-          .send({ query: '{getGroups {id name active }}' })
+          .send({ query: '{getGroups {id name }}' })
           .expect(200)
           .expect((res) => {
             expect(res.body.data.getGroups).toEqual(groups);
@@ -104,7 +100,7 @@ describe('Group Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
+              '{getGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -126,8 +122,7 @@ describe('Group Module', () => {
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
           .send({
-            query:
-              'mutation { createGroup(input: {name: "Test1"}) {id name active }}',
+            query: 'mutation { createGroup(input: {name: "Test1"}) {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -153,7 +148,7 @@ describe('Group Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { updateGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {name: "Test1"}) {id name active }}',
+              'mutation { updateGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {name: "Test1"}) {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -172,7 +167,7 @@ describe('Group Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { deleteGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
+              'mutation { deleteGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -200,7 +195,7 @@ describe('Group Module', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           query:
-            'mutation { updateGroupPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
+            'mutation { updateGroupPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name }}',
         })
         .expect(200)
         .expect((res) => {

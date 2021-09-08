@@ -145,19 +145,16 @@ export interface UserSignupResponse {
     firstName: string;
     middleName?: string;
     lastName: string;
-    active: boolean;
 }
 
 export interface Entity {
     id: string;
     name: string;
-    active: boolean;
 }
 
 export interface EntityPermission {
     id: string;
     name: string;
-    active?: boolean;
 }
 
 export interface IQuery {
@@ -179,19 +176,16 @@ export interface IQuery {
 export interface Group {
     id: string;
     name: string;
-    active: boolean;
 }
 
 export interface GroupPermission {
     id: string;
     name: string;
-    active?: boolean;
 }
 
 export interface Permission {
     id: string;
     name: string;
-    active: boolean;
 }
 
 export interface User {
@@ -201,17 +195,14 @@ export interface User {
     firstName: string;
     middleName?: string;
     lastName: string;
-    active: boolean;
 }
 
 export interface UserGroupResponse {
     id: string;
     name: string;
-    active?: boolean;
 }
 
 export interface UserPermissions {
     id: string;
     name: string;
-    active?: boolean;
 }

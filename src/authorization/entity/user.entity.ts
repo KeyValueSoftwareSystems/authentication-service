@@ -1,8 +1,4 @@
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import BaseEntity from './base.entity';
 
 @Entity()
@@ -10,7 +6,7 @@ class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   public email?: string;
 
   @Column({ nullable: true })
@@ -27,9 +23,6 @@ class User extends BaseEntity {
 
   @Column()
   public lastName!: string;
-
-  @Column({ default: true })
-  public active!: boolean;
 
   @Column({ default: 'simple' })
   public origin!: string;

@@ -24,8 +24,6 @@ let users: User[] = [
     password: 's3cr3t',
     firstName: 'Test1',
     lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
     origin: 'simple',
   },
 ];
@@ -68,8 +66,6 @@ describe('test PasswordAuthService', () => {
         password: hashedPassword,
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(2020, 1, 1),
         refreshToken: token.refreshToken,
         origin: 'simple',
       },
@@ -87,8 +83,6 @@ describe('test PasswordAuthService', () => {
         password: hashedPassword,
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(2020, 1, 1),
         origin: 'simple',
       },
     ];
@@ -132,8 +126,6 @@ describe('test PasswordAuthService', () => {
         password: hashedPassword,
         firstName: users[0].firstName,
         lastName: users[0].lastName,
-        active: users[0].active,
-        updatedDate: users[0].updatedDate,
         origin: 'simple',
       },
     ];
@@ -155,8 +147,6 @@ describe('test PasswordAuthService', () => {
       password: users[0].password,
       firstName: resp.firstName,
       lastName: resp.lastName,
-      active: resp.active,
-      updatedDate: users[0].updatedDate,
       origin: 'simple',
     };
 
@@ -174,8 +164,6 @@ describe('test PasswordAuthService', () => {
         password: 's3cr3t',
         firstName: 'Test1',
         lastName: 'Test2',
-        active: true,
-        updatedDate: new Date(),
         origin: 'simple',
       },
     ];

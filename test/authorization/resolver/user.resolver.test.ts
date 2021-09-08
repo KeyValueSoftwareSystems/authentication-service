@@ -22,10 +22,8 @@ const users: User[] = [
     email: 'user@test.com',
     phone: '9112345678910',
     password: 'secret',
-    firstName: 'Test1',
-    lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
+    firstName: 'Test',
+    lastName: 'User',
     origin: 'simple',
   },
 ];
@@ -37,7 +35,6 @@ const usersInput: UserSignupResponse[] = [
     phone: users[0].phone,
     firstName: users[0].firstName,
     lastName: users[0].lastName,
-    active: users[0].active,
   },
 ];
 
@@ -45,7 +42,6 @@ const permissions = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
-    active: true,
   },
 ];
 
@@ -53,7 +49,6 @@ const groups: Group[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
-    active: true,
   },
 ];
 const gql = '/graphql';
@@ -98,7 +93,7 @@ describe('User Module', () => {
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
           .send({
-            query: '{getUsers { id email phone firstName lastName active }}',
+            query: '{getUsers { id email phone firstName lastName }}',
           })
           .expect(200)
           .expect((res) => {
@@ -116,7 +111,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName active }}',
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName }}',
           })
           .expect(200)
           .expect((res) => {
@@ -128,8 +123,8 @@ describe('User Module', () => {
         const token = authenticationHelper.generateAccessToken(users[0]);
 
         const input: UpdateUserInput = {
-          firstName: 'Test1',
-          lastName: 'Test2',
+          firstName: 'Test',
+          lastName: 'User',
         };
         const obj = Object.create(null);
         userService
@@ -143,7 +138,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { updateUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {firstName: "Test1", lastName: "Test2"}) {id email phone firstName lastName active }}',
+              'mutation { updateUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {firstName: "Test", lastName: "User"}) {id email phone firstName lastName }}',
           })
           .expect(200)
           .expect((res) => {
@@ -161,7 +156,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { deleteUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id email phone firstName lastName active }}',
+              'mutation { deleteUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id email phone firstName lastName }}',
           })
           .expect(200)
           .expect((res) => {
@@ -187,7 +182,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { updateUserPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
+              'mutation { updateUserPermissions(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {permissions: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -213,7 +208,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { updateUserGroups(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {groups: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name active }}',
+              'mutation { updateUserGroups(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {groups: ["5824f3b8-ca41-4af6-8d5f-10e6266d6ddf"]}) {id name }}',
           })
           .expect(200)
           .expect((res) => {

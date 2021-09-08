@@ -21,7 +21,7 @@ export default class PermissionCacheService {
     const permission = permissionsFromCache
       ? permissionsFromCache
       : await this.permissionsRepository.findOneOrFail({
-          where: { name: permissionName, active: true },
+          where: { name: permissionName },
         });
     permissionsFromCache ||
       (await this.cacheManager.set(`PERMISSION:${permissionName}`, permission));

@@ -24,6 +24,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "@nestjs/axios": "0.0.1",
@@ -52,6 +56,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-totp": "0.0.2",
     "pg": "^8.6.0",
+    "pre-commit": "^1.2.2",
     "qrcode": "^1.4.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

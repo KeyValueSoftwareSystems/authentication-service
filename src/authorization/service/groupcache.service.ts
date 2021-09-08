@@ -23,7 +23,7 @@ export default class GroupCacheService {
       permissionsFromCache ||
       (
         await this.groupRepository
-          .findOneOrFail({ where: { id: groupId, active: true } })
+          .findOneOrFail({ where: { id: groupId } })
           .then(() =>
             this.groupPermissionRepository.find({
               where: { groupId: groupId },

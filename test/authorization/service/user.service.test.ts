@@ -25,8 +25,6 @@ const users: User[] = [
     password: 'SecretPassword',
     firstName: 'Test1',
     lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
     origin: 'simple',
   },
 ];
@@ -35,7 +33,6 @@ const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
-    active: true,
   },
 ];
 
@@ -43,7 +40,6 @@ const groups: Group[] = [
   {
     id: '39d338b9-02bd-4971-a24e-b39a3f475580',
     name: 'Customers',
-    active: true,
   },
 ];
 describe('test UserService', () => {
@@ -114,18 +110,14 @@ describe('test UserService', () => {
   });
 
   it('should get all users', async () => {
-    userRepository
-      .find({ where: { active: true } })
-      .returns(Promise.resolve(users));
+    userRepository.find().returns(Promise.resolve(users));
     const resp = await userService.getAllUsers();
     expect(resp).toEqual(users);
   });
 
   it('should get a user by id', async () => {
     userRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8', {
-        where: { active: true },
-      })
+      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .returns(Promise.resolve(users[0]));
     const resp = await userService.getUserById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -141,13 +133,12 @@ describe('test UserService', () => {
       password: 'SecretPassword',
       firstName: 'Test1',
       lastName: 'Test2',
-      active: true,
-      updatedDate: new Date(),
       origin: 'simple',
     };
     userRepository.create(input).returns(users[0]);
 
-    userRepository.save(users[0]).resolves(users[0]);
+    const insertRes = { raw: users, identifiers: [], generatedMaps: [] };
+    userRepository.insert(users[0]).resolves(insertRes);
 
     const resp = await userService.createUser(input);
     expect(resp).toEqual(users[0]);
@@ -162,10 +153,6 @@ describe('test UserService', () => {
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
       .returns(Promise.resolve(Arg.any()));
 
-    userRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-      .returns(Promise.resolve(users[0]));
-
     const resp = await userService.updateUser(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       input,
@@ -174,9 +161,17 @@ describe('test UserService', () => {
   });
 
   it('should delete a user', async () => {
+    userRepository
+      .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(Arg.any());
+    userRepository
+      .findOne({ where: { id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' } })
+      .resolves(users[0]);
+
     const resp = await userService.deleteUser(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
+
     expect(resp).toEqual(users[0]);
   });
 
@@ -188,13 +183,8 @@ describe('test UserService', () => {
       },
     ];
     userPermissionRepository.create(request).returns(request);
-    userPermissionRepository.save(request).resolves(request);
+    userPermissionRepository.insert(request).resolves(Arg.any());
     userPermissionRepository.remove([]).resolves(Arg.any());
-    permissionRepository
-      .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'], {
-        where: { active: true },
-      })
-      .resolves(permissions);
     permissionRepository
       .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
       .resolves(permissions);
@@ -236,11 +226,9 @@ describe('test UserService', () => {
       },
     ];
     userPermissionRepository.create(request).returns(request);
-    userPermissionRepository.save(request).resolves(request);
+    userPermissionRepository.insert(request).resolves(Arg.any());
     permissionRepository
-      .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'], {
-        where: { active: true },
-      })
+      .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'])
       .resolves([]);
 
     const resp = userService.updateUserPermissions(
@@ -262,7 +250,7 @@ describe('test UserService', () => {
       },
     ];
     userGroupRepository.create(request).returns(request);
-    userGroupRepository.save(request).resolves(request);
+    userGroupRepository.insert(request).resolves(Arg.any());
     groupRepository
       .findByIds(['39d338b9-02bd-4971-a24e-b39a3f475580'])
       .resolves(groups);
@@ -292,7 +280,7 @@ describe('test UserService', () => {
       },
     ];
     userGroupRepository.create(request).returns(request);
-    userGroupRepository.save(request).resolves(request);
+    userGroupRepository.insert(request).resolves(Arg.any());
     groupRepository
       .findByIds(['91742290-4049-45c9-9c27-c9f6200fef4c'])
       .resolves([]);
@@ -331,7 +319,6 @@ describe('test UserService', () => {
       {
         id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
         name: 'CreateUser',
-        active: true,
       },
     ];
     userGroupRepository
@@ -390,7 +377,6 @@ describe('test UserService', () => {
       {
         id: '366ad922-464c-4e48-a26b-d8d5a9090763',
         name: 'CreateEmployee',
-        active: true,
       },
     ];
     userGroupRepository

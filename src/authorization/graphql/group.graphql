@@ -1,7 +1,6 @@
 type Group {
   id: ID!
   name: String!
-  active: Boolean!
 }
 
 input NewGroupInput {
@@ -18,8 +17,7 @@ input UpdateGroupPermissionInput {
 
 type GroupPermission {
   id: ID!,
-  name: String!,
-  active: Boolean
+  name: String!
 }
 
 type Query {

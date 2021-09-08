@@ -1,7 +1,6 @@
 type Entity {
   id: ID!
   name: String!
-  active: Boolean!
 }
 
 input NewEntityInput {
@@ -18,8 +17,7 @@ input UpdateEntityPermissionInput {
 
 type EntityPermission {
   id: ID!,
-  name: String!,
-  active: Boolean
+  name: String!
 }
 
 type Query {

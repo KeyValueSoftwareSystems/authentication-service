@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn } from 'typeorm';
 import BaseEntity from './base.entity';
 
 @Entity()
-class EntityPermission extends BaseEntity{
+class EntityPermission extends BaseEntity {
   @PrimaryColumn({ type: 'uuid' })
   public permissionId!: string;
 

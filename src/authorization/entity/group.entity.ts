@@ -8,9 +8,6 @@ class Group extends BaseEntity {
 
   @Column()
   public name!: string;
-
-  @Column({ default: true })
-  public active!: boolean;
 }
 
 export default Group;

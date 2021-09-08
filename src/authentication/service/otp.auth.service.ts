@@ -69,7 +69,7 @@ export default class OTPAuthService implements Authenticatable {
 
   async sendOTP(phoneNumber: string): Promise<void> {
     const user = await this.userService.getActiveUserByPhoneNumber(phoneNumber);
-    if (user && user.active && user.phone) {
+    if (user && user.phone) {
       //Found an active user, generating OTP and sending the message to the user
       await this.otpService.sendOTP(user);
     } else {

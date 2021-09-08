@@ -24,8 +24,6 @@ const users: User[] = [
     password: 's3cr3t1234567890',
     firstName: 'Test1',
     lastName: 'Test2',
-    active: true,
-    updatedDate: new Date(),
     origin: 'simple',
   },
 ];
@@ -33,7 +31,6 @@ const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
-    active: true,
   },
 ];
 const permissionService = Substitute.for<PermissionService>();
@@ -74,7 +71,7 @@ describe('Permission Module', () => {
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
-          .send({ query: '{getPermissions {id name active }}' })
+          .send({ query: '{getPermissions {id name }}' })
           .expect(200)
           .expect((res) => {
             expect(res.body.data.getPermissions).toEqual(permissions);
@@ -90,7 +87,7 @@ describe('Permission Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getPermission(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
+              '{getPermission(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -111,7 +108,7 @@ describe('Permission Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { createPermission(input: {name: "Test1"}) {id name active }}',
+              'mutation { createPermission(input: {name: "Test1"}) {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -135,7 +132,7 @@ describe('Permission Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { updatePermission(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {name: "Test1"}) {id name active }}',
+              'mutation { updatePermission(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8", input: {name: "Test1"}) {id name }}',
           })
           .expect(200)
           .expect((res) => {
@@ -152,7 +149,7 @@ describe('Permission Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              'mutation { deletePermission(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name active }}',
+              'mutation { deletePermission(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name }}',
           })
           .expect(200)
           .expect((res) => {
