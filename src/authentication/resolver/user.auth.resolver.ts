@@ -33,9 +33,9 @@ export default class UserAuthResolver {
   ) {}
 
   @Mutation('passwordLogin')
-  @UsePipes(new ValidationPipe(UserPasswordLoginInputSchema))
   async passwordLogin(
-    @Args('input') request: UserPasswordLoginInput,
+    @Args('input', new ValidationPipe(UserPasswordLoginInputSchema))
+    request: UserPasswordLoginInput,
   ): Promise<TokenResponse> {
     return this.passwordAuthService.userLogin(request);
   }
@@ -45,10 +45,7 @@ export default class UserAuthResolver {
     @Args('input', new ValidationPipe(UserPasswordSignupInputSchema))
     request: UserPasswordSignupInput,
   ): Promise<UserSignupResponse> {
-    console.log('reached resolver');
-    const res = this.passwordAuthService.userSignup(request);
-    console.log(res);
-    return res;
+    return this.passwordAuthService.userSignup(request);
   }
 
   @Mutation('otpLogin')
