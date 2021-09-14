@@ -1,4 +1,4 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../common/cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import GroupPermission from '../entity/groupPermission.entity';
 import { InjectRepository } from '@nestjs/typeorm';

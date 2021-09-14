@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { CustomExceptionsFilter } from './exception/exception.filter';
+import { CustomExceptionsFilter } from './common/exception/exception.filter';
 import { ConfigService } from '@nestjs/config';
-import { LoggerService } from './logger/logger.service';
+import { LoggerService } from './common/logger/logger.service';
 
 async function bootstrap() {
   const appOptions = { cors: true };

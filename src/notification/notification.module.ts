@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TwilioImplModule } from '../twilio/twilio.module';
+import { TwilioImplModule } from '../common/twilio/twilio.module';
 
 @Module({
   imports: [ConfigModule, TwilioImplModule],

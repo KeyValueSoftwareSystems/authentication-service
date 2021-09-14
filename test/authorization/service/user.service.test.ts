@@ -13,7 +13,7 @@ import { GroupNotFoundException } from '../../../src/authorization/exception/gro
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
-import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../../src/common/cache/redis-cache/redis-cache.service';
 import GroupCacheService from '../../../src/authorization/service/groupcache.service';
 import { ConfigService } from '@nestjs/config';
 import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';

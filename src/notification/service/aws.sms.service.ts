@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SMSInterface } from '../interfaces/sms.interface';
-import { LoggerService } from '../../logger/logger.service';
+import { LoggerService } from '../../common/logger/logger.service';
 
 @Injectable()
 export default class AWSSMSService implements SMSInterface {

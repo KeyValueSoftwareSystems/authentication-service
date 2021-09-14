@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectTwilio, TwilioClient } from 'nestjs-twilio';
 import User from '../../authorization/entity/user.entity';
-import { LoggerService } from '../../logger/logger.service';
+import { LoggerService } from '../../common/logger/logger.service';
 import { OTPVerifiable } from '../interfaces/otp.verifiable';
 
 @Injectable()

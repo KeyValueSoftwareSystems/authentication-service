@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import * as Joi from '@hapi/joi';
 import { ConfigModule } from '@nestjs/config';
 
-import { DatabaseModule } from './database/database.module';
-import { AppGraphQLModule } from './graphql/graphql.module';
+import { DatabaseModule } from './common/database/database.module';
+import { AppGraphQLModule } from './common/graphql/graphql.module';
 import { UserAuthModule } from './authentication/authentication.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { HealthModule } from './health/health.module';

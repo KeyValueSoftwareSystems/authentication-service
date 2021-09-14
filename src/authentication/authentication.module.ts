@@ -12,16 +12,16 @@ import GroupCacheService from '../authorization/service/groupcache.service';
 import PermissionCacheService from '../authorization/service/permissioncache.service';
 import UserService from '../authorization/service/user.service';
 import UserCacheService from '../authorization/service/usercache.service';
-import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
-import { ProviderFactory } from '../factory/provider.factory';
-import { LoggerService } from '../logger/logger.service';
+import { RedisCacheModule } from '../common/cache/redis-cache/redis-cache.module';
+import { ProviderFactory } from '../common/factory/provider.factory';
+import { LoggerService } from '../common/logger/logger.service';
 import { NotificationModule } from '../notification/notification.module';
 import AWSSMSService from '../notification/service/aws.sms.service';
 import {
   default as SmsService,
   default as TwilioSmsService,
 } from '../notification/service/twilio.sms.service';
-import { TwilioImplModule } from '../twilio/twilio.module';
+import { TwilioImplModule } from '../common/twilio/twilio.module';
 import { AuthenticationHelper } from './authentication.helper';
 import { GoogleAuthController } from './controller/google.controller';
 import { GoogleStrategy } from './passport/googleStrategy';
@@ -60,12 +60,9 @@ const providers = [
   AWSSMSService,
   LoggerService,
   RecaptchaService,
+  GoogleStrategy,
 ];
 
-const providersWithGoogleStrategy =
-  process.env.IS_GOOGLE_SOCIAL_LOGIN_ENBALED === 'true'
-    ? providers.concat([GoogleStrategy as any])
-    : providers;
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -83,7 +80,7 @@ const providersWithGoogleStrategy =
     TwilioImplModule,
     HttpModule,
   ],
-  providers: providersWithGoogleStrategy,
+  providers: providers,
   controllers: [GoogleAuthController],
 })
 export class UserAuthModule {}

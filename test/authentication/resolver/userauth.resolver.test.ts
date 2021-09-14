@@ -5,7 +5,7 @@ import UserService from '../../../src/authorization/service/user.service';
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
-import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import { AppGraphQLModule } from '../../../src/common/graphql/graphql.module';
 import {
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -15,7 +15,7 @@ import UserAuthResolver from '../../../src/authentication/resolver/user.auth.res
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
-import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../../src/common/cache/redis-cache/redis-cache.service';
 import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
 import OTPAuthService from '../../../src/authentication/service/otp.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';

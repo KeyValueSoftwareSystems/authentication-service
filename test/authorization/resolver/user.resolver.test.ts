@@ -5,7 +5,7 @@ import UserService from '../../../src/authorization/service/user.service';
 import Substitute from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
-import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import { AppGraphQLModule } from '../../../src/common/graphql/graphql.module';
 import {
   UpdateUserGroupInput,
   UpdateUserInput,
