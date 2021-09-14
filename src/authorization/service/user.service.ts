@@ -257,7 +257,6 @@ export default class UserService {
     if (email) {
       user = await this.usersRepository
         .createQueryBuilder('user')
-        .where('deleted_at IS NULL')
         .where('lower(user.email) = lower(:email)', { email })
         .getOne();
     }
