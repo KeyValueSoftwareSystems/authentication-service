@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectTwilio, TwilioClient } from 'nestjs-twilio';
 import { ConfigService } from '@nestjs/config';
 import { SMSInterface } from '../interfaces/sms.interface';
-import { LoggerService } from '../../common/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export default class TwilioSmsService implements SMSInterface {

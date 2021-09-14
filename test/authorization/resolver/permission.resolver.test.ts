@@ -1,7 +1,7 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppGraphQLModule } from '../../../src/common/graphql/graphql.module';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
 import {
   NewPermissionInput,

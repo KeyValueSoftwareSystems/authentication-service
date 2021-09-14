@@ -19,7 +19,7 @@ import {
   UserPasswordLoginInputSchema,
   UserPasswordSignupInputSchema,
 } from '../validation/user.auth.schema.validation';
-import ValidationPipe from '../../common/validation/validation.pipe';
+import ValidationPipe from '../../validation/validation.pipe';
 import PasswordAuthService from '../service/password.auth.service';
 import OTPAuthService from '../service/otp.auth.service';
 import { TokenService } from '../service/token.service';

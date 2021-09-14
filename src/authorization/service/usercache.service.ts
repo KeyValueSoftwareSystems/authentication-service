@@ -1,4 +1,4 @@
-import { RedisCacheService } from '../../common/cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

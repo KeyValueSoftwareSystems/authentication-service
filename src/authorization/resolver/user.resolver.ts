@@ -11,7 +11,7 @@ import {
   OperationType,
 } from '../../schema/graphql.schema';
 import UserService from '../service/user.service';
-import ValidationPipe from '../../common/validation/validation.pipe';
+import ValidationPipe from '../../validation/validation.pipe';
 import * as UserSchema from '../validation/user.validation.schema';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';

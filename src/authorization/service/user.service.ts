@@ -18,7 +18,7 @@ import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
-import { RedisCacheService } from '../../common/cache/redis-cache/redis-cache.service';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 
