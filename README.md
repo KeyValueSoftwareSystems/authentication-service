@@ -90,7 +90,6 @@ Developers can customise this as per their requirement.
   &nbsp;
 |Google social login Configuration(Optional)|  |
 |--|--|
-|IS_GOOGLE_SOCIAL_LOGIN_ENBALED|false |
 |GOOGLE_CLIENT_ID  |  |
 |GOOGLE_SECRET  |  |
 |APP_URL  | the URL of the application to which the redirect should happen |
