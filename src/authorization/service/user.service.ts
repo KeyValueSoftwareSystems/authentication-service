@@ -257,7 +257,6 @@ export default class UserService {
     if (email) {
       user = await this.usersRepository
         .createQueryBuilder('user')
-        .where('deletedAt IS NULL')
         .where('lower(user.email) = lower(:email)', { email })
         .getOne();
     }
@@ -282,9 +281,7 @@ export default class UserService {
         'Username should be provided with email or phone',
       );
     }
-    let query = this.usersRepository
-      .createQueryBuilder('user')
-      .where('deletedAt IS NULL');
+    let query = this.usersRepository.createQueryBuilder('user');
     if (email) {
       query = query.orWhere('lower(user.email) = lower(:email)', {
         email: nullCheckedEmail,

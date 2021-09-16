@@ -60,12 +60,9 @@ const providers = [
   AWSSMSService,
   LoggerService,
   RecaptchaService,
+  GoogleStrategy,
 ];
 
-const providersWithGoogleStrategy =
-  process.env.IS_GOOGLE_SOCIAL_LOGIN_ENBALED === 'true'
-    ? providers.concat([GoogleStrategy as any])
-    : providers;
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -83,7 +80,7 @@ const providersWithGoogleStrategy =
     TwilioImplModule,
     HttpModule,
   ],
-  providers: providersWithGoogleStrategy,
+  providers: providers,
   controllers: [GoogleAuthController],
 })
 export class UserAuthModule {}
