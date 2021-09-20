@@ -16,7 +16,7 @@ A standalone service to handle authentication and authorization.
 
 User signup, authentication and authorization are integral parts of any SAAS product. When we kick start a new product development we can either use services like AWS cognito , Auth0 etc or build ourselves to achieve this, Even if we use external services we end up writing a wrapper. This service tries to implement the user authentication and authorization features needed for any application.
 
-Service can be used as mentioned below
+Service can be  used as mentioned below
 -   Deploy as a standalone service for managing authentication and authorization   
 -   Use it as a starting point for new product development and build new features on top of it.
  
