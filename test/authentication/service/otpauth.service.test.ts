@@ -144,8 +144,12 @@ describe('test OTPAuthService', () => {
       lastName: users[0].lastName,
     };
     userService
-      .getUserDetailsByEmailOrPhone(undefined, users[0].phone)
-      .returns(Promise.resolve(undefined));
+      .verifyDuplicateUser(userSignup.email, userSignup.phone)
+      .resolves({
+        existingUserDetails: undefined,
+        duplicate: 'username',
+      });
+
     userService.createUser(Arg.any()).returns(Promise.resolve(userResponse[0]));
 
     const resp = await otpAuthService.userSignup(userSignup);
@@ -182,13 +186,16 @@ describe('test OTPAuthService', () => {
     };
 
     userService
-      .getUserDetailsByEmailOrPhone(existUsers[0].email, existUsers[0].phone)
-      .resolves(existUsers[0]);
+      .verifyDuplicateUser(existUsers[0].email, existUsers[0].phone)
+      .resolves({
+        existingUserDetails: existUsers[0],
+        duplicate: 'username',
+      });
 
     const resp = otpAuthService.userSignup(userSignup);
 
     await expect(resp).rejects.toThrowError(
-      new UserExistsException(existUsers[0].email || existUsers[0].phone || ''),
+      new UserExistsException(existUsers[0], 'username'),
     );
   });
 

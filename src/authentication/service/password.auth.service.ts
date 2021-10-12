@@ -28,13 +28,14 @@ export default class PasswordAuthService implements Authenticatable {
   async userSignup(
     userDetails: UserPasswordSignupInput,
   ): Promise<UserSignupResponse> {
-    const existingUserDetails = await this.userService.getUserDetailsByEmailOrPhone(
+    const verifyObj = await this.userService.verifyDuplicateUser(
       userDetails.email,
       userDetails.phone,
     );
-    if (existingUserDetails) {
+    if (verifyObj.existingUserDetails) {
       throw new UserExistsException(
-        userDetails.email || userDetails.phone || '',
+        verifyObj.existingUserDetails,
+        verifyObj.duplicate,
       );
     }
 
