@@ -132,7 +132,7 @@ describe('test PasswordAuthService', () => {
 
     const verifyObj = {
       existingUserDetails: undefined,
-      duplicate: 'username',
+      duplicate: 'email',
     };
     const userSingup: UserPasswordSignupInput = {
       ...users[0],
@@ -178,7 +178,7 @@ describe('test PasswordAuthService', () => {
     };
     const verifyObj = {
       existingUserDetails: existUsers[0],
-      duplicate: 'username',
+      duplicate: 'email',
     };
 
     userService
@@ -187,7 +187,7 @@ describe('test PasswordAuthService', () => {
 
     const resp = passwordAuthService.userSignup(userSingup);
     await expect(resp).rejects.toThrowError(
-      new UserExistsException(existUsers[0], 'username'),
+      new UserExistsException(existUsers[0], 'email'),
     );
   });
 

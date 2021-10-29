@@ -268,7 +268,7 @@ export default class UserService {
       return { existingUserDetails: user, duplicate: 'phone number' };
     }
 
-    return { existingUserDetails: user, duplicate: 'username' };
+    return { existingUserDetails: user, duplicate: 'email' };
   }
 
   async getUserDetailsByEmailOrPhone(

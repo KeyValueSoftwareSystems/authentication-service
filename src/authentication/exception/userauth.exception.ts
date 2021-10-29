@@ -5,7 +5,7 @@ export class UserExistsException extends BadRequestException {
   constructor(user: User, duplicate: string) {
     super(
       `User with ${duplicate}: ${
-        duplicate === 'username' ? user.email : user.phone
+        duplicate === 'email' ? user.email : user.phone
       } exits. Cannot signup this user.`,
     );
   }
