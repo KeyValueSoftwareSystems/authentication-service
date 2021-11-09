@@ -1,7 +1,7 @@
 
 # Authentication Service
 
-A standalone service to handle authentication and authorization.
+A standaloneservice to handle authentication and authorization.
 <p  align="center">
 <img src="https://www.keyvalue.systems/logo.png" width="290" height="100">
 </p>
