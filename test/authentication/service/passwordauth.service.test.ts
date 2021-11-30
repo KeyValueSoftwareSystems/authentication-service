@@ -129,13 +129,18 @@ describe('test PasswordAuthService', () => {
         origin: 'simple',
       },
     ];
+
+    const verifyObj = {
+      existingUserDetails: undefined,
+      duplicate: 'email',
+    };
     const userSingup: UserPasswordSignupInput = {
       ...users[0],
       password: users[0].password as string,
     };
     userService
-      .getUserDetailsByEmailOrPhone(users[0].email, users[0].phone)
-      .returns(Promise.resolve(undefined));
+      .verifyDuplicateUser(users[0].email, users[0].phone)
+      .returns(Promise.resolve(verifyObj));
     userService.createUser(Arg.any()).returns(Promise.resolve(userResponse[0]));
 
     const resp = await passwordAuthService.userSignup(userSingup);
@@ -171,15 +176,18 @@ describe('test PasswordAuthService', () => {
       ...existUsers[0],
       password: 's3cr3t',
     };
+    const verifyObj = {
+      existingUserDetails: existUsers[0],
+      duplicate: 'email',
+    };
 
     userService
-      .getUserDetailsByEmailOrPhone(existUsers[0].email, existUsers[0].phone)
-      .resolves(existUsers[0]);
+      .verifyDuplicateUser(existUsers[0].email, existUsers[0].phone)
+      .resolves(verifyObj);
 
     const resp = passwordAuthService.userSignup(userSingup);
-
     await expect(resp).rejects.toThrowError(
-      new UserExistsException(existUsers[0].email || existUsers[0].phone || ''),
+      new UserExistsException(existUsers[0], 'email'),
     );
   });
 

@@ -1,8 +1,13 @@
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import User from '../../authorization/entity/user.entity';
 
 export class UserExistsException extends BadRequestException {
-  constructor(username: string) {
-    super(`User with username: ${username} exits. Cannot signup this user.`);
+  constructor(user: User, duplicate: string) {
+    super(
+      `User with ${duplicate}: ${
+        duplicate === 'email' ? user.email : user.phone
+      } exits. Cannot signup this user.`,
+    );
   }
 }
 

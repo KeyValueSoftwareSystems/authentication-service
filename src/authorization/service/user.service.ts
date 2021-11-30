@@ -249,6 +249,28 @@ export default class UserService {
     }
   }
 
+  async verifyDuplicateUser(
+    email?: string | undefined,
+    phone?: string | undefined,
+  ): Promise<{ existingUserDetails: User | undefined; duplicate: string }> {
+    let user;
+    if (email) {
+      user = await this.usersRepository
+        .createQueryBuilder('user')
+        .where('lower(user.email) = lower(:email)', { email })
+        .getOne();
+    }
+
+    if (phone && !user) {
+      user = await this.usersRepository.findOne({
+        where: { phone: phone },
+      });
+      return { existingUserDetails: user, duplicate: 'phone number' };
+    }
+
+    return { existingUserDetails: user, duplicate: 'email' };
+  }
+
   async getUserDetailsByEmailOrPhone(
     email?: string | undefined,
     phone?: string | undefined,
