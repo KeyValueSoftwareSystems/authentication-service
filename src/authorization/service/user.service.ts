@@ -234,12 +234,13 @@ export default class UserService {
     permissionsToVerify: string[],
     operation: OperationType = OperationType.AND,
   ): Promise<boolean> {
-    let permissionsRequired = await Promise.all(
-      permissionsToVerify.map((p) =>
-        this.permissionCacheService.getPermissionsFromCache(p),
-      ),
-    );
-    permissionsRequired = permissionsRequired.flat(1);
+    const permissionsRequired = (
+      await Promise.all(
+        permissionsToVerify.map((p) =>
+          this.permissionCacheService.getPermissionsFromCache(p),
+        ),
+      )
+    ).flat(1);
     if (permissionsRequired.length !== permissionsToVerify.length) {
       const validPermissions = new Set(permissionsRequired.map((p) => p.name));
       throw new PermissionNotFoundException(
