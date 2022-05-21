@@ -15,15 +15,26 @@ input UpdateGroupPermissionInput {
   permissions: [ID!]!
 }
 
+input UpdateGroupRoleInput {
+  roles: [ID!]!
+}
+
 type GroupPermission {
   id: ID!,
   name: String!
 }
 
+type GroupRole {
+  id: ID!,
+  name: String!
+}
+
+
 type Query {
   getGroups: [Group]!
   getGroup(id: ID!): Group
   getGroupPermissions(id: ID!): [GroupPermission]
+  getGroupRoles(id: ID!): [GroupRole]
 }
 
 type Mutation {
@@ -31,4 +42,5 @@ type Mutation {
   updateGroup(id: ID!, input: UpdateGroupInput!): Group
   deleteGroup(id: ID!): Group
   updateGroupPermissions(id: ID!, input: UpdateGroupPermissionInput!): [GroupPermission]
+  updateGroupRoles(id: ID!, input: UpdateGroupRoleInput!): [GroupRole]
 }

@@ -17,6 +17,8 @@ import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import { ConfigService } from '@nestjs/config';
 import GroupCacheService from '../../../src/authorization/service/groupcache.service';
+import GroupRole from '../../../src/authorization/entity/groupRole.entity';
+import Role from '../../../src/authorization/entity/role.entity';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -41,6 +43,8 @@ describe('test Group Service', () => {
   const userGroupRepository = Substitute.for<Repository<UserGroup>>();
   const groupCacheService = Substitute.for<GroupCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
+  const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
+  const roleRepository = Substitute.for<Repository<Role>>();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -64,6 +68,14 @@ describe('test Group Service', () => {
         {
           provide: getRepositoryToken(UserGroup),
           useValue: userGroupRepository,
+        },
+        {
+          provide: getRepositoryToken(GroupRole),
+          useValue: groupRoleRepository,
+        },
+        {
+          provide: getRepositoryToken(Role),
+          useValue: roleRepository,
         },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },

@@ -4,6 +4,7 @@ import {
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
+  UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
 import { createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
@@ -16,6 +17,9 @@ import {
 } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import GroupCacheService from './groupcache.service';
+import GroupRole from '../entity/groupRole.entity';
+import Role from '../entity/role.entity';
+import { RoleNotFoundException } from '../exception/role.exception';
 
 @Injectable()
 export class GroupService {
@@ -29,6 +33,10 @@ export class GroupService {
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
     private groupCacheService: GroupCacheService,
+    @InjectRepository(GroupRole)
+    private groupRoleRepository: Repository<GroupRole>,
+    @InjectRepository(Role)
+    private rolesRepository: Repository<Role>,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -122,6 +130,43 @@ export class GroupService {
       .where('groupPermission.groupId = :groupId', { groupId: id })
       .getMany();
     return permissions;
+  }
+
+  async getGroupRoles(id: string): Promise<Role[]> {
+    const roles = await createQueryBuilder<Role>('role')
+      .leftJoinAndSelect(GroupRole, 'groupRole', 'Role.id = groupRole.roleId')
+      .where('groupRole.groupId = :groupId', { groupId: id })
+      .getMany();
+    return roles;
+  }
+
+  async updateGroupRoles(
+    id: string,
+    request: UpdateGroupRoleInput,
+  ): Promise<Role[]> {
+    const updatedGroup = await this.groupsRepository.findOne(id);
+    if (!updatedGroup) {
+      throw new GroupNotFoundException(id);
+    }
+    const rolesInRequest = await this.rolesRepository.findByIds(request.roles);
+    if (rolesInRequest.length !== request.roles.length) {
+      const validRoles = rolesInRequest.map((r) => r.id);
+      throw new RoleNotFoundException(
+        request.roles.filter((r) => !validRoles.includes(r)).toString(),
+      );
+    }
+    const groupRoles = this.groupRoleRepository.create(
+      request.roles.map((role) => ({
+        groupId: id,
+        roleId: role,
+      })),
+    );
+    const savedGroupRoles = await this.groupRoleRepository.save(groupRoles);
+    const roles = await this.rolesRepository.findByIds(
+      savedGroupRoles.map((groupRole) => groupRole.roleId),
+    );
+    await this.groupCacheService.invalidateGroupRolesByGroupId(id);
+    return roles;
   }
 
   private async checkGroupUsage(id: string) {

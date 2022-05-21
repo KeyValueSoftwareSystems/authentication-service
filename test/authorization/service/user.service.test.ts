@@ -17,6 +17,9 @@ import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.se
 import GroupCacheService from '../../../src/authorization/service/groupcache.service';
 import { ConfigService } from '@nestjs/config';
 import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
+import RoleCacheService from '../../../src/authorization/service/rolecache.service';
+import GroupRole from '../../../src/authorization/entity/groupRole.entity';
+import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -54,6 +57,8 @@ describe('test UserService', () => {
   const groupPermissionRepository = Substitute.for<
     Repository<GroupPermission>
   >();
+  const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
+  const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
   const userCacheService = Substitute.for<UserCacheService>();
   const groupCacheService = Substitute.for<GroupCacheService>();
   const permissionCacheService = Substitute.for<PermissionCacheService>();
@@ -63,6 +68,7 @@ describe('test UserService', () => {
     SelectQueryBuilder<Permission>
   >();
   const connectionMock = Substitute.for<Connection>();
+  const roleCacheService = Substitute.for<RoleCacheService>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -96,10 +102,19 @@ describe('test UserService', () => {
           provide: getRepositoryToken(GroupPermission),
           useValue: groupPermissionRepository,
         },
+        {
+          provide: getRepositoryToken(GroupRole),
+          useValue: groupRoleRepository,
+        },
+        {
+          provide: getRepositoryToken(RolePermission),
+          useValue: rolePermissionRepository,
+        },
         { provide: 'UserCacheService', useValue: userCacheService },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
         { provide: 'PermissionCacheService', useValue: permissionCacheService },
+        { provide: 'RoleCacheService', useValue: roleCacheService },
         {
           provide: Connection,
           useValue: connectionMock,
@@ -321,6 +336,18 @@ describe('test UserService', () => {
         name: 'CreateUser',
       },
     ];
+    const groupRoles = [
+      {
+        groupId: '91742290-4049-45c9-9c27-c9f6200fef4c',
+        roleId: '366ad922-464c-4e48-a26b-d8d5a9090763',
+      },
+    ];
+    const groupRolePermissions = [
+      {
+        roleId: '366ad922-464c-4e48-a26b-d8d5a9090763',
+        permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+      },
+    ];
     userGroupRepository
       .find({ where: { userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' } })
       .resolves(userGroups);
@@ -335,6 +362,16 @@ describe('test UserService', () => {
     permissionRepository
       .find({ where: { name: In(['CreateUser']) } })
       .resolves(permissions);
+    groupRoleRepository
+      .find({
+        where: { groupId: In(['91742290-4049-45c9-9c27-c9f6200fef4c']) },
+      })
+      .resolves(groupRoles);
+    rolePermissionRepository
+      .find({
+        where: { roleId: In(['366ad922-464c-4e48-a26b-d8d5a9090763']) },
+      })
+      .resolves(groupRolePermissions);
     userCacheService
       .getUserGroupsByUserId('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .resolves(userGroups.map((x) => x.groupId));
@@ -347,6 +384,12 @@ describe('test UserService', () => {
     permissionCacheService
       .getPermissionsFromCache(Arg.any())
       .resolves(permissions[0]);
+    groupCacheService
+      .getGroupRolesFromGroupId('91742290-4049-45c9-9c27-c9f6200fef4c')
+      .resolves(groupRoles.map((x) => x.roleId));
+    roleCacheService
+      .getRolePermissionsFromRoleId('366ad922-464c-4e48-a26b-d8d5a9090763')
+      .resolves(groupRolePermissions.map((x) => x.permissionId));
     const resp = await userService.verifyUserPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       ['CreateUser'],
@@ -379,6 +422,18 @@ describe('test UserService', () => {
         name: 'CreateEmployee',
       },
     ];
+    const groupRoles = [
+      {
+        groupId: 'a8f55c77-4f8f-4a12-99f9-8962144e08f0',
+        roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+      },
+    ];
+    const groupRolePermissions = [
+      {
+        roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+        permissionId: '366ad922-464c-4e48-a26b-d8d5a9090763',
+      },
+    ];
     userGroupRepository
       .find({ where: { userId: 'f95e6f6d-7678-4871-9e08-c3f23b87c3ff' } })
       .resolves(userGroups);
@@ -393,6 +448,16 @@ describe('test UserService', () => {
     permissionRepository
       .find({ where: { name: In(['CreateEmployee']) } })
       .resolves(permissions);
+    groupRoleRepository
+      .find({
+        where: { groupId: In(['a8f55c77-4f8f-4a12-99f9-8962144e08f0']) },
+      })
+      .resolves(groupRoles);
+    rolePermissionRepository
+      .find({
+        where: { roleId: In(['fcd858c6-26c5-462b-8c53-4b544830dca8']) },
+      })
+      .resolves(groupRolePermissions);
     userCacheService
       .getUserGroupsByUserId('f95e6f6d-7678-4871-9e08-c3f23b87c3ff')
       .resolves(userGroups.map((x) => x.groupId));
@@ -402,6 +467,12 @@ describe('test UserService', () => {
     groupCacheService
       .getGroupPermissionsFromGroupId('a8f55c77-4f8f-4a12-99f9-8962144e08f0')
       .resolves(groupPermissions.map((x) => x.permissionId));
+    groupCacheService
+      .getGroupRolesFromGroupId('a8f55c77-4f8f-4a12-99f9-8962144e08f0')
+      .resolves(groupRoles.map((x) => x.roleId));
+    roleCacheService
+      .getRolePermissionsFromRoleId('fcd858c6-26c5-462b-8c53-4b544830dca8')
+      .resolves(groupRolePermissions.map((x) => x.permissionId));
     const resp = await userService.verifyUserPermissions(
       'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
       ['CreateUser'],
