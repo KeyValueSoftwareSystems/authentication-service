@@ -14,4 +14,8 @@ export enum PermissionsType {
   EditUser = 'edit-user',
   ViewUser = 'view-user',
   DeleteUser = 'delete-user',
+  CreateRoles = 'create-roles',
+  EditRoles = 'edit-roles',
+  ViewRoles = 'view-roles',
+  DeleteRoles = 'delete-roles',
 }

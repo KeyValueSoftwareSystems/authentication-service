@@ -21,6 +21,7 @@ import UserCacheService from './usercache.service';
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
+import RoleCacheService from './rolecache.service';
 
 @Injectable()
 export default class UserService {
@@ -42,6 +43,7 @@ export default class UserService {
     private permissionCacheService: PermissionCacheService,
     private cacheManager: RedisCacheService,
     private connection: Connection,
+    private roleCacheService: RoleCacheService,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -203,13 +205,26 @@ export default class UserService {
         ),
       )
     ).flat(1);
-
+    const groupRoles: string[] = (
+      await Promise.all(
+        userGroups.map((x) =>
+          this.groupCacheService.getGroupRolesFromGroupId(x),
+        ),
+      )
+    ).flat(1);
+    const distinctGroupRoles = [...new Set(groupRoles)];
+    const groupRolePermissions: string[] = (
+      await Promise.all(
+        distinctGroupRoles.map((x) =>
+          this.roleCacheService.getRolePermissionsFromRoleId(x),
+        ),
+      )
+    ).flat(1);
     const userPermissions: string[] = await this.userCacheService.getUserPermissionsByUserId(
       id,
     );
-
     const allPermissionsOfUser = new Set(
-      userPermissions.concat(groupPermissions),
+      userPermissions.concat(groupPermissions, groupRolePermissions),
     );
     return allPermissionsOfUser;
   }
@@ -219,13 +234,12 @@ export default class UserService {
     permissionsToVerify: string[],
     operation: OperationType = OperationType.AND,
   ): Promise<boolean> {
-    const permissionsRequired = (
-      await Promise.all(
-        permissionsToVerify.map((p) =>
-          this.permissionCacheService.getPermissionsFromCache(p),
-        ),
-      )
-    ).flat(1);
+    let permissionsRequired = await Promise.all(
+      permissionsToVerify.map((p) =>
+        this.permissionCacheService.getPermissionsFromCache(p),
+      ),
+    );
+    permissionsRequired = permissionsRequired.flat(1);
     if (permissionsRequired.length !== permissionsToVerify.length) {
       const validPermissions = new Set(permissionsRequired.map((p) => p.name));
       throw new PermissionNotFoundException(

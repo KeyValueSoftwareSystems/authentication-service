@@ -1,6 +1,10 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import GroupRole from 'src/authorization/entity/groupRole.entity';
+import Role from 'src/authorization/entity/role.entity';
+import RolePermission from 'src/authorization/entity/rolePermission.entity';
+import RoleCacheService from 'src/authorization/service/rolecache.service';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import Group from '../authorization/entity/group.entity';
 import GroupPermission from '../authorization/entity/groupPermission.entity';
@@ -61,6 +65,7 @@ const providers = [
   LoggerService,
   RecaptchaService,
   GoogleStrategy,
+  RoleCacheService,
 ];
 
 @Module({
@@ -72,6 +77,9 @@ const providers = [
       UserGroup,
       UserPermission,
       GroupPermission,
+      Role,
+      GroupRole,
+      RolePermission,
     ]),
     ConfigModule,
     RedisCacheModule,

@@ -3,8 +3,10 @@ import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import {
   NewGroupInput,
   Permission,
+  Role,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
+  UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
 import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
@@ -63,5 +65,20 @@ export class GroupResolver {
     @Args('id', ParseUUIDPipe) id: string,
   ): Promise<Permission[]> {
     return this.groupService.getGroupPermissions(id);
+  }
+
+  @Permissions(PermissionsType.EditGroups)
+  @Mutation()
+  async updateGroupRoles(
+    @Args('id', ParseUUIDPipe) id: string,
+    @Args('input') groupInput: UpdateGroupRoleInput,
+  ): Promise<Role[]> {
+    return this.groupService.updateGroupRoles(id, groupInput);
+  }
+
+  @Permissions(PermissionsType.ViewGroups)
+  @Query()
+  async getGroupRoles(@Args('id', ParseUUIDPipe) id: string): Promise<Role[]> {
+    return this.groupService.getGroupRoles(id);
   }
 }

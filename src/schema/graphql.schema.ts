@@ -80,12 +80,28 @@ export interface UpdateGroupPermissionInput {
     permissions: string[];
 }
 
+export interface UpdateGroupRoleInput {
+    roles: string[];
+}
+
 export interface NewPermissionInput {
     name: string;
 }
 
 export interface UpdatePermissionInput {
     name: string;
+}
+
+export interface NewRoleInput {
+    name: string;
+}
+
+export interface UpdateRoleInput {
+    name: string;
+}
+
+export interface UpdateRolePermissionInput {
+    permissions: string[];
 }
 
 export interface UpdateUserInput {
@@ -124,9 +140,14 @@ export interface IMutation {
     updateGroup(id: string, input: UpdateGroupInput): Group | Promise<Group>;
     deleteGroup(id: string): Group | Promise<Group>;
     updateGroupPermissions(id: string, input: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
+    updateGroupRoles(id: string, input: UpdateGroupRoleInput): GroupRole[] | Promise<GroupRole[]>;
     createPermission(input: NewPermissionInput): Permission | Promise<Permission>;
     updatePermission(id: string, input: UpdatePermissionInput): Permission | Promise<Permission>;
     deletePermission(id: string): Permission | Promise<Permission>;
+    createRole(input: NewRoleInput): Role | Promise<Role>;
+    updateRole(id: string, input: UpdateRoleInput): Role | Promise<Role>;
+    deleteRole(id: string): Role | Promise<Role>;
+    updateRolePermissions(id: string, input: UpdateRolePermissionInput): RolePermission[] | Promise<RolePermission[]>;
     updateUser(id: string, input: UpdateUserInput): User | Promise<User>;
     deleteUser(id: string): User | Promise<User>;
     updateUserPermissions(id: string, input: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
@@ -164,8 +185,12 @@ export interface IQuery {
     getGroups(): Group[] | Promise<Group[]>;
     getGroup(id: string): Group | Promise<Group>;
     getGroupPermissions(id: string): GroupPermission[] | Promise<GroupPermission[]>;
+    getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
     getPermission(id: string): Permission | Promise<Permission>;
+    getRoles(): Role[] | Promise<Role[]>;
+    getRole(id: string): Role | Promise<Role>;
+    getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
     getUsers(): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
@@ -183,7 +208,22 @@ export interface GroupPermission {
     name: string;
 }
 
+export interface GroupRole {
+    id: string;
+    name: string;
+}
+
 export interface Permission {
+    id: string;
+    name: string;
+}
+
+export interface Role {
+    id: string;
+    name: string;
+}
+
+export interface RolePermission {
     id: string;
     name: string;
 }
