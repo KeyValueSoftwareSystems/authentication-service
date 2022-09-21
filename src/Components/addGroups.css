@@ -1,0 +1,12 @@
+#add-groups{
+    margin-top: 10px;
+}
+
+#checkbox{
+    border: 1px solid #ebebeb;
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 18px 20px 18px 16px;
+    margin-top: 8px;
+    width:50%;
+}
