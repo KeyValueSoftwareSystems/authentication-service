@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 
 import { LOGIN } from "./services/mutations";
 import CustomerAuth from "../../services/auth";
+import "./styles.css";
+import LoginPassword from "./loginPassword";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -18,28 +19,21 @@ const Login: React.FC = () => {
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
-      navigate('/home/users')
+      navigate("/home/users");
     }
   }, [data]);
- 
+
+  const onSubmitForm = (data: any) => {
+    userLogin({
+      variables: {
+        input: data,
+      },
+    });
+  };
+
   return (
-    <div>
-      Login Page UI
-      <Button
-        variant="contained"
-        onClick={() => {
-          userLogin({
-            variables: {
-              input: {
-                username: "admin@domain.com",
-                password: "adminpassword",
-              },
-            },
-          });
-        }}
-      >
-        Login
-      </Button>
+    <div className="container">
+      <LoginPassword onSubmitForm={onSubmitForm} />
     </div>
   );
 };
