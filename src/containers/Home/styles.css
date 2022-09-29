@@ -1,0 +1,66 @@
+.wrapperContainer {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+.navBar {
+  width: 100%;
+  display: flex;
+  background-color: aliceblue;
+  overflow: hidden;
+}
+
+.sideBarContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-top: 10px;
+}
+.sideBar {
+  width: 300px;
+  background-color: white;
+  height: calc(-60px + 100vh);
+}
+.option {
+  text-decoration: none;
+}
+.text-link {
+  color: inherit;
+  height: 40px;
+  text-decoration: inherit;
+  margin: 10px 0px 20px 20px;
+  display: flex;
+  border-radius: 20px 0px 0px 20px;
+  align-items: center;
+  background-color: aliceblue;
+  padding: 5px 10px 5px 20px;
+}
+
+.text-link:hover {
+  background-color: #00aeef;
+  color: white;
+}
+.body {
+  background-color: #fafafa;
+  display: flex;
+  height: calc(-60px + 100vh);
+}
+.outlet {
+  width: 80%;
+  margin: 20px;
+  padding: 20px;
+  box-shadow: 6px 6px 6px 6px #9d9d9d29;
+  border-radius: 10px;
+  background-color: white;
+  overflow: auto;
+}
+
+.icon {
+  margin-right: 10px;
+}
+
+.navLogo {
+  width: 300px;
+  background-color: aliceblue;
+  padding: 6px 0px 6px 20px;
+}

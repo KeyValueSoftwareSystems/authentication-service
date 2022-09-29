@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 250px;
+  height: 100%;
+  /* background-color: aliceblue; */
+}
+
+.containerLogin {
+  width: 25%;
+}
+
+.box {
+  margin-bottom: 20px !important;
+  margin-top: 20px !important;
+  background-color: white;
+}
+
+.button {
+  height: 50px;
+  margin-top: 20px !important;
+}
+
+.logo {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}

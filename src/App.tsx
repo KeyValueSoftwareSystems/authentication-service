@@ -1,15 +1,18 @@
 import React from 'react';
+import { HashRouter as Router } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
 
 import './App.css';
-import Groups from './Containers/Gropus';
+import RoutesLayout from './routes/routesLayout';
+import theme from './themes/themes';
 
 function App() {
   return (
-    <div className="App">
-hi
-<Groups/>
-
-    </div>
+    <ThemeProvider theme={theme}>
+        <Router>
+          <RoutesLayout />
+        </Router>
+    </ThemeProvider>
   );
 }
 
