@@ -1,0 +1,48 @@
+.table-toolbar {
+  border: 1px solid #9d9d9d29;
+  border-bottom: none;
+  height: 65px;
+  box-sizing: border-box;
+  border-radius: 5px 5px 0px 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sort-search-button {
+  display: flex;
+  margin-right: 20px;
+}
+
+.sort {
+  margin-right: 35px;
+}
+
+.legend-title {
+  display: flex;
+  align-items: center;
+  font-weight: bolder;
+  font-size: larger;
+  margin-left: 10px;
+}
+
+.toolbar-button {
+  margin-top: 11px;
+}
+
+@media screen and (max-width: 1103px) {
+  div.search {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 699px) {
+  div.sort {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 515px) {
+  div.sort-search-button {
+    display: none;
+  }
+}
