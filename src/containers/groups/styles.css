@@ -1,0 +1,35 @@
+#group-details {
+  margin: 10px 10px 10px 10px;
+}
+
+#bold {
+  font-weight: bold;
+}
+
+#group-title {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+#rolesandpermissions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+#roles {
+  width: 20%;
+}
+
+#item {
+  background-color: #edf6ff;
+  color: #007aff;
+  margin: 5px 5px 5px 5px;
+}
+
+#item-list {
+  flex-wrap: wrap;
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+}
