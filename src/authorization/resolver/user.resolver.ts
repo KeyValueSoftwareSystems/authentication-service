@@ -1,5 +1,12 @@
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import {
   UpdateUserGroupInput,
   UpdateUserInput,
@@ -30,6 +37,20 @@ export class UserResolver {
   @Query()
   getUser(@Args('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.userService.getUserById(id);
+  }
+
+  @ResolveField('groups')
+  async getUserGroupResolveField(user: User) {
+    if (user.id) {
+      return this.userService.getUserGroups(user.id);
+    }
+  }
+
+  @ResolveField('permissions')
+  async getUserPermissionResolveField(user: User) {
+    if (user.id) {
+      return this.userService.getUserPermissions(user.id);
+    }
   }
 
   @Permissions(PermissionsType.EditUser)

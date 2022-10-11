@@ -5,6 +5,8 @@ type User {
   firstName: String!
   middleName: String
   lastName: String!
+  groups: [Group]
+  permissions: [Permission]
 }
 
 enum OperationType {

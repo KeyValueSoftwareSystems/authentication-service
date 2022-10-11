@@ -235,6 +235,8 @@ export interface User {
     firstName: string;
     middleName?: string;
     lastName: string;
+    groups?: Group[];
+    permissions?: Permission[];
 }
 
 export interface UserGroupResponse {
