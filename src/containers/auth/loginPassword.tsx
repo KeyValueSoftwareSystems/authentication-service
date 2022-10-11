@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import FormInputText from "../../components/InputText";
+import FormInputText from "../../components/inputText";
 import { LoginSchema } from "./authSchema";
 import { LOGO_URL } from "../../config";
 import "./styles.css";
