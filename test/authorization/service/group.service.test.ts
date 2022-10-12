@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewGroupInput,
@@ -45,6 +45,8 @@ describe('test Group Service', () => {
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const roleRepository = Substitute.for<Repository<Role>>();
+  const connectionMock = Substitute.for<Connection>();
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -79,6 +81,10 @@ describe('test Group Service', () => {
         },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
+        {
+          provide: Connection,
+          useValue: connectionMock,
+        },
       ],
     }).compile();
     groupService = moduleRef.get<GroupService>(GroupService);
