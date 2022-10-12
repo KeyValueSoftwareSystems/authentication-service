@@ -8,9 +8,16 @@ export interface FormInputProps {
   type: string;
   setValue?: any;
   className?: any;
+  defaultText?: string;
 }
 
-const FormInputText = ({ name, label, type, className }: FormInputProps) => {
+const FormInputText = ({
+  name,
+  label,
+  type,
+  className,
+  defaultText,
+}: FormInputProps) => {
   const { control } = useFormContext();
 
   return (
@@ -32,6 +39,7 @@ const FormInputText = ({ name, label, type, className }: FormInputProps) => {
           label={label}
           variant="outlined"
           className={className}
+          defaultValue={defaultText}
         />
       )}
     />
