@@ -47,8 +47,12 @@ permissions: [String]!,
 operation: OperationType
 }
 
+input FilterUserInput {
+  searchTerm: String
+}
+
 type Query {
-  getUsers: [User]!
+  getUsers(input: FilterUserInput): [User]!
   getUser(id: ID!): User
   getUserGroups(id: ID!): [UserGroupResponse]
   getUserPermissions(id: ID!): [UserPermissions]

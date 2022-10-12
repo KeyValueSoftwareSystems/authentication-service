@@ -9,6 +9,7 @@ import {
   Permission,
   UserPermissionsVerification,
   OperationType,
+  FilterUserInput,
 } from '../../schema/graphql.schema';
 import UserService from '../service/user.service';
 import ValidationPipe from '../../validation/validation.pipe';
@@ -22,8 +23,8 @@ export class UserResolver {
 
   @Permissions(PermissionsType.ViewUser)
   @Query()
-  getUsers(): Promise<User[]> {
-    return this.userService.getAllUsers();
+  getUsers(@Args('input') input: FilterUserInput): Promise<User[]> {
+    return this.userService.getAllUsers(input);
   }
 
   @Permissions(PermissionsType.ViewUser)

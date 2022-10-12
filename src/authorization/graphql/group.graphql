@@ -29,9 +29,13 @@ type GroupRole {
   name: String!
 }
 
+input FilterGroupInput {
+  searchTerm: String
+}
+
 
 type Query {
-  getGroups: [Group]!
+  getGroups(input: FilterGroupInput): [Group]!
   getGroup(id: ID!): Group
   getGroupPermissions(id: ID!): [GroupPermission]
   getGroupRoles(id: ID!): [GroupRole]

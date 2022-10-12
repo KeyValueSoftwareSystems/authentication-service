@@ -84,6 +84,10 @@ export interface UpdateGroupRoleInput {
     roles: string[];
 }
 
+export interface FilterGroupInput {
+    searchTerm?: string;
+}
+
 export interface NewPermissionInput {
     name: string;
 }
@@ -104,6 +108,10 @@ export interface UpdateRolePermissionInput {
     permissions: string[];
 }
 
+export interface FilterRoleInput {
+    searchTerm?: string;
+}
+
 export interface UpdateUserInput {
     firstName?: string;
     middleName?: string;
@@ -121,6 +129,10 @@ export interface UpdateUserGroupInput {
 export interface UserPermissionsVerification {
     permissions: string[];
     operation?: OperationType;
+}
+
+export interface FilterUserInput {
+    searchTerm?: string;
 }
 
 export interface IMutation {
@@ -182,16 +194,16 @@ export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
     getEntityPermissions(id: string): EntityPermission[] | Promise<EntityPermission[]>;
-    getGroups(): Group[] | Promise<Group[]>;
+    getGroups(input?: FilterGroupInput): Group[] | Promise<Group[]>;
     getGroup(id: string): Group | Promise<Group>;
     getGroupPermissions(id: string): GroupPermission[] | Promise<GroupPermission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
     getPermission(id: string): Permission | Promise<Permission>;
-    getRoles(): Role[] | Promise<Role[]>;
+    getRoles(input?: FilterRoleInput): Role[] | Promise<Role[]>;
     getRole(id: string): Role | Promise<Role>;
     getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
-    getUsers(): User[] | Promise<User[]>;
+    getUsers(input?: FilterUserInput): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
