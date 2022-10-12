@@ -71,7 +71,7 @@ describe('test Role Service', () => {
   });
 
   it('should get all roles', async () => {
-    rolesRepository.find().returns(Promise.resolve(roles));
+    rolesRepository.find({ where: [] }).returns(Promise.resolve(roles));
     const resp = await roleService.getAllRoles();
     expect(resp).toEqual(roles);
   });
