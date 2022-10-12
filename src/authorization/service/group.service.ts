@@ -6,7 +6,7 @@ import {
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Connection, createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -37,6 +37,7 @@ export class GroupService {
     private groupRoleRepository: Repository<GroupRole>,
     @InjectRepository(Role)
     private rolesRepository: Repository<Role>,
+    private connection: Connection,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -148,23 +149,38 @@ export class GroupService {
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
+
+    const existingRolesOfGroup = await this.getGroupRoles(id);
     const rolesInRequest = await this.rolesRepository.findByIds(request.roles);
+    const validRolesInRequest: Set<string> = new Set(
+      rolesInRequest.map((p) => p.id),
+    );
+
     if (rolesInRequest.length !== request.roles.length) {
       const validRoles = rolesInRequest.map((r) => r.id);
       throw new RoleNotFoundException(
         request.roles.filter((r) => !validRoles.includes(r)).toString(),
       );
     }
+
+    const rolesToBeRemovedFromGroup: GroupRole[] = existingRolesOfGroup
+      .filter((p) => !validRolesInRequest.has(p.id))
+      .map((r) => ({ groupId: id, roleId: r.id }));
+
     const groupRoles = this.groupRoleRepository.create(
       request.roles.map((role) => ({
         groupId: id,
         roleId: role,
       })),
     );
-    const savedGroupRoles = await this.groupRoleRepository.save(groupRoles);
-    const roles = await this.rolesRepository.findByIds(
-      savedGroupRoles.map((groupRole) => groupRole.roleId),
-    );
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const groupRolesRepo = entityManager.getRepository(GroupRole);
+      await groupRolesRepo.remove(rolesToBeRemovedFromGroup);
+      await groupRolesRepo.save(groupRoles);
+    });
+
+    const roles = await this.getGroupRoles(id);
     await this.groupCacheService.invalidateGroupRolesByGroupId(id);
     return roles;
   }
