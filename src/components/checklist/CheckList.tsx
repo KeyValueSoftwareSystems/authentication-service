@@ -1,5 +1,5 @@
 import { FC } from "react";
-import "./checklist.css";
+import "./styles.css";
 interface ChecklistProps {
   name: String;
   mapList: any;
@@ -17,7 +17,7 @@ export const ChecklistComponent: FC<ChecklistProps> = ({
   };
 
   return (
-    <div id="add-groups">
+    <div id="add-items">
       <div id="titlebar">
         <div id="titleChecklist"> {name} </div>
         <div id="selectall">
@@ -32,7 +32,7 @@ export const ChecklistComponent: FC<ChecklistProps> = ({
               <input
                 type="checkbox"
                 key={item.id}
-                checked={isChecked(item.id)}
+                defaultChecked={isChecked(item.id)}
                 onChange={(e) => onChange(e, item)}
               />
               <span className="checklistLabel">{item.name}</span>

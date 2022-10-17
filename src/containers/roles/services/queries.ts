@@ -18,7 +18,7 @@ export const GET_ROLES = gql`
   }
 `;
 
-export const GET_ROLE_DETAILS = gql`
+export const GET_ROLE = gql`
   query getRole($id: ID!) {
     getRole(id: $id) {
       id

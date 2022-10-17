@@ -3,12 +3,11 @@ import { useRecoilState } from "recoil";
 import { useMutation, useQuery } from "@apollo/client";
 import { GridColumns } from "@mui/x-data-grid";
 import { Chip } from "@mui/material";
-
 import { GET_USERS, GET_USER_GROUPS } from "./services/queries";
-import "./styles.css";
 import { DELETE_USER } from "./services/mutations";
 import { userListAtom } from "../../states/userStates";
 import TableList from "../../components/table/Table";
+import { useNavigate } from "react-router-dom";
 
 const Users: React.FC = () => {
   useMutation(DELETE_USER, {
@@ -16,12 +15,20 @@ const Users: React.FC = () => {
   });
 
   const [userList, setUserList] = useRecoilState(userListAtom);
-
+  const navigate = useNavigate();
   useQuery(GET_USERS, {
     onCompleted: (data) => {
       setUserList(data?.getUsers);
     },
   });
+
+  const onEdit = (id: any) => {
+    navigate(`/home/users/add/${id}`);
+  };
+
+  const onAdd = () => {
+    navigate(`/home/users/add`);
+  };
 
   const columns: GridColumns = [
     {
@@ -47,6 +54,8 @@ const Users: React.FC = () => {
         rows={userList}
         columns={columns}
         text="All Users"
+        onAdd={onAdd}
+        onEdit={onEdit}
         buttonLabel="Add User"
         searchLabel="Search User"
         deleteMutation={DELETE_USER}

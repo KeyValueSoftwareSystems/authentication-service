@@ -21,7 +21,7 @@ import "./styles.css";
 import GroupForm from "./GroupForm";
 import { GET_GROUP_ROLES } from "../../services/queries";
 import { getUniquePermissions } from "../../../../utils/permissions";
-import { ChecklistComponent } from "../../../../components/checklist/checkList";
+import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import {
   Permission,
   RolePermissionsDetails,

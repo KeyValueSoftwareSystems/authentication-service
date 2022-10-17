@@ -1,10 +1,10 @@
 export interface User {
-  id: String;
-  email: String;
-  phone: String;
-  firstName: String;
-  middleName: String;
-  lastName: String;
+  id: string;
+  email: string;
+  phone: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
 }
 
 export interface Group {

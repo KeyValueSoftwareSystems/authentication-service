@@ -5,3 +5,4 @@ export const userListAtom = atom ({
     key: "UserList",
     default : [],
   });
+

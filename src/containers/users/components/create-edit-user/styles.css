@@ -1,0 +1,164 @@
+.user-name {
+  font-weight: bold !important;
+  font-size: 16px !important;
+}
+
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.options {
+  display: flex;
+}
+
+.option {
+  padding-right: 15px;
+  color: #a4a4a4;
+  font-size: 14px !important;
+}
+
+#title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  align-items: center;
+  font-size: 18px;
+}
+
+#add-cancel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+#fixed {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+}
+
+#form-row {
+  display: flex;
+  align-content: flex-start;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+#phone {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.fields {
+  border-radius: 6px !important;
+  margin-right: 30px !important;
+  height: 45px;
+}
+
+.text {
+  border-radius: 6px !important;
+  margin-right: 30px !important;
+  height: 45px;
+}
+
+#code {
+  margin-right: 10px;
+  height: 45px;
+  width: 50px;
+}
+
+#cancel {
+  margin-top: 2px;
+  margin-right: 5px;
+  color: gray;
+}
+
+#form {
+  border: 5px;
+  padding: 10px 10px 10px 10px;
+  margin-bottom: 10px;
+}
+
+#arrowicon {
+  width: 20px;
+  height: 15px;
+  margin-right: 5px;
+}
+
+#back-page {
+  display: flex;
+  flex-direction: row;
+  color: gray;
+  margin-bottom: 3px;
+  font-size: small;
+}
+
+#inputs {
+  margin-left: 0px;
+  margin-bottom: 10px;
+}
+
+#cancel {
+  width: 80px;
+  background-color: #fff;
+  height: 40px;
+  background: #ffffff;
+  margin-top: 10px;
+  color: grey !important;
+  text-decoration: inherit !important;
+  text-align: justify;
+  justify-content: center;
+  font-size: 15px;
+}
+
+#add {
+  border-radius: 20px;
+  border: 1px solid rgb(23, 119, 240);
+  color: rgb(23, 119, 240);
+  height: 40px;
+  width: 80px;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+#legend {
+  font-weight: bold;
+}
+
+#page {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+#bold {
+  font-weight: bold;
+}
+
+#groups-permissions {
+
+  display: flex;
+  justify-content: flex-start;
+}
+
+#item-list{
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#item{
+  background: #edf6ff;
+  color: #007aff;
+  margin: 5px 5px 5px 5px;
+}
+
+#permission-list {
+  flex-wrap: wrap;
+  display: flex;
+  margin-top: 20px;
+  align-items: center;
+}

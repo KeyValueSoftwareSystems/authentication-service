@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { RoleDetailsAtom } from "../../states/roleStates";
 import { RolePermissionsAtom } from "../../states/permissionsStates";
-import "../groups/styles.css";
-import { GET_ROLE_DETAILS, GET_ROLE_PERMISSIONS } from "./services/queries";
+import "../groups/components/create-edit/details/styles.css"
+import { GET_ROLE, GET_ROLE_PERMISSIONS } from "./services/queries";
 import { Chip } from "@mui/material";
 
 const RoleDetails: React.FC = () => {
@@ -12,7 +12,7 @@ const RoleDetails: React.FC = () => {
   const [role, setRole] = useRecoilState(RoleDetailsAtom);
   const [permissions, setPermissions] = useRecoilState(RolePermissionsAtom);
 
-  useQuery(GET_ROLE_DETAILS, {
+  useQuery(GET_ROLE, {
     variables: { id },
     onCompleted: (data) => {
       setRole(data?.getRole);

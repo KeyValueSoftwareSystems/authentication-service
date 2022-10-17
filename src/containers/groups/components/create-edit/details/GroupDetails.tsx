@@ -2,14 +2,10 @@ import { useQuery } from "@apollo/client";
 import { Chip } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { groupDetailsAtom } from "../../states/groupStates";
-import { GroupPermissionsAtom } from "../../states/permissionsStates";
-import { GroupRolesAtom } from "../../states/roleStates";
-import {
-  GET_GROUP_DETAILS,
-  GET_GROUP_PERMISSIONS,
-  GET_GROUP_ROLES,
-} from "./services/queries";
+import { groupDetailsAtom } from "../../../../../states/groupStates";
+import { GroupPermissionsAtom } from "../../../../../states/permissionsStates";
+import { GroupRolesAtom } from "../../../../../states/roleStates";
+import { GET_GROUP, GET_GROUP_PERMISSIONS, GET_GROUP_ROLES } from "../../../services/queries";
 import "./styles.css";
 
 const GroupDetails: React.FC = () => {
@@ -18,7 +14,7 @@ const GroupDetails: React.FC = () => {
   const [roles, setRoles] = useRecoilState(GroupRolesAtom);
   const [permissions, setPermissions] = useRecoilState(GroupPermissionsAtom);
 
-  useQuery(GET_GROUP_DETAILS, {
+  useQuery(GET_GROUP, {
     variables: { id },
     onCompleted: (data) => {
       setGroup(data?.getGroup);
