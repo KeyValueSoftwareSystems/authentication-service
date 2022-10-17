@@ -7,3 +7,8 @@ export const groupDetailsAtom = atom({
     name: "",
   },
 });
+
+export const groupListAtom = atom({
+  key: "GroupList",
+  default: [],
+});

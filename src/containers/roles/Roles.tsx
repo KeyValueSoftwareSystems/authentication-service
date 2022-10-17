@@ -1,7 +1,9 @@
 import React from "react";
 import { useRecoilState } from "recoil";
 import { useMutation, useQuery } from "@apollo/client";
-import { GridColumns } from "@mui/x-data-grid";
+import { GridColumns, GridRowId } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
+
 import "./roles.css";
 import { GET_ROLES } from "./services/queries";
 import { DELETE_ROLE } from "./services/mutations";
@@ -9,6 +11,8 @@ import { RolesListAtom } from "../../states/roleStates";
 import TableList from "../../components/table";
 
 const Roles: React.FC = () => {
+  const navigate = useNavigate();
+
   useMutation(DELETE_ROLE, {
     refetchQueries: [{ query: GET_ROLES }],
   });
@@ -28,6 +32,14 @@ const Roles: React.FC = () => {
     },
   ];
 
+  const onAddRole = () => {
+    navigate("add");
+  };
+
+  const onEditRole = (id: GridRowId) => {
+    navigate(`edit/${id}`);
+  };
+
   return (
     <>
       <TableList
@@ -38,6 +50,8 @@ const Roles: React.FC = () => {
         searchLabel="Search Role"
         deleteMutation={DELETE_ROLE}
         refetchQuery={GET_ROLES}
+        onAdd={onAddRole}
+        onEdit={onEditRole}
       />
     </>
   );

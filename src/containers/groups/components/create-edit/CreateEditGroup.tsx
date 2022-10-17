@@ -110,7 +110,6 @@ const CreateOrEditGroup = () => {
     item?: Role
   ) => {
     const value = event.target.value;
-    console.log(item);
 
     if (event.target.checked) {
       if (value === "all") {
@@ -145,8 +144,6 @@ const CreateOrEditGroup = () => {
   };
 
   const onCreateGroup = (inputs: FieldValues) => {
-    console.log(inputs);
-
     createGroup({
       variables: {
         input: inputs,

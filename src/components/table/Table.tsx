@@ -47,6 +47,7 @@ const TableList: FC<TableProps> = ({
               label="Edit"
               className="textPrimary"
               color="inherit"
+              onClick={() => onEdit(id)}
             />
           </Tooltip>,
           <Tooltip title="Delete" arrow>
