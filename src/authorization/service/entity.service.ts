@@ -5,7 +5,7 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../schema/graphql.schema';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Connection, createQueryBuilder, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -21,6 +21,7 @@ export class EntityService {
     private entityPermissionRepository: Repository<EntityPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
+    private connection: Connection,
   ) {}
 
   getAllEntities(): Promise<EntityModel[]> {
@@ -79,6 +80,11 @@ export class EntityService {
     const permissionsInRequest = await this.permissionRepository.findByIds(
       request.permissions,
     );
+    const existingPermissionsOfEntity = await this.getEntityPermissions(id);
+    const validPermissionsInRequest: Set<string> = new Set(
+      permissionsInRequest.map((p) => p.id),
+    );
+
     if (permissionsInRequest.length !== request.permissions.length) {
       const validPermissions = permissionsInRequest.map((p) => p.id);
       throw new PermissionNotFoundException(
@@ -87,18 +93,26 @@ export class EntityService {
           .toString(),
       );
     }
+
+    const permissionsToBeRemovedFromEntity: EntityPermission[] = existingPermissionsOfEntity
+      .filter((p) => !validPermissionsInRequest.has(p.id))
+      .map((p) => ({ permissionId: p.id, entityId: id }));
+
     const entityPermission = this.entityPermissionRepository.create(
       request.permissions.map((permission) => ({
         entityId: id,
         permissionId: permission,
       })),
     );
-    const savedEntityPermissions = await this.entityPermissionRepository.save(
-      entityPermission,
-    );
-    const permissions = await this.permissionRepository.findByIds(
-      savedEntityPermissions.map((g) => g.permissionId),
-    );
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const entityPermissionsRepo = entityManager.getRepository(
+        EntityPermission,
+      );
+      await entityPermissionsRepo.remove(permissionsToBeRemovedFromEntity);
+      await entityPermissionsRepo.save(entityPermission);
+    });
+    const permissions = await this.getEntityPermissions(id);
     return permissions;
   }
 
@@ -107,9 +121,11 @@ export class EntityService {
       .leftJoinAndSelect(
         EntityPermission,
         'entityPermission',
-        'Permission.id = entityPermission.permissionId',
+        'Permission.id = cast(entityPermission.permissionId as uuid)',
       )
-      .where('entityPermission.entityId = :entityId', { entityId: id })
+      .where('entityPermission.entityId = :entityId', {
+        entityId: id,
+      })
       .getMany();
     return permissions;
   }
