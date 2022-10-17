@@ -18,6 +18,11 @@
   font-size: 14px !important;
 }
 
+.chips{
+  display: flex;
+  flex-wrap: wrap;
+}
+
 #title {
   display: flex;
   justify-content: space-between;

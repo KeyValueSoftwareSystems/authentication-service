@@ -59,6 +59,16 @@ const theme = createTheme({
         },
       },
     },
+    MuiChip: {
+      styleOverrides: {
+        root: { height: "100%", display: "flex", flexDirection: "column" },
+        label: {
+          overflowWrap: "break-word",
+          whiteSpace: "normal",
+          textOverflow: "clip",
+        },
+      },
+    },
   },
 });
 export default theme;
