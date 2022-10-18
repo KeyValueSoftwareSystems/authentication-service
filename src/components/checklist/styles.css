@@ -12,7 +12,7 @@
   }
   
   #add-items {
-    margin-top: 50px;
+    margin-top: 40px;
     width:50%;
     padding-right: 5px;
   }
@@ -28,6 +28,7 @@
   #component {
     overflow-y: scroll;
     width: 90%;
+    height:400px
   }
   
   #titlebar{

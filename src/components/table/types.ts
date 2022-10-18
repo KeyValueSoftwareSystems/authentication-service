@@ -1,4 +1,9 @@
-import { GridColumns, GridRowId, GridRowParams, GridRowsProp } from "@mui/x-data-grid";
+import {
+  GridColumns,
+  GridRowId,
+  GridRowParams,
+  GridRowsProp,
+} from "@mui/x-data-grid";
 import { DocumentNode } from "graphql";
 
 export interface TableProps {

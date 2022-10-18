@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
-
+import { LOGIN_URL } from "../../config";
 import { LOGIN } from "./services/mutations";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
@@ -32,8 +32,13 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <LoginPassword onSubmitForm={onSubmitForm} />
+    <div className="login-page">
+      <div className="left">
+        <img src={LOGIN_URL} alt="login image" id="login-image"/>
+      </div>
+      <div className="input-container">
+        <LoginPassword onSubmitForm={onSubmitForm} />
+      </div>
     </div>
   );
 };

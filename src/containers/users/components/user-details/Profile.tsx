@@ -70,7 +70,8 @@ const Profile = () => {
             </div>
             <Divider flexItem />
             <div className="contact">
-              <div style={{ fontWeight: 600 }}>Status:</div>{/* To integrate with status api */}
+              <div style={{ fontWeight: 600 }}>Status:</div>
+              {/* To integrate with status api */}
               <Chip
                 label={"Active"}
                 sx={{ fontSize: "20px", background: "#D3F4BE" }}

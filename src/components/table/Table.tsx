@@ -1,8 +1,4 @@
-import {
-  DataGrid,
-  GridActionsCellItem,
-  GridColumns,
-} from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColumns } from "@mui/x-data-grid";
 import { FC } from "react";
 import { Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -23,7 +19,7 @@ const TableList: FC<TableProps> = ({
   searchLabel,
   deleteMutation,
   refetchQuery,
-  handleRowClick
+  handleRowClick,
 }) => {
   const [deleteItem] = useMutation(deleteMutation, {
     refetchQueries: [{ query: refetchQuery }],
@@ -45,7 +41,7 @@ const TableList: FC<TableProps> = ({
               icon={
                 <EditIcon
                   onClick={() => {
-                    onEdit(id)
+                    onEdit(id);
                   }}
                 />
               }

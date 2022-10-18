@@ -1,13 +1,31 @@
-import { Link, Outlet, Navigate } from "react-router-dom";
+
+import { useMutation } from "@apollo/client";
+import { Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Button } from "@mui/material";
+
 import { LOGO_URL } from "../../config";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
+import { LOGOUT } from "../auth/services/mutations";
+
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
+  const [logout] = useMutation(LOGOUT, {
+    onCompleted: () => {
+      CustomerAuth.clearTokens();
+      navigate("/login");
+    },
+  });
+
+  const onLogout = () => {
+    logout();
+  };
   return (
     <>
       <div className="wrapperContainer">
@@ -15,31 +33,59 @@ const HomePage = () => {
           <div className="navLogo">
             <img alt="logo" src={LOGO_URL} />
           </div>
+          <div className="logout">
+            <Button
+              variant="outlined"
+              onClick={onLogout}
+              sx={{ textTransform: "none" }}
+            >
+              Logout
+            </Button>
+          </div>
         </div>
 
         <div className="body">
           <div className="sideBar">
             <nav>
               <div className="sideBarContainer">
-                <Link to="/home/users" className="text-link">
+                <NavLink
+                  to="/home/users"
+                  className={({ isActive }) =>
+                    isActive ? "active-text-link" : "text-link"
+                  }
+                >
                   <PeopleAltOutlinedIcon className="icon" />
                   USERS
-                </Link>
-
-                <Link to="/home/groups" className="text-link">
+                </NavLink>
+                <NavLink
+                  to="/home/groups"
+                  className={({ isActive }) =>
+                    isActive ? "active-text-link" : "text-link"
+                  }
+                >
                   <Diversity3OutlinedIcon className="icon" />
                   GROUPS
-                </Link>
+                </NavLink>
 
-                <Link to="/home/roles" className="text-link">
+                <NavLink
+                  to="/home/roles"
+                  className={({ isActive }) =>
+                    isActive ? "active-text-link" : "text-link"
+                  }
+                >
                   <WorkOutlineOutlinedIcon className="icon" />
                   ROLES
-                </Link>
+                </NavLink>
 
-                <Link to="/home/permissions" className="text-link">
+                <NavLink
+                  to="/home/permissions"
+                  className={({ isActive }) =>
+                    isActive ? "active-text-link" : "text-link"
+                  }
+                >
                   <LockOutlinedIcon className="icon" />
                   PERMISSIONS
-                </Link>
+                </NavLink>
               </div>
             </nav>
           </div>

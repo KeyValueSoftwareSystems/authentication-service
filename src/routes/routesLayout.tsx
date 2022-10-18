@@ -4,12 +4,11 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import UserDetails from "../containers/users/components/user-details/UserDetails";
 import CreateOrEditRole from "../containers/roles/components/create-edit/CreateOrEditRole";
 import AddUser from "../containers/users/components/create-edit-user/AddUser";
-import RoleDetails from "../containers/roles/RoleDetails";
 import EditUser from "../containers/users/components/create-edit-user/EditUser";
 import { RoutePaths } from "./routePaths";
-import GroupDetails from "../containers/groups/components/create-edit/details/GroupDetails";
 import CreateOrEditGroup from "../containers/groups/components/create-edit/CreateEditGroup";
 
+import RoleDetails from "../containers/roles/components/details/RoleDetails";
 
 const NotFound = lazy(() => import("../components/NotFound"));
 const HomePage = lazy(() => import("../containers/home"));
@@ -37,7 +36,7 @@ const RoutesLayout: React.FC = () => {
 
         <Route path="/home/*" element={<HomePage />}>
           <Route path={RoutePaths.users} element={<Users />} />
-          <Route path="users/:id" element={<UserDetails />} ></Route>
+          <Route path="users/:id" element={<UserDetails />}></Route>
           <Route path="users/add" element={<AddUser />} />
           <Route path="users/add/:id" element={<EditUser />} />
           <Route path={RoutePaths.groups} element={<Groups />} />

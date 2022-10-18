@@ -1,12 +1,12 @@
 {
-  "name": "my-app",
+  "name": "kv-ums",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.9",
-    "@hookform/resolvers": "^2.9.8",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "@hookform/resolvers": "^2.9.8",
     "@mui/icons-material": "^5.10.6",
     "@mui/material": "^5.10.5",
     "@mui/x-data-grid": "^5.17.3",
@@ -31,7 +31,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +54,17 @@
     ]
   },
   "devDependencies": {
+    "husky": "^4.3.8",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
     "yup": "^0.32.11"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*": "prettier --write"
   }
 }
