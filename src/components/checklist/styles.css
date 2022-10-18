@@ -1,41 +1,42 @@
 #checkbox {
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  box-sizing: border-box;
-  border-radius: 10px;
-  padding: 20px 20px 20px 16px;
-  margin-top: 20px;
-  width: 95%;
-}
-
-#checkbox input:checked ~ #checkbox {
-  background-color: gray;
-}
-
-#add-items {
-  margin-top: 50px;
-  width: 50%;
-  padding-right: 5px;
-}
-
-#titleChecklist {
-  font-size: 16px;
-  color: #040404;
-}
-.checklistLabel {
-  margin-left: 10px;
-}
-
-#component {
-  overflow-y: scroll;
-  width: 90%;
-}
-
-#titlebar {
-  display: flex;
-}
-
-#selectall {
-  margin-left: 10px;
-  font-size: 14px;
-  color: grey;
-}
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 20px 20px 20px 16px;
+    margin-top: 20px;
+    width: 95%;
+  }
+  
+  #checkbox input:checked ~ #checkbox {
+    background-color: gray;
+  }
+  
+  #add-items {
+    margin-top: 40px;
+    width:50%;
+    padding-right: 5px;
+  }
+  
+  #titleChecklist {
+    font-size: 16px;
+    color: #040404;
+  }
+  .checklistLabel {
+    margin-left: 10px;
+  }
+  
+  #component {
+    overflow-y: scroll;
+    width: 90%;
+    height:400px
+  }
+  
+  #titlebar{
+      display: flex;
+  }
+  
+  #selectall{
+      margin-left:10px;
+      font-size: 14px;
+      color:grey
+  }
