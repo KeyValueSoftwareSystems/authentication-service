@@ -6,8 +6,14 @@
 .navBar {
   width: 100%;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: aliceblue;
   overflow: hidden;
+}
+
+.logout{
+ padding-right: 50px;
 }
 
 .sideBarContainer {
