@@ -1,8 +1,7 @@
-.container {
+.input-container {
   width: 50%;
   display: flex;
   justify-content: space-around;
-  margin-left: 20%;
 }
 
 .containerLogin {
@@ -16,7 +15,7 @@
   background-color: white;
 }
 
-.button {
+.login-button {
   height: 50px;
   margin-top: 20px !important;
 }

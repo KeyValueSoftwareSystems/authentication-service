@@ -46,7 +46,7 @@ const LoginPassword: React.FC<Props> = ({ onSubmitForm }) => {
             variant="contained"
             type="submit"
             fullWidth
-            className="button"
+            className="login-button"
           >
             Login
           </Button>

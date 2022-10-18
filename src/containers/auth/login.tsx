@@ -36,7 +36,7 @@ const Login: React.FC = () => {
       <div className="left">
         <img src={LOGIN_URL} alt="login image" id="login-image"/>
       </div>
-      <div className="container">
+      <div className="input-container">
         <LoginPassword onSubmitForm={onSubmitForm} />
       </div>
     </div>
