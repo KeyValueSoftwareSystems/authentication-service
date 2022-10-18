@@ -4,10 +4,10 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import UserDetails from "../containers/users/components/user-details/UserDetails";
 import CreateOrEditRole from "../containers/roles/components/create-edit/CreateOrEditRole";
 import AddUser from "../containers/users/components/create-edit-user/AddUser";
-import RoleDetails from "../containers/roles/RoleDetails";
 import EditUser from "../containers/users/components/create-edit-user/EditUser";
 import { RoutePaths } from "./routePaths";
 import GroupDetails from "../containers/groups/components/create-edit/details/GroupDetails";
+import RoleDetails from "../containers/roles/components/details/RoleDetails";
 
 const NotFound = lazy(() => import("../components/NotFound"));
 const HomePage = lazy(() => import("../containers/home"));
