@@ -1,69 +1,67 @@
-.container{
-    display: flex;
-    flex-direction: column;
-    padding: 5px 0px 5px 0px;
-    box-shadow: aliceblue;
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 0px 5px 0px;
+  box-shadow: aliceblue;
 }
 
-.box{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+.box {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
-.box1{
-    display: flex;
-    flex-direction: column;
+.box1 {
+  display: flex;
+  flex-direction: column;
 }
 
-.box2{
-    justify-content: center;
-    align-items: center;
+.box2 {
+  justify-content: center;
+  align-items: center;
 }
 
-.access-setting{
-    display: flex;
-    align-items: center;
-    font-size: x-small;
-    padding: 5px 0px 5px 0px;
-    color: rgba(47,47,47,.6);
-    cursor: pointer;
+.access-setting {
+  display: flex;
+  align-items: center;
+  font-size: x-small;
+  padding: 5px 0px 5px 0px;
+  color: rgba(47, 47, 47, 0.6);
+  cursor: pointer;
 }
 
-.create-role{
-    font-size: large;
-    font-weight: 500;
-    padding: 5px 0px 10px 0px
+.create-role {
+  font-size: large;
+  font-weight: 500;
+  padding: 5px 0px 10px 0px;
 }
 
-
-.role-name{
-    margin-top: 20px !important;
-    width: 50% !important;
+.role-name {
+  margin-top: 20px !important;
+  width: 50% !important;
 }
 
-.description{
-    margin-top: 20px !important;
-    width: 50% !important;
+.description {
+  margin-top: 20px !important;
+  width: 50% !important;
 }
 
-.form{
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
 }
 
-.button{
-    border-radius: 50px !important;
-    text-transform: none !important;
-    height: 60%;
+.button {
+  border-radius: 50px !important;
+  text-transform: none !important;
+  height: 60%;
 }
 
-.role-permissions{
+.role-permissions {
 }
 
-
-.permission-header{
-    font-size: large;
-    font-weight: 500;
+.permission-header {
+  font-size: large;
+  font-weight: 500;
 }

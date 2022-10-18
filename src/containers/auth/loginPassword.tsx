@@ -7,12 +7,11 @@ import FormInputText from "../../components/inputText";
 import { LoginSchema } from "./authSchema";
 import { LOGO_URL } from "../../config";
 import "./styles.css";
- 
-type Props = {
-    onSubmitForm: (data:any) => void;
-}
-const LoginPassword: React.FC<Props> = ({onSubmitForm}) => {
 
+type Props = {
+  onSubmitForm: (data: any) => void;
+};
+const LoginPassword: React.FC<Props> = ({ onSubmitForm }) => {
   const initialValues = {
     username: "",
     password: "",
@@ -25,36 +24,35 @@ const LoginPassword: React.FC<Props> = ({onSubmitForm}) => {
   const { handleSubmit } = methods;
 
   return (
-  
-      <div className="containerLogin">
-        <div className="logo">
-          <img alt="logo" src={LOGO_URL} />
-        </div>
-        <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmitForm)}>
-            <FormInputText
-              name="username"
-              label="Username"
-              type="text"
-              className="box"
-            />
-            <FormInputText
-              name="password"
-              label="Password"
-              type="password"
-              className="box"
-            />
-            <Button
-              variant="contained"
-              type="submit"
-              fullWidth
-              className="button"
-            >
-              Login
-            </Button>
-          </form>
-        </FormProvider>
+    <div className="containerLogin">
+      <div className="logo">
+        <img alt="logo" src={LOGO_URL} />
       </div>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmitForm)}>
+          <FormInputText
+            name="username"
+            label="Username"
+            type="text"
+            className="textBox"
+          />
+          <FormInputText
+            name="password"
+            label="Password"
+            type="password"
+            className="textBox"
+          />
+          <Button
+            variant="contained"
+            type="submit"
+            fullWidth
+            className="button"
+          >
+            Login
+          </Button>
+        </form>
+      </FormProvider>
+    </div>
   );
 };
 

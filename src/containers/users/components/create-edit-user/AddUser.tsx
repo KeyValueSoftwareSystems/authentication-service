@@ -17,7 +17,9 @@ import { FieldValues } from "react-hook-form";
 const AddUser: React.FC = () => {
   const navigate = useNavigate();
 
-  const [userPermissions,setUserPermissions] = useState<GroupPermissionsDetails[]>([]);
+  const [userPermissions, setUserPermissions] = useState<
+    GroupPermissionsDetails[]
+  >([]);
   const [userGroupIds, setUserGroupIds] = useState<string[]>([]);
 
   const [createUser, { error: createUserError, data }] =
@@ -32,8 +34,11 @@ const AddUser: React.FC = () => {
     if (data) updateUserInfo();
   }, [data]);
 
-
-  const onCreateUser = (inputs: FieldValues,userGroupIds:string[],userPermissions:GroupPermissionsDetails[]) => {
+  const onCreateUser = (
+    inputs: FieldValues,
+    userGroupIds: string[],
+    userPermissions: GroupPermissionsDetails[]
+  ) => {
     createUser({
       variables: {
         input: inputs,
@@ -68,12 +73,8 @@ const AddUser: React.FC = () => {
     });
   };
 
-
   return (
-    <UserForm
-      createUser={onCreateUser}
-      userformSchema={AddUserformSchema}
-    />
+    <UserForm createUser={onCreateUser} userformSchema={AddUserformSchema} />
   );
 };
 

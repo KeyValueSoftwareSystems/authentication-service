@@ -1,114 +1,112 @@
-.container{
-    padding: 5px 0px 5px 0px;
-    box-shadow: aliceblue;
+.container {
+  padding: 5px 0px 5px 0px;
+  box-shadow: aliceblue;
 }
 
-.set{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+.set {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
-.set1{
-    display: flex;
-    flex-direction: column;
-    width: inherit;
+.set1 {
+  display: flex;
+  flex-direction: column;
+  width: inherit;
 }
 
-.set3{
-    width: inherit;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
+.set3 {
+  width: inherit;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-.access-setting{
-    display: flex;
-    align-items: center;
-    font-size: x-small;
-    padding: 5px 0px 5px 0px;
-    color: rgba(47,47,47,.6);
+.access-setting {
+  display: flex;
+  align-items: center;
+  font-size: x-small;
+  padding: 5px 0px 5px 0px;
+  color: rgba(47, 47, 47, 0.6);
 }
 
-.create-group{
-    font-size: large;
-    font-weight: 500;
-    padding: 5px 0px 10px 0px
+.create-group {
+  font-size: large;
+  font-weight: 500;
+  padding: 5px 0px 10px 0px;
 }
 
-
-.group-name{
-    margin-top: 20px !important;
-    width: 50% !important;
+.group-name {
+  margin-top: 20px !important;
+  width: 50% !important;
 }
 
-.description{
-    margin-top: 20px !important;
-    width: 50% !important;
+.description {
+  margin-top: 20px !important;
+  width: 50% !important;
 }
 
-.form{
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
 }
 
-.button{
-    text-transform: none !important;
+.button {
+  text-transform: none !important;
 }
 
-.access-settings{
-    width: 100%;
-    font-size: large;
-    padding: 10px 0px 10px 15px;
-    font-weight: 500;
+.access-settings {
+  width: 100%;
+  font-size: large;
+  padding: 10px 0px 10px 15px;
+  font-weight: 500;
 }
 
-.add-members{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    row-gap: 15px;
+.add-members {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 15px;
 }
 
-.roles{
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 5px;
+.roles {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 5px;
 }
 
-.role{
-    padding: 10px 5px 5px 0px ;
+.role {
+  padding: 10px 5px 5px 0px;
 }
 
-.role-name{
-    font-weight: 600;
+.role-name {
+  font-weight: 600;
 }
 
-.role-description{
-    font-size: 14px;
-    color: rgba(47,47,47,.6);
+.role-description {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.6);
 }
 
-.header{
-    padding-left: 4px;
-    font-weight: 600;
-    margin-bottom: 16px;
+.header {
+  padding-left: 4px;
+  font-weight: 600;
+  margin-bottom: 16px;
 }
 
-.chips{
-    padding-left: 5;
-    display: flex;
-    flex-wrap: wrap;
+.chips {
+  padding-left: 5;
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.permission-chip{
-    font-size: 16px !important;
-    margin-right: 16px;
-    margin-bottom: 8px;
-    background: aliceblue !important;
-
+.permission-chip {
+  font-size: 16px !important;
+  margin-right: 16px;
+  margin-bottom: 8px;
+  background: aliceblue !important;
 }

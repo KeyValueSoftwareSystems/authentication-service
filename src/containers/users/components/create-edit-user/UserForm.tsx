@@ -13,7 +13,10 @@ import {
 import { useLazyQuery, useQuery } from "@apollo/client";
 import FormInputText from "../../../../components/inputText";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
-import { GroupPermissionsDetails, Permission } from "../../../../types/permission";
+import {
+  GroupPermissionsDetails,
+  Permission,
+} from "../../../../types/permission";
 import { GET_USER } from "../../services/queries";
 import { Group, User } from "../../../../types/user";
 
@@ -73,8 +76,10 @@ const UserForm = (props: any) => {
   const [getGroupPermissionsData] = useLazyQuery(GET_GROUP_PERMISSIONS);
 
   const removeGroup = (group: string) => {
-    setUserGroupIds(userGroupIds.filter((groupId)=>groupId!==group));
-    setUserPermissions(userPermissions.filter((permission)=>permission.groupId!==group));
+    setUserGroupIds(userGroupIds.filter((groupId) => groupId !== group));
+    setUserPermissions(
+      userPermissions.filter((permission) => permission.groupId !== group)
+    );
   };
 
   const handleChange = (
@@ -184,7 +189,12 @@ const UserForm = (props: any) => {
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tab
           label="Groups & Permissions"
-          sx={{ textTransform: "none", color:' rgb(23, 119, 240);', fontWeight:'bolder'}}/>
+          sx={{
+            textTransform: "none",
+            color: " rgb(23, 119, 240);",
+            fontWeight: "bolder",
+          }}
+        />
       </Box>
 
       <div id="groups-permissions">
@@ -204,7 +214,13 @@ const UserForm = (props: any) => {
               return (
                 <div key={group.groupId}>
                   {group?.permissions.map((permission: Permission) => {
-                    return <Chip id="item" key={permission.id} label={permission.name} />;
+                    return (
+                      <Chip
+                        id="item"
+                        key={permission.id}
+                        label={permission.name}
+                      />
+                    );
                   })}
                 </div>
               );

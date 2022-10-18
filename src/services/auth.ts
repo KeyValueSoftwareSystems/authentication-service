@@ -1,9 +1,7 @@
-
 import LocalStorage from "./storage";
 
 const ACCESS_TOKEN = "access_token";
 const REFRESH_TOKEN = "refresh_token";
-
 
 interface UserToken {
   accessToken: string;

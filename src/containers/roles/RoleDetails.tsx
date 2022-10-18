@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { RoleDetailsAtom } from "../../states/roleStates";
 import { RolePermissionsAtom } from "../../states/permissionsStates";
-import "../groups/components/create-edit/details/styles.css"
+import "../groups/components/create-edit/details/styles.css";
 import { GET_ROLE, GET_ROLE_PERMISSIONS } from "./services/queries";
 import { Chip } from "@mui/material";
 

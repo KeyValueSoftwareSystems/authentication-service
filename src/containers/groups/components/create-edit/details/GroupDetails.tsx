@@ -5,7 +5,11 @@ import { useRecoilState } from "recoil";
 import { groupDetailsAtom } from "../../../../../states/groupStates";
 import { GroupPermissionsAtom } from "../../../../../states/permissionsStates";
 import { GroupRolesAtom } from "../../../../../states/roleStates";
-import { GET_GROUP, GET_GROUP_PERMISSIONS, GET_GROUP_ROLES } from "../../../services/queries";
+import {
+  GET_GROUP,
+  GET_GROUP_PERMISSIONS,
+  GET_GROUP_ROLES,
+} from "../../../services/queries";
 import "./styles.css";
 
 const GroupDetails: React.FC = () => {

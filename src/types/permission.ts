@@ -8,7 +8,6 @@ export interface RolePermissionsDetails {
   rolePermissions: Permission[];
 }
 
-
 export interface GroupPermissionsDetails {
   groupId: string;
   permissions: Permission[];

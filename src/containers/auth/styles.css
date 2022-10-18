@@ -1,8 +1,7 @@
 .container {
-  width:50%;
+  width: 50%;
   display: flex;
   justify-content: space-around;
-
 }
 
 .containerLogin {
@@ -10,7 +9,7 @@
   margin-top: 275px;
 }
 
-.box {
+.textBox {
   margin-bottom: 20px !important;
   margin-top: 20px !important;
   background-color: white;
@@ -33,13 +32,12 @@
 
 .login-page {
   width: 100%;
-  display: flex; 
-  align-items: flex-start; 
+  display: flex;
+  align-items: flex-start;
 }
 
-#login-image{
-
+#login-image {
   padding: 10px 10px 0px 10px;
-  width:90%;
+  width: 90%;
   height: 98vh;
 }
