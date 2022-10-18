@@ -5,12 +5,16 @@ import Sort from "../sort/Sort";
 import { TableToolBarProps } from "./types";
 import "./tabletoolbar.css";
 import SearchBar from "../search-bar/SearchBar";
+import { useNavigate } from "react-router-dom";
 
 const TableToolBar: FC<TableToolBarProps> = ({
   text,
   searchLabel,
   buttonLabel,
+  onAdd,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="table-toolbar">
       <legend className="legend-title">{text}</legend>
@@ -22,7 +26,9 @@ const TableToolBar: FC<TableToolBarProps> = ({
           <SearchBar searchLabel={searchLabel} />
         </div>
         <div className="toolbar-button">
-          <Button variant="outlined">{buttonLabel}</Button>
+          <Button variant="outlined" onClick={onAdd}>
+            {buttonLabel}
+          </Button>
         </div>
       </div>
     </div>

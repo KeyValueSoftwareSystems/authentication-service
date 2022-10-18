@@ -5,6 +5,10 @@ export interface Role {
   name: string;
 }
 
+export interface NewRole {
+  name: string;
+}
+
 export interface RolePermission {
   rolePermission: Permission[];
 }

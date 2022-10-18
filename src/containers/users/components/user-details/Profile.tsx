@@ -2,17 +2,7 @@ import { useState } from "react";
 
 import { useQuery } from "@apollo/client";
 
-import {
-  styled,
-  Box,
-  Paper,
-  Grid,
-  Divider,
-  Link,
-  Chip,
-  List,
-  ListItem,
-} from "@mui/material";
+import { styled, Box, Paper, Grid, Divider, Link, Chip } from "@mui/material";
 
 import {
   GET_USER,
@@ -20,6 +10,8 @@ import {
   GET_USER_PERMISSIONS,
 } from "../../services/queries";
 import { User, Group, Permission } from "../../../../types/user";
+import { useParams } from "react-router-dom";
+import "./styles.css";
 
 const Item = styled(Paper)(() => ({
   backgroundColor: "#fff",
@@ -27,43 +19,32 @@ const Item = styled(Paper)(() => ({
 }));
 
 const Profile = () => {
+  const { id } = useParams();
+
   const [user, setUser] = useState<User>();
   const [userGroups, setUserGroups] = useState<Group[]>();
   const [userPermissions, setUserPermissions] = useState<Permission[]>();
 
-  const { data, loading, refetch } = useQuery(GET_USER, {
-    //Replace with userId
-    variables: { id: "324a43e0-e919-4394-b171-a8a2e3c72807" },
+  useQuery(GET_USER, {
+    variables: { id: id },
     onCompleted: (data) => {
       setUser(data?.getUser);
     },
   });
 
-  const {
-    data: groupsData,
-    loading: groupsLoading,
-    refetch: groupsRefetch,
-  } = useQuery(GET_USER_GROUPS, {
-    //Replace with userId
-    variables: { id: "324a43e0-e919-4394-b171-a8a2e3c72807" },
+  useQuery(GET_USER_GROUPS, {
+    variables: { id: id },
     onCompleted: (data) => {
       setUserGroups(data?.getUserGroups);
     },
   });
 
-  const {
-    data: permissionsData,
-    loading: permissionsLoading,
-    refetch: permissionsRefetch,
-  } = useQuery(GET_USER_PERMISSIONS, {
-    //Replace with userId
-    variables: { id: "324a43e0-e919-4394-b171-a8a2e3c72807" },
+  useQuery(GET_USER_PERMISSIONS, {
+    variables: { id: id },
     onCompleted: (data) => {
       setUserPermissions(data?.getUserPermissions);
     },
   });
-
-  const testRoles = ["admin", "test", "dev"];
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -84,57 +65,47 @@ const Profile = () => {
             </div>
             <Divider flexItem />
             <div className="contact">
-              <div>Contact No:</div>
+              <div style={{ fontWeight: 600 }}>Contact No:</div>
               <div>{user?.phone}</div>
             </div>
+            <Divider flexItem />
+            <div className="contact">
+              <div style={{ fontWeight: 600 }}>Status:</div>{/* To integrate with status api */}
+              <Chip
+                label={"Active"}
+                sx={{ fontSize: "20px", background: "#D3F4BE" }}
+              />
+            </div>
+            <Divider
+              flexItem
+              className="divider-horizontal"
+              sx={{ marginTop: 1 }}
+            />
           </Item>
         </Grid>
-        <Divider orientation="vertical" flexItem light />
+        <Divider
+          orientation="vertical"
+          flexItem
+          light
+          className="divider-vertical"
+        />
         <Grid item sm={10} md={7}>
           <Item className="grid-item2" elevation={0}>
-            <div className="roles">
-              <div>Roles</div>
-              <div className="items">
-                {testRoles.map((role, index) => (
-                  <Chip
-                    label={role}
-                    sx={{ marginRight: 2, marginBottom: 1 }}
-                    key={index}
-                    color="primary"
-                  />
-                ))}
-              </div>
-            </div>
-            <Divider flexItem />
-            <div className="group-permissions">
-              <div>Role Groups</div>
+            <div className="user-groups">
+              <div>Groups</div>
               <div className="items">
                 {userGroups?.map((group, index) => (
-                  <Chip
-                    label={group?.name}
-                    sx={{ marginRight: 2, marginBottom: 1 }}
-                    key={index}
-                    color="primary"
-                  />
+                  <Chip label={group?.name} className="chip" key={index} />
                 ))}
               </div>
             </div>
             <Divider flexItem />
-            <div className="group-permissions">
+            <div className="user-permissions">
               <div>Permissions</div>
               <div className="items">
-                <List sx={{ listStyleType: "disc", paddingLeft: 2 }}>
-                  {userPermissions?.map((permission, index) => (
-                    <ListItem
-                      sx={{
-                        display: "list-item",
-                      }}
-                      key={index}
-                    >
-                      {permission?.name}
-                    </ListItem>
-                  ))}
-                </List>
+                {userPermissions?.map((permission, index) => (
+                  <Chip label={permission?.name} key={index} className="chip" />
+                ))}
               </div>
             </div>
           </Item>

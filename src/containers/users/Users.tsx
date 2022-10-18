@@ -1,16 +1,19 @@
 import React from "react";
 import { useRecoilState } from "recoil";
 import { useMutation, useQuery } from "@apollo/client";
-import { GridColumns } from "@mui/x-data-grid";
+import { GridColumns, GridRowParams } from "@mui/x-data-grid";
 import { Chip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import { GET_USERS, GET_USER_GROUPS } from "./services/queries";
-import "./styles.css";
 import { DELETE_USER } from "./services/mutations";
 import { userListAtom } from "../../states/userStates";
 import TableList from "../../components/table/Table";
+import "./components/create-edit-user/styles.css";
 
 const Users: React.FC = () => {
+  const navigate = useNavigate();
+
   useMutation(DELETE_USER, {
     refetchQueries: [{ query: GET_USERS }],
   });
@@ -22,6 +25,14 @@ const Users: React.FC = () => {
       setUserList(data?.getUsers);
     },
   });
+
+  const onEdit = (id: any) => {
+    navigate(`/home/users/add/${id}`);
+  };
+
+  const onAdd = () => {
+    navigate(`/home/users/add`);
+  };
 
   const columns: GridColumns = [
     {
@@ -41,16 +52,23 @@ const Users: React.FC = () => {
     },
   ];
 
+  const onUserClick = (params: GridRowParams) => {
+    navigate(`./${params.id}`);
+  };
+
   return (
     <>
       <TableList
         rows={userList}
         columns={columns}
         text="All Users"
+        onAdd={onAdd}
+        onEdit={onEdit}
         buttonLabel="Add User"
         searchLabel="Search User"
         deleteMutation={DELETE_USER}
         refetchQuery={GET_USERS}
+        handleRowClick={onUserClick}
       />
     </>
   );
@@ -70,11 +88,15 @@ const ShowGroupList = (props: any) => {
   });
 
   return (
-    <>
+    <div className="chips">
       {groupList?.map((group: any) => (
-        <Chip label={group?.name} key={group?.id} />
+        <Chip
+          label={group.name}
+          key={group.id}
+          sx={{ marginRight: 1, marginTop: 1, fontSize: "14px" }}
+        />
       ))}
-    </>
+    </div>
   );
 };
 

@@ -6,12 +6,17 @@
     margin-top: 20px;
     width: 95%;
   }
+  
   #checkbox input:checked ~ #checkbox {
     background-color: gray;
   }
-  #add-groups {
+  
+  #add-items {
     margin-top: 50px;
+    width:50%;
+    padding-right: 5px;
   }
+  
   #titleChecklist {
     font-size: 16px;
     color: #040404;
@@ -19,13 +24,16 @@
   .checklistLabel {
     margin-left: 10px;
   }
+  
   #component {
     overflow-y: scroll;
-    width: 40%;
+    width: 90%;
   }
+  
   #titlebar{
       display: flex;
   }
+  
   #selectall{
       margin-left:10px;
       font-size: 14px;

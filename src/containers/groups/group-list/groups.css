@@ -1,0 +1,10 @@
+.rolesvalue {
+  color: #2d2d2d;
+  padding: 4px 6px;
+  margin: 0 6px 6px 0;
+  background: rgba(196, 196, 196, 0.3);
+  border-radius: 6px;
+  font-size: 12px !important;
+  display: flex;
+  flex-wrap: wrap;
+}

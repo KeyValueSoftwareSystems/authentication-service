@@ -21,7 +21,7 @@ import "./styles.css";
 import GroupForm from "./GroupForm";
 import { GET_GROUP_ROLES } from "../../services/queries";
 import { getUniquePermissions } from "../../../../utils/permissions";
-import { ChecklistComponent } from "../../../../components/checklist/checkList";
+import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import {
   Permission,
   RolePermissionsDetails,
@@ -71,8 +71,7 @@ const CreateOrEditGroup = () => {
     setValue(newValue);
   };
 
-  const [getData, { data: rolePermissions, loading, refetch }] =
-    useLazyQuery(GET_ROLE_PERMISSIONS);
+  const [getData] = useLazyQuery(GET_ROLE_PERMISSIONS);
 
   const { data: roleData } = useQuery(GET_ROLES, {
     onCompleted: (data) => {
@@ -81,17 +80,14 @@ const CreateOrEditGroup = () => {
     },
   });
 
-  const { data: groupRoles, loading: groupRolesloading } = useQuery(
-    GET_GROUP_ROLES,
-    {
-      skip: !id,
-      variables: { id: id },
-      onCompleted: (data) => {
-        const groupRoleIds = data?.getGroupRoles?.map((item: Role) => item.id);
-        setRoles([...roles, ...groupRoleIds]);
-      },
-    }
-  );
+  const { loading: groupRolesloading } = useQuery(GET_GROUP_ROLES, {
+    skip: !id,
+    variables: { id: id },
+    onCompleted: (data) => {
+      const groupRoleIds = data?.getGroupRoles?.map((item: Role) => item.id);
+      setRoles([...roles, ...groupRoleIds]);
+    },
+  });
 
   const removeItem = (item: string) => {
     const itemIndex = roles.findIndex((e: string) => e === item);
@@ -110,7 +106,6 @@ const CreateOrEditGroup = () => {
     item?: Role
   ) => {
     const value = event.target.value;
-    console.log(item);
 
     if (event.target.checked) {
       if (value === "all") {
@@ -145,8 +140,6 @@ const CreateOrEditGroup = () => {
   };
 
   const onCreateGroup = (inputs: FieldValues) => {
-    console.log(inputs);
-
     createGroup({
       variables: {
         input: inputs,
@@ -256,7 +249,7 @@ const CreateOrEditGroup = () => {
                       <Chip
                         label={item.name}
                         key={index}
-                        sx={{ marginRight: 2, marginBottom: 1 }}
+                        className="permission-chip"
                       />
                     )
                   )

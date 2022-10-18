@@ -40,6 +40,20 @@
   background-color: #00aeef;
   color: white;
 }
+
+.active-text-link {
+  background-color: #00aeef;
+  color: white;
+  height: 40px;
+  text-decoration: inherit;
+  margin: 10px 0px 20px 20px;
+  display: flex;
+  border-radius: 20px 0px 0px 20px;
+  align-items: center;
+  padding: 5px 10px 5px 20px;
+}
+
+
 .body {
   background-color: #fafafa;
   display: flex;
@@ -60,7 +74,10 @@
 }
 
 .navLogo {
+  margin-top: 20px;
   width: 300px;
+  height:60px;
   background-color: aliceblue;
   padding: 6px 0px 6px 20px;
 }
+

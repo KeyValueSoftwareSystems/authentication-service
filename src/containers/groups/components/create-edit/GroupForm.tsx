@@ -36,8 +36,6 @@ const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
   const { handleSubmit } = methods;
 
   const onSubmitForm = (input: FieldValues) => {
-    console.log(input);
-
     id ? editGroup(input) : createGroup(input);
   };
 
@@ -45,8 +43,8 @@ const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
     <div className="container">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)} className="form">
-          <div className="box">
-            <div className="box1">
+          <div className="set">
+            <div className="set1">
               <div className="access-setting">
                 <ArrowBackIcon sx={{ height: 15 }} />
                 Access setting
@@ -55,14 +53,14 @@ const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
                 {id ? "Edit Group" : "Create Group"}
               </div>
             </div>
-            <Stack className="box2" spacing={2} direction="row">
+            <div className="set3">
               <Button variant="text" className="button">
                 Cancel
               </Button>
               <Button variant="outlined" className="button" type="submit">
                 {id ? "Update Group" : "Create Group"}
               </Button>
-            </Stack>
+            </div>
           </div>
           <Divider />
           {!loading && (
