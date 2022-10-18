@@ -1,13 +1,13 @@
 .container {
+  width:50%;
   display: flex;
   justify-content: space-around;
-  padding-top: 250px;
-  height: 100%;
-  /* background-color: aliceblue; */
+
 }
 
 .containerLogin {
-  width: 25%;
+  width: 50%;
+  margin-top: 275px;
 }
 
 .box {
@@ -25,4 +25,21 @@
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+}
+
+.left {
+  width: 50%;
+}
+
+.login-page {
+  width: 100%;
+  display: flex; 
+  align-items: flex-start; 
+}
+
+#login-image{
+
+  padding: 10px 10px 0px 10px;
+  width:90%;
+  height: 98vh;
 }
