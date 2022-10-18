@@ -34,7 +34,7 @@ const Login: React.FC = () => {
   return (
     <div className="login-page">
       <div className="left">
-        <img src={LOGIN_URL} id="login-image"/>
+        <img src={LOGIN_URL} alt="login image" id="login-image"/>
       </div>
       <div className="container">
         <LoginPassword onSubmitForm={onSubmitForm} />
