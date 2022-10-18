@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-
 export const GET_USER = gql`
   query getUser($id: ID!) {
     getUser(id: $id) {
@@ -33,7 +32,7 @@ export const GET_USER_GROUPS = gql`
   }
 `;
 
-export const  GET_USER_PERMISSIONS = gql`
+export const GET_USER_PERMISSIONS = gql`
   query getUserPermissions($id: ID!) {
     getUserPermissions(id: $id) {
       id

@@ -16,7 +16,6 @@ import { GroupPermissionsDetails } from "../../../../types/permission";
 import "./styles.css";
 
 const EditUser: React.FC = () => {
-
   const { id } = useParams();
 
   const [userPermissions, setUserPermissions] = useState<
@@ -24,17 +23,18 @@ const EditUser: React.FC = () => {
   >([]);
   const [selectedGroupIds, setUserGroupIds] = useState<string[]>([]);
 
-  const [updateUser,{ error: userUpdateError }] = useMutation(UPDATE_USER);
-  const [updateUserGroups,{ error: groupUpdateError }] = useMutation(UPDATE_USER_GROUPS);
-  const [updateUserPermissions,{ error: permissionUpdateError }] = useMutation(UPDATE_USER_PERMISSIONS);
+  const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
+  const [updateUserGroups, { error: groupUpdateError }] =
+    useMutation(UPDATE_USER_GROUPS);
+  const [updateUserPermissions, { error: permissionUpdateError }] = useMutation(
+    UPDATE_USER_PERMISSIONS
+  );
   const navigate = useNavigate();
 
   useQuery(GET_USER_GROUPS, {
     variables: { id },
     onCompleted: (data) => {
-      const groupIds= data?.getUserGroups.map((group:any) => 
-        group.id
-      );
+      const groupIds = data?.getUserGroups.map((group: any) => group.id);
       setUserGroupIds(groupIds);
     },
   });
@@ -54,9 +54,7 @@ const EditUser: React.FC = () => {
         },
       });
     });
-  
   }, [selectedGroupIds]);
-
 
   const onUpdateUser = (
     inputs: any,
@@ -95,7 +93,6 @@ const EditUser: React.FC = () => {
           navigate("/home/users");
       },
     });
-
   };
 
   return (
@@ -104,7 +101,8 @@ const EditUser: React.FC = () => {
       updateUser={onUpdateUser}
       userformSchema={EditUserformSchema}
       currentGroupIDs={selectedGroupIds}
-      currentUserPermissions={userPermissions}    />
+      currentUserPermissions={userPermissions}
+    />
   );
 };
 

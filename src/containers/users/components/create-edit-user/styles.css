@@ -18,7 +18,7 @@
   font-size: 14px !important;
 }
 
-.chips{
+.chips {
   display: flex;
   flex-wrap: wrap;
 }
@@ -144,18 +144,17 @@
 }
 
 #groups-permissions {
-
   display: flex;
   justify-content: flex-start;
 }
 
-#item-list{
+#item-list {
   margin-top: 15px;
   display: flex;
   flex-wrap: wrap;
 }
 
-#item{
+#item {
   background: #edf6ff;
   color: #007aff;
   margin: 5px 5px 5px 5px;

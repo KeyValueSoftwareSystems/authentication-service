@@ -28,7 +28,7 @@ const HomePage = () => {
                   }
                 >
                   <PeopleAltOutlinedIcon className="icon" />
-                  Users
+                  USERS
                 </NavLink>
                 <NavLink
                   to="/home/groups"
@@ -40,16 +40,22 @@ const HomePage = () => {
                   GROUPS
                 </NavLink>
 
-                <NavLink to="/home/roles" className={({ isActive }) =>
+                <NavLink
+                  to="/home/roles"
+                  className={({ isActive }) =>
                     isActive ? "active-text-link" : "text-link"
-                  }>
+                  }
+                >
                   <WorkOutlineOutlinedIcon className="icon" />
                   ROLES
                 </NavLink>
 
-                <NavLink to="/home/permissions" className={({ isActive }) =>
+                <NavLink
+                  to="/home/permissions"
+                  className={({ isActive }) =>
                     isActive ? "active-text-link" : "text-link"
-                  }>
+                  }
+                >
                   <LockOutlinedIcon className="icon" />
                   PERMISSIONS
                 </NavLink>

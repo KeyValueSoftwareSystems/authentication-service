@@ -9,13 +9,10 @@ export const permissionsListAtom = atom<Permission[]>({
 
 export const GroupPermissionsAtom = atom<Permission[]>({
   key: "GroupPermissionsList",
-  default: [
-  ],
+  default: [],
 });
-
 
 export const RolePermissionsAtom = atom<Permission[]>({
   key: "RolePermissions",
-  default: [
-  ],
+  default: [],
 });

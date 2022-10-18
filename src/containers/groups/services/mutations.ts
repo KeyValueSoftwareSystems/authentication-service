@@ -28,7 +28,10 @@ export const UPDATE_GROUP_ROLES = gql`
 `;
 
 export const UPDATE_GROUP_PERMISSIONS = gql`
-  mutation updateGroupPermissions($id: ID!, $input: UpdateGroupPermissionInput!) {
+  mutation updateGroupPermissions(
+    $id: ID!
+    $input: UpdateGroupPermissionInput!
+  ) {
     updateGroupPermissions(id: $id, input: $input) {
       id
       name
