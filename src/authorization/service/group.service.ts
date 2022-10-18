@@ -5,8 +5,9 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
+  UpdateGroupUserInput,
 } from '../../schema/graphql.schema';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Connection, createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -20,6 +21,9 @@ import GroupCacheService from './groupcache.service';
 import GroupRole from '../entity/groupRole.entity';
 import Role from '../entity/role.entity';
 import { RoleNotFoundException } from '../exception/role.exception';
+import { UserNotFoundException } from '../exception/user.exception';
+import UserCacheService from './usercache.service';
+import User from '../entity/user.entity';
 
 @Injectable()
 export class GroupService {
@@ -37,6 +41,10 @@ export class GroupService {
     private groupRoleRepository: Repository<GroupRole>,
     @InjectRepository(Role)
     private rolesRepository: Repository<Role>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private connection: Connection,
+    private userCacheService: UserCacheService,
   ) {}
 
   getAllGroups(): Promise<Group[]> {
@@ -49,6 +57,15 @@ export class GroupService {
       return group;
     }
     throw new GroupNotFoundException(id);
+  }
+
+  async getGroupUsers(id: string): Promise<User[]> {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId = user.id')
+      .where('userGroup.groupId = :groupId', { groupId: id })
+      .getMany();
+    return users;
   }
 
   async createGroup(group: NewGroupInput): Promise<Group> {
@@ -130,6 +147,43 @@ export class GroupService {
       .where('groupPermission.groupId = :groupId', { groupId: id })
       .getMany();
     return permissions;
+  }
+
+  async updateGroupUsers(
+    id: string,
+    input: UpdateGroupUserInput,
+  ): Promise<User[]> {
+    await this.getGroupById(id);
+    const usersInRequest = await this.userRepository.findByIds(input.users);
+    const existingUsersOfGroup = await this.getGroupUsers(id);
+
+    const validUsersInRequest: Set<string> = new Set(
+      usersInRequest.map((p) => p.id),
+    );
+    if (usersInRequest.length !== input.users.length) {
+      throw new UserNotFoundException(
+        input.users.filter((u) => !validUsersInRequest.has(u)).toString(),
+      );
+    }
+
+    const usersToBeRemovedFromGroup: UserGroup[] = existingUsersOfGroup
+      .filter((user) => !validUsersInRequest.has(user.id))
+      .map((user) => ({ userId: user.id, groupId: id }));
+    const userGroups = this.userGroupRepository.create(
+      input.users.map((userId) => ({ userId: userId, groupId: id })),
+    );
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const userGroupsRepo = entityManager.getRepository(UserGroup);
+      await userGroupsRepo.remove(usersToBeRemovedFromGroup);
+      await userGroupsRepo.save(userGroups);
+    });
+
+    const users = await this.getGroupUsers(id);
+    for (const user of users) {
+      await this.userCacheService.invalidateUserGroupsCache(user.id);
+    }
+    return users;
   }
 
   async getGroupRoles(id: string): Promise<Role[]> {

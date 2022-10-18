@@ -7,11 +7,13 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
+  UpdateGroupUserInput,
 } from '../../schema/graphql.schema';
 import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
+import User from '../entity/user.entity';
 
 @Resolver('Group')
 export class GroupResolver {
@@ -27,6 +29,12 @@ export class GroupResolver {
   @Query()
   getGroup(@Args('id', ParseUUIDPipe) id: string): Promise<Group> {
     return this.groupService.getGroupById(id);
+  }
+
+  @Permissions(PermissionsType.ViewGroups)
+  @Query()
+  getGroupUsers(@Args('id', ParseUUIDPipe) id: string): Promise<User[]> {
+    return this.groupService.getGroupUsers(id);
   }
 
   @Permissions(PermissionsType.CreateGroups)
@@ -51,6 +59,15 @@ export class GroupResolver {
     @Args('input') groupInput: UpdateGroupPermissionInput,
   ): Promise<Permission[]> {
     return this.groupService.updateGroupPermissions(id, groupInput);
+  }
+
+  @Permissions(PermissionsType.EditGroups)
+  @Mutation()
+  async updateGroupUsers(
+    @Args('id', ParseUUIDPipe) id: string,
+    @Args('input') groupInput: UpdateGroupUserInput,
+  ): Promise<User[]> {
+    return this.groupService.updateGroupUsers(id, groupInput);
   }
 
   @Permissions(PermissionsType.DeleteGroups)
