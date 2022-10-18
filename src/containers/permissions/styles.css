@@ -1,0 +1,19 @@
+.permissionList {
+  display: flex;
+  flex-wrap: wrap;
+}
+.topContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 70px;
+}
+
+.heading {
+  font-size: 26px;
+}
+
+.permissionContainer {
+  padding: 30px;
+}
