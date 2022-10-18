@@ -8,6 +8,7 @@ import RoleDetails from "../containers/roles/RoleDetails";
 import EditUser from "../containers/users/components/create-edit-user/EditUser";
 import { RoutePaths } from "./routePaths";
 import GroupDetails from "../containers/groups/components/create-edit/details/GroupDetails";
+import CreateOrEditGroup from "../containers/groups/components/create-edit/CreateEditGroup";
 
 
 const NotFound = lazy(() => import("../components/NotFound"));
@@ -40,7 +41,7 @@ const RoutesLayout: React.FC = () => {
           <Route path="users/add" element={<AddUser />} />
           <Route path="users/add/:id" element={<EditUser />} />
           <Route path={RoutePaths.groups} element={<Groups />} />
-          <Route path="groups/:id" element={<GroupDetails />}></Route>
+          <Route path="groups/:id" element={<CreateOrEditGroup />}></Route>
           <Route path={RoutePaths.roles} element={<Roles />} />
           <Route path="roles/:id" element={<RoleDetails />}></Route>
           <Route path="roles/add" element={<CreateOrEditRole />}></Route>

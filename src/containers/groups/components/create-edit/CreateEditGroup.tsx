@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useParams } from "react-router-dom";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { FieldValues } from "react-hook-form";
 
 import { Box, Tab, Tabs, Typography, Grid, Divider, Chip } from "@mui/material";
@@ -27,6 +27,7 @@ import {
   RolePermissionsDetails,
 } from "../../../../types/permission";
 import { Role } from "../../../../types/role";
+import apolloClient from "../../../../services/apolloClient";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -59,6 +60,8 @@ const CreateOrEditGroup = () => {
   const [roles, setRoles] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<RolePermissionsDetails[]>([]);
   const [allRoles, setAllRoles] = useState<string[]>([]);
+  const [status, setStatus] = useState<boolean>(false);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
 
   const [updateGroup] = useMutation(UPDATE_GROUP);
   const [createGroup, { data: createGroupData }] = useMutation(CREATE_GROUP);
@@ -70,8 +73,6 @@ const CreateOrEditGroup = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
-  const [getData] = useLazyQuery(GET_ROLE_PERMISSIONS);
 
   const { data: roleData } = useQuery(GET_ROLES, {
     onCompleted: (data) => {
@@ -109,22 +110,11 @@ const CreateOrEditGroup = () => {
 
     if (event.target.checked) {
       if (value === "all") {
+        setSelectAll(true);
         setRoles(allRoles);
         return;
       }
-      getData({
-        variables: { id: item?.id },
-        fetchPolicy: "no-cache",
-        onCompleted: (data) => {
-          setPermissions([
-            ...permissions,
-            {
-              roleId: item?.id as string,
-              rolePermissions: data?.getRolePermissions,
-            },
-          ]);
-        },
-      });
+      handlePermissions(item?.id as string);
       if (roles[0] === null) {
         setRoles([item?.id as string]);
       } else {
@@ -132,7 +122,9 @@ const CreateOrEditGroup = () => {
       }
     } else {
       if (value === "all") {
+        setSelectAll(false);
         setRoles([]);
+        setPermissions([]);
         return;
       }
       removeItem(item?.id as string);
@@ -188,29 +180,44 @@ const CreateOrEditGroup = () => {
     });
   };
 
-  // useEffect(() => {
-  //   if (permissions.length != roles.length)
-  //     roles.map((role) => {
-  //       getData({
-  //         variables: { id: role },
-  //         onCompleted: (data) => {
-  //           if (permissions[0]?.roleId === "") {
-  //             setPermissions([
-  //               { roleId: role, permissions: data?.getRolePermissions },
-  //             ]);
-  //           } else if (
-  //             permissions.map((item: any) => item.roleId).includes(role) ===
-  //             false
-  //           ) {
-  //             setPermissions([
-  //               ...permissions,
-  //               { roleId: role, permissions: data?.getRolePermissions },
-  //             ]);
-  //           }
-  //         },
-  //       });
-  //     });
-  // }, [roles]);
+  useEffect(() => {
+    if ((permissions.length === 0 && id) || selectAll)
+      roles.forEach((role) => handlePermissions(role));
+  }, [roles]);
+
+  useEffect(() => {
+    if (allRoles.length === roles.length) {
+      setSelectAll(true);
+    } else setSelectAll(false);
+  }, [allRoles,roles]);
+
+  const handlePermissions = async (role: string) => {
+    setStatus(true);
+    try {
+      const response = await apolloClient.query({
+        query: GET_ROLE_PERMISSIONS,
+        variables: {
+          id: role,
+        },
+      });
+
+      if (response?.data?.getRolePermissions) {
+        const currentPermissions = permissions;
+        if (
+          !currentPermissions.some((permission) => permission.roleId === role)
+        ) {
+          currentPermissions.push({
+            roleId: role as string,
+            permissions: response?.data?.getRolePermissions,
+          });
+          setPermissions([...currentPermissions]);
+        }
+      }
+    } finally {
+      setStatus(false);
+    }
+  };
+  console.log(selectAll, permissions);
 
   return (
     <div className="access-settings">
@@ -234,6 +241,7 @@ const CreateOrEditGroup = () => {
                   currentCheckedItems={roles}
                   name="Select roles"
                   onChange={onChange}
+                  selectAll={selectAll}
                 />
               )}
             </Grid>
@@ -244,7 +252,7 @@ const CreateOrEditGroup = () => {
               </div>
               <div className="chips">
                 {permissions?.map((permission, index) =>
-                  permission?.rolePermissions?.map(
+                  permission?.permissions?.map(
                     (item: Permission, index: number) => (
                       <Chip
                         label={item.name}

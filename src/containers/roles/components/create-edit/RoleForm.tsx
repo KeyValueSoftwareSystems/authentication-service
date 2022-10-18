@@ -50,8 +50,8 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
     <div className="container">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)} className="form">
-          <div className="box">
-            <div className="box1">
+          <div className="horizontal-bar">
+            <div className="page-header">
               <div className="access-setting" onClick={onClickBack}>
                 <ArrowBackIcon sx={{ height: 15 }} />
                 Roles Listing
@@ -60,7 +60,7 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
                 {id ? "Edit Role" : "Create Role"}
               </div>
             </div>
-            <Stack className="box2" spacing={2} direction="row">
+            <Stack className="submit-section" spacing={2} direction="row">
               <Button variant="text" className="button" onClick={onClickBack}>
                 Cancel
               </Button>

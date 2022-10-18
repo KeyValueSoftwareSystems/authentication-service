@@ -5,18 +5,18 @@
     box-shadow: aliceblue;
 }
 
-.box{
+.horizontal-bar{
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
 }
 
-.box1{
+.page-header{
     display: flex;
     flex-direction: column;
 }
 
-.box2{
+.submit-section{
     justify-content: center;
     align-items: center;
 }

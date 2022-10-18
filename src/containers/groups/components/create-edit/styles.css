@@ -3,19 +3,19 @@
     box-shadow: aliceblue;
 }
 
-.set{
+.top-bar{
     width: 100%;
     display: flex;
     justify-content: space-between;
 }
 
-.set1{
+.title-section{
     display: flex;
     flex-direction: column;
     width: inherit;
 }
 
-.set3{
+.button-section{
     width: inherit;
     display: flex;
     flex-direction: row;
