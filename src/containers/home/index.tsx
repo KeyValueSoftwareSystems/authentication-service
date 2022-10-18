@@ -1,19 +1,46 @@
-import { Link, Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
+
+import { useMutation } from "@apollo/client";
+import { Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Button } from "@mui/material";
+
 import { LOGO_URL } from "../../config";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
+import { LOGOUT } from "../auth/services/mutations";
+
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
+  const [logout] = useMutation(LOGOUT, {
+    onCompleted: () => {
+      CustomerAuth.clearTokens();
+      navigate("/login");
+    },
+  });
+
+  const onLogout = () => {
+    logout();
+  };
   return (
     <>
       <div className="wrapperContainer">
         <div className="navBar">
           <div className="navLogo">
             <img alt="logo" src={LOGO_URL} />
+          </div>
+          <div className="logout">
+            <Button
+              variant="outlined"
+              onClick={onLogout}
+              sx={{ textTransform: "none" }}
+            >
+              Logout
+            </Button>
           </div>
         </div>
 
