@@ -181,7 +181,7 @@ const CreateOrEditGroup = () => {
   };
 
   useEffect(() => {
-    if ((permissions.length === 0 && id) || selectAll)
+    if ((permissions.length === 0 ) || selectAll)
       roles.forEach((role) => handlePermissions(role));
   }, [roles]);
 
@@ -217,7 +217,6 @@ const CreateOrEditGroup = () => {
       setStatus(false);
     }
   };
-  console.log(selectAll, permissions);
 
   return (
     <div className="access-settings">
