@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import "./styles.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm, FormProvider, FieldValues } from "react-hook-form";
 import { Box, Button, Chip, Tab } from "@mui/material";
@@ -15,10 +14,11 @@ import FormInputText from "../../../../components/inputText";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import {
   GroupPermissionsDetails,
-  Permission,
 } from "../../../../types/permission";
 import { GET_USER } from "../../services/queries";
 import { Group, User } from "../../../../types/user";
+import "./styles.css";
+import apolloClient from "../../../../services/apolloClient";
 
 const UserForm = (props: any) => {
   const {
@@ -26,22 +26,65 @@ const UserForm = (props: any) => {
     updateUser,
     createUser,
     userformSchema,
-    currentGroupIDs,
-    currentUserPermissions,
+    currentGroups,
   } = props;
 
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<User>();
-  const [userGroupIds, setUserGroupIds] = useState<String[]>([]);
+  // const [userGroupIds, setUserGroupIds] = useState<string[]>([]);
+  // const [groupList, setGroupList] = useState<Group[]>([]);
+
+  const [userGroups,setUserGroups]=useState<Group[]>([]);
+
   const [userPermissions, setUserPermissions] = useState<
     GroupPermissionsDetails[]
   >([]);
-  const [groupList, setGroupList] = useState<Group[]>([]);
+  const [allGroups, setAllGroups] = useState<Group[]>([]);
+ 
+  const [filteredPermission, setFilteredPermission] = useState<any[]>([]);
 
   useEffect(() => {
-    if (currentUserPermissions) setUserPermissions(currentUserPermissions);
-  }, [currentUserPermissions]);
+    if(id){
+    currentGroups.forEach((group: Group) => {
+      handlePermissions(group.id);
+    });
+    setUserGroups(currentGroups);
+  }
+  }, [currentGroups]);
+  
+
+  const handlePermissions = async (group: string) => {
+    const response = await apolloClient.query({
+      query: GET_GROUP_PERMISSIONS,
+      variables: {
+        id: group,
+      },
+    });
+    if (response) {
+      const currentPermissions = userPermissions;
+      if (
+        !currentPermissions.some((permission) => permission.groupId === group)
+      ) {
+        currentPermissions.push({
+          groupId: group,
+          permissions: response?.data?.getGroupPermissions,
+        });
+      }
+      setUserPermissions([...currentPermissions]);
+    }
+  };
+
+  const { data: groupData } = useQuery(GET_GROUPS, {
+    onCompleted: (data) => {
+      const groups = data?.getGroups.map((group: Group) => group);
+      setAllGroups([...groups]);
+    },
+  });
+
+  useEffect(() => {
+    getUniquePermissionNames();
+  }, [userPermissions]);
 
   const { loading } = useQuery(GET_USER, {
     skip: !id,
@@ -51,15 +94,9 @@ const UserForm = (props: any) => {
     },
   });
 
-  useQuery(GET_GROUPS, {
-    onCompleted: (data) => {
-      setGroupList(data?.getGroups);
-    },
-  });
-
   useEffect(() => {
-    if (isEdit) setUserGroupIds(currentGroupIDs);
-  }, [isEdit, currentGroupIDs]);
+    if (isEdit) setUserGroups(currentGroups);
+  }, [isEdit, currentGroups]);
 
   const methods = useForm({
     resolver: yupResolver(userformSchema),
@@ -69,16 +106,18 @@ const UserForm = (props: any) => {
 
   const onSubmitForm = (inputs: FieldValues) => {
     isEdit
-      ? updateUser(inputs, userGroupIds, userPermissions)
-      : createUser(inputs, userGroupIds, userPermissions);
+      ? updateUser(inputs, userGroups, userPermissions)
+      : createUser(inputs, userGroups, userPermissions);
   };
 
   const [getGroupPermissionsData] = useLazyQuery(GET_GROUP_PERMISSIONS);
 
-  const removeGroup = (group: string) => {
-    setUserGroupIds(userGroupIds.filter((groupId) => groupId !== group));
+  const removeGroup = (group: Group) => {
+    setUserGroups(
+      userGroups.filter((groupDetails) => groupDetails.id !== group.id)
+    );
     setUserPermissions(
-      userPermissions.filter((permission) => permission.groupId !== group)
+      userPermissions.filter((permission) => permission.groupId !== group.id)
     );
   };
 
@@ -86,22 +125,70 @@ const UserForm = (props: any) => {
     event: React.ChangeEvent<HTMLInputElement>,
     group: Group
   ) => {
-    if (event.target.checked) {
-      setUserGroupIds([...userGroupIds, group.id]);
+    const value = event.target.value;
 
-      getGroupPermissionsData({
-        variables: { id: group.id },
-        fetchPolicy: "no-cache",
-        onCompleted: (data) => {
-          setUserPermissions([
-            ...userPermissions,
-            { groupId: group.id, permissions: data?.getGroupPermissions },
-          ]);
-        },
-      });
+    if (event.target.checked) {
+      if (event.target.checked) {
+        if (value === "all") {
+          setUserGroups(allGroups);
+          allGroups.forEach((group) => {
+            handlePermissions(group.id);
+          });
+        } else {
+          setUserGroups([...userGroups, group]);
+        }
+        getGroupPermissionsData({
+          variables: { id: group.id },
+          fetchPolicy: "no-cache",
+          onCompleted: (data) => {
+            setUserPermissions([
+              ...userPermissions,
+              { groupId: group.id, permissions: data?.getGroupPermissions },
+            ]);
+          },
+        });
+      }
     } else {
-      removeGroup(group.id);
+      if (value === "all") {
+        setUserGroups([]);
+        setUserPermissions([]);
+      }
+      removeGroup(group);
     }
+  };
+
+  const getUniquePermissionNames = () => {
+    console.log(userPermissions)
+    const uniquePermissions: string[] = []
+     userPermissions.forEach((group) => 
+     {
+      group.permissions.forEach((item) => {
+        uniquePermissions.push(item.name);
+      })
+     }
+     )
+   setFilteredPermission([...Array.from(new Set(uniquePermissions))])
+}
+
+  const displayGroup = (tag: any) => {
+    const uniquePermissions: string[] = [];
+
+    if (tag === "overall") {
+      getUniquePermissionNames();
+    }
+
+    else {
+      userPermissions.forEach((group_permissions) => {
+        if (group_permissions.groupId === tag.id) {
+          group_permissions.permissions.forEach((permission) => {
+            uniquePermissions.push(permission.name);
+          });
+        }
+      });
+      setFilteredPermission([...uniquePermissions]);
+      console.log(filteredPermission);
+    }
+    return;
   };
 
   return (
@@ -200,30 +287,33 @@ const UserForm = (props: any) => {
       <div id="groups-permissions">
         <ChecklistComponent
           name="Select Groups"
-          mapList={groupList}
-          currentCheckedItems={currentGroupIDs}
+          mapList={groupData?.getGroups}
+          currentCheckedItems={userGroups}
           onChange={handleChange}
         />
 
         <div id="add-items">
-          <div id="permission-header">
-            <div> Permissions </div>
+          <span>Permissions</span>
+          <div id="permission-groupwise">
+            <Chip
+              id="group"
+              label="Overall Permissions"
+              onClick={(event: any) => displayGroup("overall")}
+            />
+            {userGroups?.map((group: Group) => {
+              return (
+                <Chip
+                  id="group"
+                  key={group.id}
+                  label={group.name}
+                  onClick={() => displayGroup(group)}
+                />
+              );
+            })}
           </div>
           <div id="permission-list">
-            {userPermissions?.map((group: GroupPermissionsDetails) => {
-              return (
-                <div key={group.groupId}>
-                  {group?.permissions.map((permission: Permission) => {
-                    return (
-                      <Chip
-                        id="item"
-                        key={permission.id}
-                        label={permission.name}
-                      />
-                    );
-                  })}
-                </div>
-              );
+            {filteredPermission?.map((permission) => {
+              return <Chip id="item" label={permission} />;
             })}
           </div>
         </div>

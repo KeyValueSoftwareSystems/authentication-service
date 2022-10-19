@@ -7,7 +7,7 @@ import AddUser from "../containers/users/components/create-edit-user/AddUser";
 import EditUser from "../containers/users/components/create-edit-user/EditUser";
 import { RoutePaths } from "./routePaths";
 import CreateOrEditGroup from "../containers/groups/components/create-edit/CreateEditGroup";
-import GroupDetails from "../containers/groups/components/create-edit/details/GroupDetails";
+import GroupDetails from "../containers/groups/components/details/GroupDetails";
 
 import RoleDetails from "../containers/roles/components/details/RoleDetails";
 

@@ -1,9 +1,10 @@
 import { FC } from "react";
+import { Entity } from "../../types/generic";
 import "./styles.css";
 interface ChecklistProps {
   name: String;
   mapList: any;
-  currentCheckedItems?: string[];
+  currentCheckedItems?: Entity[];
   onChange: (event: any, item?: any) => void;
   selectAll?: boolean;
 }
@@ -15,7 +16,7 @@ export const ChecklistComponent: FC<ChecklistProps> = ({
   selectAll,
 }) => {
   const isChecked = (id: string) => {
-    return currentCheckedItems.includes(id);
+    return currentCheckedItems.map((item)=>item.id).includes(id);
   };
 
   return (

@@ -158,11 +158,26 @@
   background: #edf6ff;
   color: #007aff;
   margin: 5px 5px 5px 5px;
+  height: 25px;
 }
 
 #permission-list {
   flex-wrap: wrap;
   display: flex;
-  margin-top: 20px;
+  margin-top: 10px;
   align-items: center;
+}
+
+#group {
+  margin-right: 5px;
+  margin-bottom: 5px;
+  height: 25px;
+  border-radius: 5px;
+  width: max-content;
+  line-height: 21px;
+}
+
+#permission-groupwise {
+  margin-top: 10px;
+  display: flex;
 }
