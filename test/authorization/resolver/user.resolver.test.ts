@@ -54,17 +54,6 @@ const groups: Group[] = [
   },
 ];
 
-// const userInputPermission: GqlSchema.User[] = [
-//   {
-//     id: users[0].id,
-//     email: users[0].email,
-//     phone: users[0].phone,
-//     firstName: users[0].firstName,
-//     lastName: users[0].lastName,
-//     permissions: permissions
-//   },
-// ];
-
 const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
@@ -133,23 +122,47 @@ describe('User Module', () => {
           });
       });
 
-      // it('should get single user permissions', () => {
-      //   const token = authenticationHelper.generateAccessToken(users[0]);
-      //   // userService
-      //   //   .getUserById(Arg.any())
-      //   //   .returns(Promise.resolve(users[0]));
-      //   return request(app.getHttpServer())
-      //     .post(gql)
-      //     .set('Authorization', `Bearer ${token}`)
-      //     .send({
-      //       query:
-      //         '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f9") { id email phone firstName lastName permissions{id,name} }}',
-      //     })
-      //     .expect(200)
-      //     .expect((res) => {
-      //       expect(res.body.data.getUser).toEqual(userInputPermission[0]);
-      //     });
-      // });
+      it('should get single users permissions', () => {
+        const userInPayload: User = {
+          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f9',
+          email: users[0].email,
+          phone: users[0].phone,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
+          origin: 'simple',
+        };
+
+        const finalResponse: GqlSchema.User = {
+          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f9',
+          email: users[0].email,
+          phone: users[0].phone,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
+          permissions: permissions,
+        };
+
+        const token = authenticationHelper.generateAccessToken(userInPayload);
+
+        userService
+          .getUserById('ae032b1b-cc3c-4e44-9197-276ca877a7f9')
+          .returns(Promise.resolve(userInPayload));
+
+        userService
+          .permissionsOfUser('ae032b1b-cc3c-4e44-9197-276ca877a7f9')
+          .returns(Promise.resolve(permissions));
+
+        return request(app.getHttpServer())
+          .post(gql)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            query:
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f9") { id email phone firstName lastName permissions { id name } }}',
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.data.getUser).toEqual(finalResponse);
+          });
+      });
 
       it('should update a user', () => {
         const token = authenticationHelper.generateAccessToken(users[0]);
