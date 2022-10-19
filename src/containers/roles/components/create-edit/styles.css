@@ -5,20 +5,20 @@
   box-shadow: aliceblue;
 }
 
-.space{
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+.horizontal-bar{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
-.space1 {
-  display: flex;
-  flex-direction: column;
+.page-header{
+    display: flex;
+    flex-direction: column;
 }
 
-.space2 {
-  justify-content: center;
-  align-items: center;
+.submit-section{
+    justify-content: center;
+    align-items: center;
 }
 
 .access-setting {
