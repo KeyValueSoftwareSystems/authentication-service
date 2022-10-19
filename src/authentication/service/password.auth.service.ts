@@ -68,7 +68,7 @@ export default class PasswordAuthService implements Authenticatable {
     if (!token) {
       throw new InvalidCredentialsException();
     }
-    return token;
+    return { ...token, user: userRecord };
   }
 
   async updatePassword(userId: string, passwordDetails: any): Promise<User> {

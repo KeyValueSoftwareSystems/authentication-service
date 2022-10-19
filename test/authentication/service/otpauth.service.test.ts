@@ -12,6 +12,7 @@ import TwilioOTPService from '../../../src/authentication/service/twilio.otp.ser
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import {
+  TokenResponse,
   UserOTPLoginInput,
   UserOTPSignupInput,
 } from '../../../src/schema/graphql.schema';
@@ -90,16 +91,25 @@ describe('test OTPAuthService', () => {
       username: '9112345678910',
       otp: '123456',
     };
+    const token = authenticationHelper.generateTokenForUser(users[0]);
+    const tokenResponse: TokenResponse = {
+      refreshToken: token.refreshToken,
+      accessToken: token.accessToken,
+      user: users[0],
+    };
 
     userService
-      .getUserDetailsByUsername('user@test.com', '9112345678910')
+      .getUserDetailsByUsername('9112345678910', '9112345678910')
       .returns(Promise.resolve(users[0]));
     userService
       .updateField(users[0].id, 'refreshToken', Arg.any())
       .returns(Promise.resolve(users[0]));
+    otpService.validateOTP(input.otp, users[0]).returns(Promise.resolve(true));
+    tokenService.getNewToken(users[0]).returns(Promise.resolve(tokenResponse));
     const resp = await otpAuthService.userLogin(input);
     expect(resp).toHaveProperty('accessToken');
     expect(resp).toHaveProperty('refreshToken');
+    expect(resp.user).toEqual(users[0]);
   });
 
   it('should not login user if otp is not valid', async () => {

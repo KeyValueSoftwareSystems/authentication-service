@@ -65,7 +65,7 @@ export default class OTPAuthService implements Authenticatable {
     if (!token) {
       throw new InvalidCredentialsException();
     }
-    return token;
+    return { ...token, user: userRecord };
   }
 
   async sendOTP(phoneNumber: string): Promise<void> {
