@@ -479,4 +479,87 @@ describe('test UserService', () => {
     );
     expect(resp).toEqual(false);
   });
+
+  it('should return all permissions of a user', async () => {
+    const userGroups: UserGroup[] = [
+      {
+        userId: '5228e8a3-5901-46a5-86c2-47611e41538a',
+        groupId: '8958f72e-6986-42f9-8089-f1e9dc291a1b',
+      },
+    ];
+    const userPermissions = [
+      {
+        userId: '5228e8a3-5901-46a5-86c2-47611e41538a',
+        permissionId: 'b7896dde-adce-41a4-88e5-37b0bbd94051',
+      },
+    ];
+    const groupPermissions = [
+      {
+        groupId: '8958f72e-6986-42f9-8089-f1e9dc291a1b',
+        permissionId: '920159fb-66c4-445c-a907-8a055b317c58',
+      },
+    ];
+    const groupRoles = [
+      {
+        groupId: 'a8f55c77-4f8f-4a12-99f9-8962144e08f0',
+        roleId: 'fb357f0c-1287-4d3a-be77-3eececfbfb77',
+      },
+    ];
+    const groupRolePermissions = [
+      {
+        roleId: 'fb357f0c-1287-4d3a-be77-3eececfbfb77',
+        permissionId: '366ad922-464c-4e48-a26b-d8d5a9090763',
+      },
+    ];
+    const permissions: Permission[] = [
+      {
+        id: 'b7896dde-adce-41a4-88e5-37b0bbd94051',
+        name: 'CreateEmployee',
+      },
+      {
+        id: '920159fb-66c4-445c-a907-8a055b317c58',
+        name: 'DeleteEmployee',
+      },
+      {
+        id: '366ad922-464c-4e48-a26b-d8d5a9090763',
+        name: 'EditEmployee',
+      },
+    ];
+    userCacheService
+      .getUserGroupsByUserId('5228e8a3-5901-46a5-86c2-47611e41538a')
+      .resolves(userGroups.map((x) => x.groupId));
+    groupCacheService
+      .getGroupPermissionsFromGroupId('8958f72e-6986-42f9-8089-f1e9dc291a1b')
+      .resolves(groupPermissions.map((x) => x.permissionId));
+    groupCacheService
+      .getGroupRolesFromGroupId('8958f72e-6986-42f9-8089-f1e9dc291a1b')
+      .resolves(groupRoles.map((x) => x.roleId));
+    roleCacheService
+      .getRolePermissionsFromRoleId('fb357f0c-1287-4d3a-be77-3eececfbfb77')
+      .resolves(groupRolePermissions.map((x) => x.permissionId));
+    userCacheService
+      .getUserPermissionsByUserId('5228e8a3-5901-46a5-86c2-47611e41538a')
+      .resolves(userPermissions.map((x) => x.permissionId));
+    const resp = await userService.getAllUserpermissionIds(
+      '5228e8a3-5901-46a5-86c2-47611e41538a',
+    );
+    expect(resp).toEqual(
+      new Set([
+        'b7896dde-adce-41a4-88e5-37b0bbd94051',
+        '920159fb-66c4-445c-a907-8a055b317c58',
+        '366ad922-464c-4e48-a26b-d8d5a9090763',
+      ]),
+    );
+    permissionRepository
+      .findByIds([
+        'b7896dde-adce-41a4-88e5-37b0bbd94051',
+        '920159fb-66c4-445c-a907-8a055b317c58',
+        '366ad922-464c-4e48-a26b-d8d5a9090763',
+      ])
+      .resolves(permissions);
+    const response = await userService.permissionsOfUser(
+      '5228e8a3-5901-46a5-86c2-47611e41538a',
+    );
+    expect(response).toEqual(permissions);
+  });
 });

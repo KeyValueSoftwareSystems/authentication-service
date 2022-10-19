@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import UserService from '../../../src/authorization/service/user.service';
-import Substitute from '@fluffy-spoon/substitute';
+import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
@@ -12,9 +12,11 @@ import {
   UpdateUserPermissionInput,
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
+import * as GqlSchema from '../../../src/schema/graphql.schema';
 import Group from '../../../src/authorization/entity/group.entity';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
+import Permission from 'src/authorization/entity/permission.entity';
 
 const users: User[] = [
   {
@@ -38,7 +40,7 @@ const usersInput: UserSignupResponse[] = [
   },
 ];
 
-const permissions = [
+const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
@@ -51,6 +53,18 @@ const groups: Group[] = [
     name: 'Customers',
   },
 ];
+
+// const userInputPermission: GqlSchema.User[] = [
+//   {
+//     id: users[0].id,
+//     email: users[0].email,
+//     phone: users[0].phone,
+//     firstName: users[0].firstName,
+//     lastName: users[0].lastName,
+//     permissions: permissions
+//   },
+// ];
+
 const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
@@ -111,13 +125,31 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName }}',
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName  }}',
           })
           .expect(200)
           .expect((res) => {
             expect(res.body.data.getUser).toEqual(usersInput[0]);
           });
       });
+
+      // it('should get single user permissions', () => {
+      //   const token = authenticationHelper.generateAccessToken(users[0]);
+      //   // userService
+      //   //   .getUserById(Arg.any())
+      //   //   .returns(Promise.resolve(users[0]));
+      //   return request(app.getHttpServer())
+      //     .post(gql)
+      //     .set('Authorization', `Bearer ${token}`)
+      //     .send({
+      //       query:
+      //         '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f9") { id email phone firstName lastName permissions{id,name} }}',
+      //     })
+      //     .expect(200)
+      //     .expect((res) => {
+      //       expect(res.body.data.getUser).toEqual(userInputPermission[0]);
+      //     });
+      // });
 
       it('should update a user', () => {
         const token = authenticationHelper.generateAccessToken(users[0]);

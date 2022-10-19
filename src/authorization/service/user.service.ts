@@ -22,6 +22,8 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
+import { UserContext } from 'twilio/lib/rest/chat/v1/service/user';
+import { not } from '@hapi/joi';
 
 @Injectable()
 export default class UserService {
@@ -196,7 +198,7 @@ export default class UserService {
     return user;
   }
 
-  private async getAllUserpermissionIds(id: string): Promise<Set<string>> {
+  public async getAllUserpermissionIds(id: string): Promise<Set<string>> {
     const userGroups = await this.userCacheService.getUserGroupsByUserId(id);
     const groupPermissions: string[] = (
       await Promise.all(
@@ -227,6 +229,17 @@ export default class UserService {
       userPermissions.concat(groupPermissions, groupRolePermissions),
     );
     return allPermissionsOfUser;
+  }
+
+  public async permissionsOfUser(id: string) {
+    const setOfPermissions: Set<string> = await this.getAllUserpermissionIds(
+      id,
+    );
+    const arrOfPermissions = Array.from(setOfPermissions);
+    const allPermissions = await this.permissionRepository.findByIds(
+      arrOfPermissions,
+    );
+    return allPermissions;
   }
 
   async verifyUserPermissions(
