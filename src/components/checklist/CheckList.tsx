@@ -32,7 +32,7 @@ export const ChecklistComponent: FC<ChecklistProps> = ({
               <input
                 type="checkbox"
                 key={item.id}
-                defaultChecked={isChecked(item.id)}
+                checked={isChecked(item.id)}
                 onChange={(e) => onChange(e, item)}
               />
               <span className="checklistLabel">{item.name}</span>

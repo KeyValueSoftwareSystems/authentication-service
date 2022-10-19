@@ -42,7 +42,7 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
     id ? editRole(input) : createRole(input);
   };
 
-  const onClickBack = () => {
+  const onBackNavigation = () => {
     navigate("/home/roles");
   };
 
@@ -50,9 +50,9 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
     <div className="container">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)} className="form">
-          <div className="box">
-            <div className="box1">
-              <div className="access-setting" onClick={onClickBack}>
+          <div className="space">
+            <div className="space1">
+              <div className="access-setting" onClick={onBackNavigation}>
                 <ArrowBackIcon sx={{ height: 15 }} />
                 Roles Listing
               </div>
@@ -60,14 +60,18 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
                 {id ? "Edit Role" : "Create Role"}
               </div>
             </div>
-            <Stack className="box2" spacing={2} direction="row">
-              <Button variant="text" className="button" onClick={onClickBack}>
+            <div className="space2">
+              <Button
+                variant="text"
+                className="button"
+                onClick={onBackNavigation}
+              >
                 Cancel
               </Button>
               <Button variant="outlined" className="button" type="submit">
                 {id ? "Update Role" : "Create Role"}
               </Button>
-            </Stack>
+            </div>
           </div>
           <Divider />
           {!loading && (

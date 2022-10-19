@@ -5,7 +5,7 @@ export interface Permission {
 
 export interface RolePermissionsDetails {
   roleId: string;
-  rolePermissions: Permission[];
+  permissions: Permission[];
 }
 
 export interface GroupPermissionsDetails {
