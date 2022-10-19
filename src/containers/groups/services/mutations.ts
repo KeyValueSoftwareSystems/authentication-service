@@ -38,3 +38,12 @@ export const UPDATE_GROUP_PERMISSIONS = gql`
     }
   }
 `;
+
+export const DELETE_GROUP = gql`
+  mutation ($id: ID!) {
+    deleteGroup(id: $id) {
+      id
+      name
+    }
+  }
+`;

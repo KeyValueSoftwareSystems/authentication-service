@@ -7,6 +7,7 @@ import AddUser from "../containers/users/components/create-edit-user/AddUser";
 import EditUser from "../containers/users/components/create-edit-user/EditUser";
 import { RoutePaths } from "./routePaths";
 import CreateOrEditGroup from "../containers/groups/components/create-edit/CreateEditGroup";
+import GroupDetails from "../containers/groups/components/create-edit/details/GroupDetails";
 
 import RoleDetails from "../containers/roles/components/details/RoleDetails";
 
@@ -40,7 +41,9 @@ const RoutesLayout: React.FC = () => {
           <Route path="users/add" element={<AddUser />} />
           <Route path="users/add/:id" element={<EditUser />} />
           <Route path={RoutePaths.groups} element={<Groups />} />
-          <Route path="groups/:id" element={<CreateOrEditGroup />}></Route>
+          <Route path="groups/:id" element={<GroupDetails />}></Route>
+          <Route path="groups/add" element={<CreateOrEditGroup />}></Route>
+          <Route path="groups/edit/:id" element={<CreateOrEditGroup />}></Route>
           <Route path={RoutePaths.roles} element={<Roles />} />
           <Route path="roles/:id" element={<RoleDetails />}></Route>
           <Route path="roles/add" element={<CreateOrEditRole />}></Route>

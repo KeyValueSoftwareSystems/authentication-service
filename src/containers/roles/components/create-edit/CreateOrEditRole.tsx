@@ -21,9 +21,9 @@ const CreateOrEditRole = () => {
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
   const [allPermissions, setAllPermissions] = useState<string[]>([]);
 
-  const [createRole, { data: createRoleData }] = useMutation(CREATE_ROLE);
-  const [updateRole, { data: updateRoleData }] = useMutation(UPDATE_ROLE);
-  const [updateRolePermissions, { data: updateRolePermissionsData }] =
+  const [createRole, { data: createdRoleData }] = useMutation(CREATE_ROLE);
+  const [updateRole, { data: updatedRoleData }] = useMutation(UPDATE_ROLE);
+  const [updateRolePermissions, { data: updatedRolePermissionsData }] =
     useMutation(UPDATE_ROLE_PERMISSIONS);
 
   const { data: permissionsData } = useQuery(GET_PERMISSIONS, {
@@ -72,19 +72,20 @@ const CreateOrEditRole = () => {
   };
 
   useEffect(() => {
-    if (createRoleData)
+    if (createdRoleData)
       updateRolePermissions({
         variables: {
-          id: createRoleData?.createRole?.id,
+          id: createdRoleData?.createRole?.id,
           input: { permissions: rolePermissions },
         },
         onCompleted: () => navigate("/home/roles"),
       });
-  }, [createRoleData]);
+  }, [createdRoleData]);
 
   useEffect(() => {
-    if (updateRoleData && updateRolePermissionsData) navigate("/home/roles");
-  }, [updateRoleData, updateRolePermissionsData]);
+    if (updatedRoleData && updatedRolePermissionsData) navigate("/home/roles");
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updatedRoleData, updatedRolePermissionsData]);
 
   const onCreateRole = (inputs: NewRole) => {
     createRole({ variables: { input: inputs } });

@@ -23,12 +23,13 @@
     align-items: center;
 }
 
-.access-setting {
-  display: flex;
-  align-items: center;
-  font-size: x-small;
-  padding: 5px 0px 5px 0px;
-  color: rgba(47, 47, 47, 0.6);
+.access-setting{
+    display: flex;
+    align-items: center;
+    font-size: x-small;
+    padding: 5px 0px 5px 0px;
+    color: rgba(47,47,47,.6);
+    cursor: pointer;
 }
 
 .create-group {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
+import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues } from "react-hook-form";
 
 import { Box, Tab, Tabs, Typography, Grid, Divider, Chip } from "@mui/material";
@@ -56,6 +56,9 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const CreateOrEditGroup = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [value, setValue] = useState(0);
   const [roles, setRoles] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<RolePermissionsDetails[]>([]);
@@ -63,12 +66,12 @@ const CreateOrEditGroup = () => {
   const [status, setStatus] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
 
-  const [updateGroup] = useMutation(UPDATE_GROUP);
-  const [createGroup, { data: createGroupData }] = useMutation(CREATE_GROUP);
-  const [updateGroupRoles] = useMutation(UPDATE_GROUP_ROLES);
-  const [updateGroupPermissions] = useMutation(UPDATE_GROUP_PERMISSIONS);
-
-  const { id } = useParams();
+  const [updateGroup, { data: updatedGroupData }] = useMutation(UPDATE_GROUP);
+  const [createGroup, { data: createdGroupData }] = useMutation(CREATE_GROUP);
+  const [updateGroupRoles, { data: updatedGroupRolesData }] =
+    useMutation(UPDATE_GROUP_ROLES);
+  const [updateGroupPermissions, { data: updatedGroupPermissionsData }] =
+    useMutation(UPDATE_GROUP_PERMISSIONS);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -140,22 +143,35 @@ const CreateOrEditGroup = () => {
   };
 
   useEffect(() => {
-    if (createGroupData) {
+    if (createdGroupData) {
       updateGroupRoles({
         variables: {
-          id: createGroupData?.createGroup?.id,
+          id: createdGroupData?.createGroup?.id,
           input: { roles: roles },
         },
       });
 
       updateGroupPermissions({
         variables: {
-          id: createGroupData?.createGroup?.id,
+          id: createdGroupData?.createGroup?.id,
           input: { permissions: getUniquePermissions(permissions) },
         },
       });
     }
-  }, [createGroupData]);
+  }, [createdGroupData]);
+
+  useEffect(() => {
+    if (createdGroupData || updatedGroupData)
+      if (updatedGroupRolesData && updatedGroupPermissionsData) {
+        navigate("/home/groups");
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    createdGroupData,
+    updatedGroupData,
+    updatedGroupRolesData,
+    updatedGroupPermissionsData,
+  ]);
 
   const onEditGroup = (inputs: FieldValues) => {
     updateGroup({
