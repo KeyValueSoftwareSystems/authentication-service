@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewGroupInput,
@@ -45,6 +45,11 @@ describe('test Group Service', () => {
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const roleRepository = Substitute.for<Repository<Role>>();
+  const connectionMock = Substitute.for<Connection>();
+  const permissionQueryBuilder = Substitute.for<
+    SelectQueryBuilder<Permission>
+  >();
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -79,6 +84,10 @@ describe('test Group Service', () => {
         },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
+        {
+          provide: Connection,
+          useValue: connectionMock,
+        },
       ],
     }).compile();
     groupService = moduleRef.get<GroupService>(GroupService);
@@ -144,7 +153,27 @@ describe('test Group Service', () => {
       .resolves(permissions);
 
     groupPermissionRepository.create(request).returns(request);
-    groupPermissionRepository.save(request, Arg.any()).resolves(request);
+
+    permissionRepository
+      .createQueryBuilder('permission')
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .leftJoinAndSelect(
+        GroupPermission,
+        'groupPermission',
+        'permission.id = groupPermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder
+      .where('groupPermission.groupId = :groupId', {
+        groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder.getMany().resolves(permissions);
+
+    connectionMock.transaction(Arg.any()).resolves(request);
 
     const resp = await groupService.updateGroupPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

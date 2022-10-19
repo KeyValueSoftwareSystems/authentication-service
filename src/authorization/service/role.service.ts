@@ -5,7 +5,7 @@ import {
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Connection, createQueryBuilder, Repository } from 'typeorm';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
 import Permission from '../entity/permission.entity';
@@ -29,6 +29,7 @@ export class RoleService {
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
     private roleCacheService: RoleCacheService,
+    private connection: Connection,
   ) {}
 
   async getAllRoles(): Promise<Role[]> {
@@ -88,6 +89,11 @@ export class RoleService {
     const permissionsInRequest = await this.permissionRepository.findByIds(
       request.permissions,
     );
+    const existingPermissionsOfRole = await this.getRolePermissions(id);
+    const validPermissionsInRequest: Set<string> = new Set(
+      permissionsInRequest.map((p) => p.id),
+    );
+
     if (permissionsInRequest.length !== request.permissions.length) {
       const validPermissions = permissionsInRequest.map((p) => p.id);
       throw new PermissionNotFoundException(
@@ -96,28 +102,37 @@ export class RoleService {
           .toString(),
       );
     }
+
+    const permissionsToBeRemovedFromRole: RolePermission[] = existingPermissionsOfRole
+      .filter((p) => !validPermissionsInRequest.has(p.id))
+      .map((p) => ({ permissionId: p.id, roleId: id }));
+
     const rolePermissions = this.rolePermissionRepository.create(
       request.permissions.map((permission) => ({
         roleId: id,
         permissionId: permission,
       })),
     );
-    const savedRolePermissions = await this.rolePermissionRepository.save(
-      rolePermissions,
-    );
-    const permissions = await this.permissionRepository.findByIds(
-      savedRolePermissions.map((r) => r.permissionId),
-    );
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const rolePermissionsRepo = entityManager.getRepository(RolePermission);
+      await rolePermissionsRepo.remove(permissionsToBeRemovedFromRole);
+      await rolePermissionsRepo.save(rolePermissions);
+    });
+
+    const permissions = await this.getRolePermissions(id);
+
     await this.roleCacheService.invalidateRolePermissionsByRoleId(id);
     return permissions;
   }
 
   async getRolePermissions(id: string): Promise<Permission[]> {
-    const permissions = await createQueryBuilder<Permission>('permission')
+    const permissions = await this.permissionRepository
+      .createQueryBuilder('permission')
       .leftJoinAndSelect(
         RolePermission,
         'rolePermission',
-        'Permission.id = rolePermission.permissionId',
+        'permission.id = rolePermission.permissionId',
       )
       .where('rolePermission.roleId = :roleId', { roleId: id })
       .getMany();
