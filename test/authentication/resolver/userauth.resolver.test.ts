@@ -83,11 +83,11 @@ describe('Userauth Module', () => {
           password: 's3cr3t1234567890',
         };
         const user = {
-          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-          email: 'user@test.com',
-          phone: '9112345678910',
-          firstName: 'Test',
-          lastName: 'User',
+          id: users[0].id,
+          email: users[0].email,
+          phone: users[0].phone,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
         };
         const tokenResponse = {
           accessToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
@@ -191,11 +191,11 @@ describe('Userauth Module', () => {
     it('should refresh the token', () => {
       const token = authenticationHelper.generateTokenForUser(users[0]);
       const user = {
-        id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-        email: 'user@test.com',
-        phone: '9112345678910',
-        firstName: 'Test',
-        lastName: 'User',
+        id: users[0].id,
+        email: users[0].email,
+        phone: users[0].phone,
+        firstName: users[0].firstName,
+        lastName: users[0].lastName,
       };
       const tokenResponse: TokenResponse = { ...token, user: user };
       tokenService

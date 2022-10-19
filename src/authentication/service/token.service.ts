@@ -21,7 +21,8 @@ export class TokenService {
     }
     const token = this.authenticationHelper.generateTokenForUser(userRecord);
     token.refreshToken = refreshToken;
-    return { ...token, user: userRecord };
+    const tokenResponse: TokenResponse = { ...token, user: userRecord };
+    return tokenResponse;
   }
 
   async resetToken(id: string): Promise<void> {
@@ -35,6 +36,7 @@ export class TokenService {
       'refreshToken',
       token.refreshToken,
     );
-    return { ...token, user: userRecord };
+    const tokenResponse: TokenResponse = { ...token, user: userRecord };
+    return tokenResponse;
   }
 }
