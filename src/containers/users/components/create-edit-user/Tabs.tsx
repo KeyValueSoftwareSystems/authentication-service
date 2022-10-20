@@ -35,7 +35,6 @@ const Tab = styled(TabUnstyled)`
 
   &.${tabUnstyledClasses.selected} {
     background-color: aliceBlue;
-    color: #007aff;
   }
 
   &.${buttonUnstyledClasses.disabled} {
