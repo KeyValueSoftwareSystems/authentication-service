@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import UserService from '../../../src/authorization/service/user.service';
-import Substitute, { Arg } from '@fluffy-spoon/substitute';
+import Substitute from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
@@ -114,7 +114,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName  }}',
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") { id email phone firstName lastName }}',
           })
           .expect(200)
           .expect((res) => {
