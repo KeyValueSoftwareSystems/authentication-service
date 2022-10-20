@@ -157,6 +157,7 @@ export interface IMutation {
 export interface TokenResponse {
     refreshToken: string;
     accessToken: string;
+    user: User;
 }
 
 export interface UserSignupResponse {
