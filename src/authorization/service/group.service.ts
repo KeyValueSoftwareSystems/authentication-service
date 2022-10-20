@@ -166,16 +166,7 @@ export class GroupService {
 
   async updateGroupUsers(id: string, userIds: string[]): Promise<User[]> {
     await this.getGroupById(id);
-    const usersInRequest = await this.userRepository.findByIds(userIds);
-    const validUsersInRequest: Set<string> = new Set(
-      usersInRequest.map((p) => p.id),
-    );
-    if (usersInRequest.length !== userIds.length) {
-      throw new UserNotFoundException(
-        userIds.filter((u) => !validUsersInRequest.has(u)).toString(),
-      );
-    }
-
+    const validUsersInRequest = await this.validateUsers(userIds);
     const existingUsersOfGroup = await this.getGroupUsers(id);
 
     const usersToBeRemovedFromGroup: UserGroup[] = existingUsersOfGroup
@@ -196,6 +187,19 @@ export class GroupService {
       await this.userCacheService.invalidateUserGroupsCache(user.id);
     }
     return users;
+  }
+
+  private async validateUsers(userIds: string[]): Promise<Set<string>> {
+    const usersInRequest = await this.userRepository.findByIds(userIds);
+    const validUsersInRequest: Set<string> = new Set(
+      usersInRequest.map((p) => p.id),
+    );
+    if (usersInRequest.length !== userIds.length) {
+      throw new UserNotFoundException(
+        userIds.filter((u) => !validUsersInRequest.has(u)).toString(),
+      );
+    }
+    return validUsersInRequest;
   }
 
   async getGroupRoles(id: string): Promise<Role[]> {

@@ -31,7 +31,7 @@ export class GroupResolver {
   }
 
   @ResolveField('users')
-  async getUsersInGroupResolveField(group: Group) {
+  async getUsersByGroup(group: Group) {
     if (group.id) {
       return this.groupService.getGroupUsers(group.id);
     }
