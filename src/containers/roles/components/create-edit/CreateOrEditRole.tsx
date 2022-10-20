@@ -40,10 +40,10 @@ const CreateOrEditRole = () => {
     skip: !id,
     variables: { id: id },
     onCompleted: (data) => {
-      const permissionIds = data?.getRolePermissions?.map(
-        (permission: any) => permission.id
+      const permissions = data?.getRolePermissions?.map(
+        (permission: any) => permission
       );
-      setRolePermissions([...permissionIds]);
+      setRolePermissions([...permissions]);
     },
   });
 
