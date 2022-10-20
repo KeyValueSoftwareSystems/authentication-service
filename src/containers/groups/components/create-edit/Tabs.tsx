@@ -67,25 +67,57 @@ const TabsList = styled(TabsListUnstyled)(`
   `);
 
 const StyledTabs: React.FC<StyledTabsProps> = ({ permissions }) => {
-  console.log(permissions);
+  const [filteredPermission, setFilteredPermission] = React.useState<any[]>([]);
+  React.useEffect(() => {
+    getUniquePermissionNames();
+  }, [permissions]);
 
-  // const getOverallPermissionsValues = () => {
-  //   return getOverallPermissions(permissions).map((permission) => {
-  //     <Chip>{permission}</Chip>;
-  //   });
-  // };
+  const getUniquePermissionNames = () => {
+    const uniquePermissions: string[] = [];
+    permissions.forEach((role) => {
+      role.permissions.forEach((item) => {
+        uniquePermissions.push(item.name);
+      });
+    });
+    setFilteredPermission([...Array.from(new Set(uniquePermissions))]);
+  };
+
+  const displayGroup = (tag: any) => {
+    const uniquePermissions: string[] = [];
+
+    if (tag === "overall") {
+      getUniquePermissionNames();
+    } else {
+      permissions.forEach((role_permissions) => {
+        if (role_permissions.roleName === tag) {
+          role_permissions.permissions.forEach((permission) => {
+            uniquePermissions.push(permission.name);
+          });
+        }
+      });
+      setFilteredPermission([...uniquePermissions]);
+      console.log(filteredPermission);
+    }
+    return;
+  };
 
   return (
-    <TabsUnstyled defaultValue={0}>
+<TabsUnstyled defaultValue={0}>
       <TabsList>
-        {permissions.length && <Tab>Overall Permissions</Tab>}
+        {permissions.length && (
+          <Tab onClick={() => displayGroup("overall")}>Overall Permissions</Tab>
+        )}
         {permissions.map((item) => (
-          <Tab>{item.roleName}</Tab>
+          <Tab onClick={() => displayGroup(item.roleName)}>
+            {item.roleName}
+          </Tab>
         ))}
       </TabsList>
-      <TabPanel value={0}>{}</TabPanel>
-      <TabPanel value={1}>Profile page</TabPanel>
-      <TabPanel value={2}>Language page</TabPanel>
+      <div id="permission-list">
+        {filteredPermission?.map((permission) => {
+          return <Chip id="item" label={permission} />;
+        })}
+      </div>
     </TabsUnstyled>
   );
 };
