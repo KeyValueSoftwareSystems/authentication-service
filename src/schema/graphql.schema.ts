@@ -73,7 +73,8 @@ export interface NewGroupInput {
 }
 
 export interface UpdateGroupInput {
-    name: string;
+    name?: string;
+    users?: string[];
 }
 
 export interface UpdateGroupPermissionInput {
@@ -82,10 +83,6 @@ export interface UpdateGroupPermissionInput {
 
 export interface UpdateGroupRoleInput {
     roles: string[];
-}
-
-export interface UpdateGroupUserInput {
-    users: string[];
 }
 
 export interface NewPermissionInput {
@@ -143,7 +140,6 @@ export interface IMutation {
     createGroup(input: NewGroupInput): Group | Promise<Group>;
     updateGroup(id: string, input: UpdateGroupInput): Group | Promise<Group>;
     deleteGroup(id: string): Group | Promise<Group>;
-    updateGroupUsers(id: string, input: UpdateGroupUserInput): User[] | Promise<User[]>;
     updateGroupPermissions(id: string, input: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
     updateGroupRoles(id: string, input: UpdateGroupRoleInput): GroupRole[] | Promise<GroupRole[]>;
     createPermission(input: NewPermissionInput): Permission | Promise<Permission>;
@@ -189,7 +185,6 @@ export interface IQuery {
     getEntityPermissions(id: string): EntityPermission[] | Promise<EntityPermission[]>;
     getGroups(): Group[] | Promise<Group[]>;
     getGroup(id: string): Group | Promise<Group>;
-    getGroupUsers(id: string): User[] | Promise<User[]>;
     getGroupPermissions(id: string): GroupPermission[] | Promise<GroupPermission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
@@ -207,6 +202,7 @@ export interface IQuery {
 export interface Group {
     id: string;
     name: string;
+    users?: User[];
 }
 
 export interface GroupPermission {

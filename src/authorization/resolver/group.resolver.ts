@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   NewGroupInput,
   Permission,
@@ -7,7 +7,6 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
-  UpdateGroupUserInput,
 } from '../../schema/graphql.schema';
 import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
@@ -31,10 +30,11 @@ export class GroupResolver {
     return this.groupService.getGroupById(id);
   }
 
-  @Permissions(PermissionsType.ViewGroups)
-  @Query()
-  getGroupUsers(@Args('id', ParseUUIDPipe) id: string): Promise<User[]> {
-    return this.groupService.getGroupUsers(id);
+  @ResolveField('users')
+  async getUsersInGroupResolveField(group: Group) {
+    if (group.id) {
+      return this.groupService.getGroupUsers(group.id);
+    }
   }
 
   @Permissions(PermissionsType.CreateGroups)
@@ -59,15 +59,6 @@ export class GroupResolver {
     @Args('input') groupInput: UpdateGroupPermissionInput,
   ): Promise<Permission[]> {
     return this.groupService.updateGroupPermissions(id, groupInput);
-  }
-
-  @Permissions(PermissionsType.EditGroups)
-  @Mutation()
-  async updateGroupUsers(
-    @Args('id', ParseUUIDPipe) id: string,
-    @Args('input') groupInput: UpdateGroupUserInput,
-  ): Promise<User[]> {
-    return this.groupService.updateGroupUsers(id, groupInput);
   }
 
   @Permissions(PermissionsType.DeleteGroups)

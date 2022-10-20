@@ -5,7 +5,6 @@ import {
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
-  UpdateGroupUserInput,
 } from '../../schema/graphql.schema';
 import { Connection, createQueryBuilder, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
@@ -79,6 +78,9 @@ export class GroupService {
     if (!existingGroup) {
       throw new GroupNotFoundException(id);
     }
+    if (group.users) {
+      await this.updateGroupUsers(id, group.users);
+    }
     const groupToUpdate = this.groupsRepository.create(group);
     await this.groupsRepository.update(id, groupToUpdate);
     return {
@@ -149,28 +151,25 @@ export class GroupService {
     return permissions;
   }
 
-  async updateGroupUsers(
-    id: string,
-    input: UpdateGroupUserInput,
-  ): Promise<User[]> {
+  async updateGroupUsers(id: string, userIds: string[]): Promise<User[]> {
     await this.getGroupById(id);
-    const usersInRequest = await this.userRepository.findByIds(input.users);
-    const existingUsersOfGroup = await this.getGroupUsers(id);
-
+    const usersInRequest = await this.userRepository.findByIds(userIds);
     const validUsersInRequest: Set<string> = new Set(
       usersInRequest.map((p) => p.id),
     );
-    if (usersInRequest.length !== input.users.length) {
+    if (usersInRequest.length !== userIds.length) {
       throw new UserNotFoundException(
-        input.users.filter((u) => !validUsersInRequest.has(u)).toString(),
+        userIds.filter((u) => !validUsersInRequest.has(u)).toString(),
       );
     }
+
+    const existingUsersOfGroup = await this.getGroupUsers(id);
 
     const usersToBeRemovedFromGroup: UserGroup[] = existingUsersOfGroup
       .filter((user) => !validUsersInRequest.has(user.id))
       .map((user) => ({ userId: user.id, groupId: id }));
     const userGroups = this.userGroupRepository.create(
-      input.users.map((userId) => ({ userId: userId, groupId: id })),
+      userIds.map((userId) => ({ userId: userId, groupId: id })),
     );
 
     await this.connection.manager.transaction(async (entityManager) => {

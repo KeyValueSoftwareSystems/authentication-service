@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewGroupInput,
@@ -35,6 +35,18 @@ const permissions: Permission[] = [
   },
 ];
 
+const users: User[] = [
+  {
+    id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    email: 'user@test.com',
+    phone: '9112345678910',
+    password: 'SecretPassword',
+    firstName: 'Test1',
+    lastName: 'Test2',
+    origin: 'simple',
+  },
+];
+
 describe('test Group Service', () => {
   let groupService: GroupService;
   const groupRepository = Substitute.for<Repository<Group>>();
@@ -50,6 +62,7 @@ describe('test Group Service', () => {
   const roleRepository = Substitute.for<Repository<Role>>();
   const connectionMock = Substitute.for<Connection>();
   const userCacheService = Substitute.for<UserCacheService>();
+  const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -127,7 +140,7 @@ describe('test Group Service', () => {
     expect(resp).toEqual(groups[0]);
   });
 
-  it('should update a group', async () => {
+  it('should update name of a group', async () => {
     const input: UpdateGroupInput = {
       name: 'Test1',
     };
@@ -135,6 +148,38 @@ describe('test Group Service', () => {
     groupRepository
       .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
       .returns(Promise.resolve(Arg.any()));
+
+    const resp = await groupService.updateGroup(
+      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      input,
+    );
+    expect(resp).toEqual(groups[0]);
+  });
+
+  it('should update users in a group', async () => {
+    const input: UpdateGroupInput = {
+      users: ['ae032b1b-cc3c-4e44-9197-276ca877a7f8'],
+    };
+
+    userRepository.findByIds([users[0].id]).resolves(users);
+
+    userRepository.createQueryBuilder('user').returns(userQueryBuilder);
+    userQueryBuilder
+      .leftJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId = user.id')
+      .returns(userQueryBuilder);
+    userQueryBuilder
+      .where('userGroup.groupId = :groupId', {
+        groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(userQueryBuilder);
+    userQueryBuilder.getMany().resolves(users);
+
+    userGroupRepository.create(Arg.any()).returns({
+      userId: users[0].id,
+      groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    } as UserGroup);
+
+    connectionMock.transaction(Arg.any()).resolves(Arg.any());
 
     const resp = await groupService.updateGroup(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
