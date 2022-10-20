@@ -12,9 +12,11 @@ import {
   UpdateUserPermissionInput,
   UserSignupResponse,
 } from '../../../src/schema/graphql.schema';
+import * as GqlSchema from '../../../src/schema/graphql.schema';
 import Group from '../../../src/authorization/entity/group.entity';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { ConfigService } from '@nestjs/config';
+import Permission from 'src/authorization/entity/permission.entity';
 
 const users: User[] = [
   {
@@ -38,7 +40,7 @@ const usersInput: UserSignupResponse[] = [
   },
 ];
 
-const permissions = [
+const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
@@ -51,6 +53,7 @@ const groups: Group[] = [
     name: 'Customers',
   },
 ];
+
 const gql = '/graphql';
 
 const userService = Substitute.for<UserService>();
@@ -116,6 +119,48 @@ describe('User Module', () => {
           .expect(200)
           .expect((res) => {
             expect(res.body.data.getUser).toEqual(usersInput[0]);
+          });
+      });
+
+      it('should get single users permissions', () => {
+        const userInPayload: User = {
+          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f9',
+          email: users[0].email,
+          phone: users[0].phone,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
+          origin: 'simple',
+        };
+
+        const finalResponse: GqlSchema.User = {
+          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f9',
+          email: users[0].email,
+          phone: users[0].phone,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
+          permissions: permissions,
+        };
+
+        const token = authenticationHelper.generateAccessToken(userInPayload);
+
+        userService
+          .getUserById('ae032b1b-cc3c-4e44-9197-276ca877a7f9')
+          .returns(Promise.resolve(userInPayload));
+
+        userService
+          .permissionsOfUser('ae032b1b-cc3c-4e44-9197-276ca877a7f9')
+          .returns(Promise.resolve(permissions));
+
+        return request(app.getHttpServer())
+          .post(gql)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            query:
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f9") { id email phone firstName lastName permissions { id name } }}',
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.data.getUser).toEqual(finalResponse);
           });
       });
 

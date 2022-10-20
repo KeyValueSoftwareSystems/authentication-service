@@ -49,7 +49,7 @@ export class UserResolver {
   @ResolveField('permissions')
   async getUserPermissionResolveField(user: User) {
     if (user.id) {
-      return this.userService.getUserPermissions(user.id);
+      return this.userService.permissionsOfUser(user.id);
     }
   }
 

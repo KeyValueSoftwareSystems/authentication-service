@@ -196,7 +196,7 @@ export default class UserService {
     return user;
   }
 
-  private async getAllUserpermissionIds(id: string): Promise<Set<string>> {
+  public async getAllUserpermissionIds(id: string): Promise<Set<string>> {
     const userGroups = await this.userCacheService.getUserGroupsByUserId(id);
     const groupPermissions: string[] = (
       await Promise.all(
@@ -227,6 +227,17 @@ export default class UserService {
       userPermissions.concat(groupPermissions, groupRolePermissions),
     );
     return allPermissionsOfUser;
+  }
+
+  public async permissionsOfUser(id: string) {
+    const setOfPermissions: Set<string> = await this.getAllUserpermissionIds(
+      id,
+    );
+    const arrOfPermissions = Array.from(setOfPermissions);
+    const allPermissions = await this.permissionRepository.findByIds(
+      arrOfPermissions,
+    );
+    return allPermissions;
   }
 
   async verifyUserPermissions(
