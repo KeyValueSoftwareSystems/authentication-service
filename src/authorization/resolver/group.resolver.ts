@@ -91,9 +91,9 @@ export class GroupResolver {
   }
 
   @ResolveField('roles')
-  async getRolesOfGroup(groups: Group) {
-    if (groups.id) {
-      return this.groupService.getGroupRoles(groups.id);
+  async getRolesOfGroup(group: Group) {
+    if (group.id) {
+      return this.groupService.getGroupRoles(group.id);
     }
   }
 }
