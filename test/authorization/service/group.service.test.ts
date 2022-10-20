@@ -49,6 +49,7 @@ describe('test Group Service', () => {
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
+  const roleQueryBuilder = Substitute.for<SelectQueryBuilder<Role>>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -215,5 +216,28 @@ describe('test Group Service', () => {
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
     expect(resp).toEqual(groups[0]);
+  });
+
+  it('should get group roles', async () => {
+    const roles: Role[] = [
+      {
+        id: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+        name: 'Role1',
+      },
+    ];
+    roleRepository.createQueryBuilder('role').returns(roleQueryBuilder);
+    roleQueryBuilder
+      .leftJoinAndSelect(GroupRole, 'groupRole', 'role.id = groupRole.roleId')
+      .returns(roleQueryBuilder);
+    roleQueryBuilder
+      .where('groupRole.groupId = :groupId', {
+        groupId: '356c00da-7356-4b66-bc9c-901ad0ede230',
+      })
+      .returns(roleQueryBuilder);
+    roleQueryBuilder.getMany().resolves(roles);
+    const resp = await groupService.getGroupRoles(
+      '356c00da-7356-4b66-bc9c-901ad0ede230',
+    );
+    expect(resp).toEqual(roles);
   });
 });

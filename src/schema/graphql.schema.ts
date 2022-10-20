@@ -201,6 +201,7 @@ export interface IQuery {
 export interface Group {
     id: string;
     name: string;
+    roles?: Role[];
 }
 
 export interface GroupPermission {

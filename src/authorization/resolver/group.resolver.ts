@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   NewGroupInput,
   Permission,
@@ -80,5 +80,12 @@ export class GroupResolver {
   @Query()
   async getGroupRoles(@Args('id', ParseUUIDPipe) id: string): Promise<Role[]> {
     return this.groupService.getGroupRoles(id);
+  }
+
+  @ResolveField('roles')
+  async getRolesOfGroup(groups: Group) {
+    if (groups.id) {
+      return this.groupService.getGroupRoles(groups.id);
+    }
   }
 }

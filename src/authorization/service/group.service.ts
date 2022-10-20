@@ -147,8 +147,9 @@ export class GroupService {
   }
 
   async getGroupRoles(id: string): Promise<Role[]> {
-    const roles = await createQueryBuilder<Role>('role')
-      .leftJoinAndSelect(GroupRole, 'groupRole', 'Role.id = groupRole.roleId')
+    const roles = await this.rolesRepository
+      .createQueryBuilder('role')
+      .leftJoinAndSelect(GroupRole, 'groupRole', 'role.id = groupRole.roleId')
       .where('groupRole.groupId = :groupId', { groupId: id })
       .getMany();
     return roles;

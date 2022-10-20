@@ -1,6 +1,7 @@
 type Group {
   id: ID!
   name: String!
+  roles: [Role]
 }
 
 input NewGroupInput {
