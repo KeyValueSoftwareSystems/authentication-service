@@ -1,9 +1,10 @@
 import { useQuery } from "@apollo/client";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RoleDetailsAtom } from "../../../../states/roleStates";
 import { RolePermissionsAtom } from "../../../../states/permissionsStates";
-import "../../../groups/components/details/styles.css"
+import "../../../groups/components/details/styles.css";
 import { Chip } from "@mui/material";
 import { GET_ROLE, GET_ROLE_PERMISSIONS } from "../../services/queries";
 
@@ -11,6 +12,7 @@ const RoleDetails: React.FC = () => {
   const { id } = useParams();
   const [role, setRole] = useRecoilState(RoleDetailsAtom);
   const [permissions, setPermissions] = useRecoilState(RolePermissionsAtom);
+  const navigate = useNavigate();
 
   useQuery(GET_ROLE, {
     variables: { id },
@@ -28,6 +30,15 @@ const RoleDetails: React.FC = () => {
 
   return (
     <div id="group-details">
+      <div id="back-page">
+        <ArrowBackIcon
+          id="arrowicon"
+          onClick={() => {
+            navigate("/home/groups");
+          }}
+        />
+        Roles
+      </div>
       <legend id="group-title"> {role.name} </legend>
       <div id="rolesandpermissions">
         <div id="roles">
