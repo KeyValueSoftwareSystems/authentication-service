@@ -84,7 +84,7 @@ const CreateOrEditRole = () => {
 
   useEffect(() => {
     if (updatedRoleData && updatedRolePermissionsData) navigate("/home/roles");
-     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatedRoleData, updatedRolePermissionsData]);
 
   const onCreateRole = (inputs: NewRole) => {
@@ -102,7 +102,7 @@ const CreateOrEditRole = () => {
   };
 
   return (
-    <div>
+    <div className="roleContainer">
       <RoleForm createRole={onCreateRole} editRole={onEditRole} />
       <div className="role-permissions">
         <div className="permission-header"> Permissions</div>

@@ -45,7 +45,7 @@ const GroupDetails: React.FC = () => {
       <div id="rolesandpermissions">
         <div id="roles">
           <legend id="bold"> Group Roles </legend>
-          <div id="item-list">
+          <div id="item-list-details">
             {roles.map((item) => (
               <Chip id="item" key={item.id} label={item.name} />
             ))}
@@ -53,7 +53,7 @@ const GroupDetails: React.FC = () => {
         </div>
         <div id="roles">
           <legend id="bold"> Group Permissions </legend>
-          <div id="item-list">
+          <div id="item-list-details">
             {permissions.map((item) => (
               <Chip id="item" key={item.id} label={item.name} />
             ))}

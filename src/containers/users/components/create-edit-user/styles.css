@@ -28,7 +28,7 @@
   justify-content: space-between;
   margin-bottom: 5px;
   align-items: center;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 #add-cancel {
@@ -98,7 +98,12 @@
   flex-direction: row;
   color: gray;
   margin-bottom: 3px;
-  font-size: small;
+  font-size: medium;
+  cursor: pointer;
+}
+
+#back-page:hover {
+  color: #01579b;
 }
 
 #inputs {
@@ -120,13 +125,13 @@
 }
 
 #add {
-  border-radius: 20px;
+  /* border-radius: 20px;
   border: 1px solid rgb(23, 119, 240);
   color: rgb(23, 119, 240);
   height: 40px;
-  width: 80px;
-  margin-top: 10px;
-  font-size: 15px;
+  width: 80px; */
+  margin-left: 10px;
+  /* font-size: 15px; */
 }
 
 #legend {
@@ -134,7 +139,7 @@
 }
 
 #page {
-  padding: 15px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
 }
@@ -156,8 +161,9 @@
 
 #item {
   background: #edf6ff;
-  color: #007aff;
+  color: #01579b;
   margin: 5px 5px 5px 5px;
+  padding: 5px;
 }
 
 #permission-list {
@@ -165,4 +171,12 @@
   display: flex;
   margin-top: 20px;
   align-items: center;
+}
+
+.userGroups {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 20px;
+  margin-top: 20px;
+  font-size: 18px;
+  color: #01579b;
 }

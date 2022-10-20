@@ -5,30 +5,30 @@
   box-shadow: aliceblue;
 }
 
-.horizontal-bar{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+.horizontal-bar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
-.page-header{
-    display: flex;
-    flex-direction: column;
+.page-header {
+  display: flex;
+  flex-direction: column;
 }
 
-.submit-section{
-    justify-content: center;
-    align-items: center;
+.submit-section {
+  justify-content: center;
+  align-items: center;
 }
 
-.access-setting {
+/* .access-setting {
   display: flex;
   align-items: center;
   font-size: x-small;
   padding: 5px 0px 5px 0px;
   color: rgba(47, 47, 47, 0.6);
   cursor: pointer;
-}
+} */
 
 .create-role {
   font-size: large;
@@ -64,4 +64,8 @@
 .permission-header {
   font-size: large;
   font-weight: 500;
+}
+
+.roleContainer {
+  padding: 40px;
 }

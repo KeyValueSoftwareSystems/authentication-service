@@ -197,7 +197,7 @@ const CreateOrEditGroup = () => {
   };
 
   useEffect(() => {
-    if ((permissions.length === 0 ) || selectAll)
+    if (permissions.length === 0 || selectAll)
       roles.forEach((role) => handlePermissions(role));
   }, [roles]);
 
@@ -205,7 +205,7 @@ const CreateOrEditGroup = () => {
     if (allRoles.length === roles.length) {
       setSelectAll(true);
     } else setSelectAll(false);
-  }, [allRoles,roles]);
+  }, [allRoles, roles]);
 
   const handlePermissions = async (role: string) => {
     setStatus(true);
@@ -237,11 +237,14 @@ const CreateOrEditGroup = () => {
   return (
     <div className="access-settings">
       <GroupForm createGroup={onCreateGroup} editGroup={onEditGroup} />
-      <div>Access Settings and Users</div>
+      {/* <div>Access Settings and Users</div> */}
       <div>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={value} onChange={handleChange}>
-            <Tab label="Roles & Permissions" sx={{ textTransform: "none" }} />
+            <Tab
+              label="Roles & Permissions"
+              sx={{ textTransform: "none", fontSize: "18px" }}
+            />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>

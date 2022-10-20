@@ -3,38 +3,40 @@
   box-shadow: aliceblue;
 }
 
-.top-bar{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  align-items: center;
 }
 
-.title-section{
-    display: flex;
-    flex-direction: column;
-    width: inherit;
+.title-section {
+  display: flex;
+  flex-direction: column;
+  width: inherit;
 }
 
-.button-section{
-    width: inherit;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
+.button-section {
+  width: inherit;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-.access-setting{
+/* .access-setting{
     display: flex;
     align-items: center;
     font-size: x-small;
     padding: 5px 0px 5px 0px;
     color: rgba(47,47,47,.6);
     cursor: pointer;
-}
+} */
 
 .create-group {
-  font-size: large;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: bold;
   padding: 5px 0px 10px 0px;
 }
 
@@ -54,14 +56,16 @@
   margin-bottom: 20px;
 }
 
-.button {
-  text-transform: none !important;
+.buttonCreateGroup {
+  margin-left: 10px !important;
+  /* text-transform: none !important; */
 }
 
 .access-settings {
-  width: 100%;
+  /* width: 100%; */
   font-size: large;
-  padding: 10px 0px 10px 15px;
+  /* padding: 10px 0px 10px 15px; */
+  padding: 40px;
   font-weight: 500;
 }
 

@@ -1,5 +1,6 @@
 #group-details {
   margin: 10px 10px 10px 10px;
+  padding: 30px;
 }
 
 #bold {
@@ -23,14 +24,15 @@
 
 #item {
   background-color: #edf6ff;
-  color: #007aff;
+  color: #01579b;
   font-size: 17px;
   margin: 5px 5px 5px 5px;
+  padding: 5;
 }
 
-#item-list {
+#item-list-details {
   flex-wrap: wrap;
   display: flex;
-  margin-top: 10px;
+  margin-top: 20px;
   align-items: center;
 }

@@ -15,21 +15,23 @@ const theme = createTheme({
         // Name of the slot
         root: {
           // Some CSS
-          backgroundColor: "#039BE5",
+          // backgroundColor: "#039BE5",
           fontSize: "1rem",
-          height:"43px",
+          height: "43px",
         },
         outlined: {
-          boxShadow: 1,     
-          border: "1px solid #fafafa",
-          color: "#fafafa",
+          boxShadow: 1,
+          borderRadius: 20,
+          border: "1px solid #039BE5",
+          color: "#039BE5",
           "&:hover": {
-            border: "1px solid #039BE5",
-            color: "#039BE5",
+            border: "1px solid #01579B",
+            color: "#01579B",
           },
         },
         text: {
           color: "#636363",
+          backgroundColor: "transparent",
           "&:hover": {
             color: "#D32F2F",
             backgroundColor: "transparent",
@@ -62,11 +64,24 @@ const theme = createTheme({
     },
     MuiChip: {
       styleOverrides: {
-        root: { height: "100%", display: "flex", flexDirection: "column" },
+        root: {
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          color: "#01579B",
+        },
         label: {
           overflowWrap: "break-word",
           whiteSpace: "normal",
           textOverflow: "clip",
+          padding: "4px 12px",
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          fontSize: "14px",
         },
       },
     },

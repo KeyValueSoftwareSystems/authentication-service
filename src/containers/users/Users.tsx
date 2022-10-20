@@ -27,6 +27,7 @@ const Users: React.FC = () => {
     onCompleted: (data) => {
       setUserList(data?.getUsers);
     },
+    fetchPolicy: "network-only",
   });
 
   const onEdit = (id: any) => {
