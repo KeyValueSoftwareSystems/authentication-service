@@ -21,7 +21,6 @@ const EditUser: React.FC = () => {
   const [userPermissions] = useState<
     GroupPermissionsDetails[]
   >([]);
-  // const [selectedGroupIds, setUserGroupIds] = useState<string[]>([]);
   const [userGroups,setUserGroups]=useState<Group[]>([]);
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
@@ -34,9 +33,7 @@ const EditUser: React.FC = () => {
   useQuery(GET_USER_GROUPS, {
     variables: { id },
     onCompleted: (data) => {
-      // const groupIds = data?.getUserGroups.map((group: any) => group.id);
       const groupList=data?.getUserGroups.map((group: any) => group);
-      // setUserGroupIds(groupIds);
       setUserGroups(groupList)
     },
   });

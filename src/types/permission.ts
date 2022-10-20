@@ -11,5 +11,6 @@ export interface RolePermissionsDetails {
 
 export interface GroupPermissionsDetails {
   groupId: string;
+  groupName:string;
   permissions: Permission[];
 }
