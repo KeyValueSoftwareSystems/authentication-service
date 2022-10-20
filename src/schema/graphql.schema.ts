@@ -204,6 +204,7 @@ export interface Group {
     id: string;
     name: string;
     users?: User[];
+    roles?: Role[];
 }
 
 export interface GroupPermission {

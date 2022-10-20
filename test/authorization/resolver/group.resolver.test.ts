@@ -15,6 +15,8 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
+import Role from 'src/authorization/entity/role.entity';
+import * as GqlSchema from '../../../src/schema/graphql.schema';
 
 const gql = '/graphql';
 
@@ -200,6 +202,95 @@ describe('Group Module', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.data.updateGroupPermissions).toEqual(permissions);
+        });
+    });
+
+    it('should get a single group with role', () => {
+      const users: User[] = [
+        {
+          id: 'bac64eea-2e51-4397-ae5b-ce8d94d5dcc9',
+          email: 'user@test.com',
+          phone: '91123456988910',
+          password: 's3cr3t1234567890',
+          firstName: 'Test1',
+          lastName: 'Test2',
+          origin: 'simple',
+        },
+      ];
+      const groupInPayload: Group[] = [
+        {
+          id: '836cccce-8ff6-40e9-9fc7-2dd5cba3f514',
+          name: 'HR',
+        },
+      ];
+      const roles: Role[] = [
+        {
+          id: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+          name: 'Customers',
+        },
+      ];
+      const groups: GqlSchema.Group[] = [
+        {
+          id: '836cccce-8ff6-40e9-9fc7-2dd5cba3f514',
+          name: 'HR',
+          roles: roles,
+        },
+      ];
+      const token = authenticationHelper.generateAccessToken(users[0]);
+
+      groupService
+        .getGroupById('836cccce-8ff6-40e9-9fc7-2dd5cba3f514')
+        .returns(Promise.resolve(groupInPayload[0]));
+      groupService
+        .getGroupRoles('836cccce-8ff6-40e9-9fc7-2dd5cba3f514')
+        .returns(Promise.resolve(roles));
+      return request(app.getHttpServer())
+        .post(gql)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query:
+            ' { getGroup(id: "836cccce-8ff6-40e9-9fc7-2dd5cba3f514") {id name roles{ id name }}}',
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.getGroup).toEqual(groups[0]);
+        });
+    });
+
+    it('should get all the groups with roles', () => {
+      const users: User[] = [
+        {
+          id: 'e5651863-d600-42db-b7f3-c44d09eb8629',
+          email: 'user@test.com',
+          phone: '91123456988910',
+          password: 's3cr3t1234567890',
+          firstName: 'Test1',
+          lastName: 'Test2',
+          origin: 'simple',
+        },
+      ];
+      const roles: Role[] = [
+        {
+          id: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+          name: 'Role1',
+        },
+      ];
+      const finalResponse: GqlSchema.Group[] = [
+        {
+          id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+          name: 'Customers',
+          roles: roles,
+        },
+      ];
+      const token = authenticationHelper.generateAccessToken(users[0]);
+      return request(app.getHttpServer())
+        .post(gql)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query: '{getGroups {id name roles{id name}}}' })
+        .expect(200)
+        .expect((res) => {
+          res.body.data.getGroups[0].roles = roles;
+          expect(res.body.data.getGroups).toEqual(finalResponse);
         });
     });
   });
