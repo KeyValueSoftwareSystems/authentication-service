@@ -1,6 +1,7 @@
 type Group {
   id: ID!
   name: String!
+  users: [User]
 }
 
 input NewGroupInput {
@@ -8,7 +9,8 @@ input NewGroupInput {
 }
 
 input UpdateGroupInput {
-  name: String!
+  name: String
+  users: [ID!]
 }
 
 input UpdateGroupPermissionInput {
@@ -28,7 +30,6 @@ type GroupRole {
   id: ID!,
   name: String!
 }
-
 
 type Query {
   getGroups: [Group]!

@@ -73,7 +73,8 @@ export interface NewGroupInput {
 }
 
 export interface UpdateGroupInput {
-    name: string;
+    name?: string;
+    users?: string[];
 }
 
 export interface UpdateGroupPermissionInput {
@@ -202,6 +203,7 @@ export interface IQuery {
 export interface Group {
     id: string;
     name: string;
+    users?: User[];
 }
 
 export interface GroupPermission {

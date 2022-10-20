@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   NewGroupInput,
   Permission,
@@ -12,6 +12,7 @@ import Group from '../entity/group.entity';
 import { GroupService } from '../service/group.service';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
+import User from '../entity/user.entity';
 
 @Resolver('Group')
 export class GroupResolver {
@@ -27,6 +28,13 @@ export class GroupResolver {
   @Query()
   getGroup(@Args('id', ParseUUIDPipe) id: string): Promise<Group> {
     return this.groupService.getGroupById(id);
+  }
+
+  @ResolveField('users')
+  async getUsersByGroup(group: Group) {
+    if (group.id) {
+      return this.groupService.getGroupUsers(group.id);
+    }
   }
 
   @Permissions(PermissionsType.CreateGroups)
