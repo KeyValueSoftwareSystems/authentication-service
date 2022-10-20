@@ -2,7 +2,6 @@ import * as React from "react";
 import { styled } from "@mui/system";
 import TabsUnstyled from "@mui/base/TabsUnstyled";
 import TabsListUnstyled from "@mui/base/TabsListUnstyled";
-import TabPanelUnstyled from "@mui/base/TabPanelUnstyled";
 import { buttonUnstyledClasses } from "@mui/base/ButtonUnstyled";
 import TabUnstyled, { tabUnstyledClasses } from "@mui/base/TabUnstyled";
 import { GroupPermissionsDetails } from "../../../../types/permission";
@@ -36,7 +35,7 @@ const Tab = styled(TabUnstyled)`
 
   &.${tabUnstyledClasses.selected} {
     background-color: aliceBlue;
-    color: black;
+    color: #007aff;
   }
 
   &.${buttonUnstyledClasses.disabled} {
@@ -44,14 +43,6 @@ const Tab = styled(TabUnstyled)`
     cursor: not-allowed;
   }
 `;
-
-const TabPanel = styled(TabPanelUnstyled)(`
-  width: 100%;
-  font-family: IBM Plex Sans, sans-serif;
-  font-size: 0.875rem;
-  // padding: 20px 12px;
-  opacity: 0.6;
-  `);
 
 const TabsList = styled(TabsListUnstyled)(`
   min-width: 400px;
@@ -61,9 +52,6 @@ const TabsList = styled(TabsListUnstyled)(`
   margin-bottom: 16px;
   display: flex;
   flex-wrap: wrap;
-  // align-items: center;
-  // justify-content: center;
-  // align-content: space-between;
   `);
 
 const StyledTabs: React.FC<StyledTabsProps> = ({ userPermissions }) => {
