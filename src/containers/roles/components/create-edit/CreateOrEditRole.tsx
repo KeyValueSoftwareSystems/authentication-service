@@ -13,13 +13,14 @@ import {
 } from "../../services/mutations";
 import RoleForm from "./RoleForm";
 import "./styles.css";
+import { Permission } from "../../../../types/user";
 
 const CreateOrEditRole = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [rolePermissions, setRolePermissions] = useState<string[]>([]);
-  const [allPermissions, setAllPermissions] = useState<string[]>([]);
+  const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
+  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
 
   const [createRole, { data: createdRoleData }] = useMutation(CREATE_ROLE);
   const [updateRole, { data: updatedRoleData }] = useMutation(UPDATE_ROLE);
@@ -28,10 +29,10 @@ const CreateOrEditRole = () => {
 
   const { data: permissionsData } = useQuery(GET_PERMISSIONS, {
     onCompleted: (data) => {
-      const permissionIds = data?.getPermissions.map(
-        (permission: any) => permission.id
+      const permissions = data?.getPermissions.map(
+        (permission: any) => permission
       );
-      setAllPermissions([...permissionIds]);
+      setAllPermissions([...permissions]);
     },
   });
 
@@ -46,9 +47,9 @@ const CreateOrEditRole = () => {
     },
   });
 
-  const removeItem = (item: string) => {
-    const newPermissions: string[] = rolePermissions.filter(
-      (e: string) => e !== item
+  const removeItem = (item: Permission) => {
+    const newPermissions: Permission[] = rolePermissions.filter(
+      (e: Permission) => e !== item
     );
     setRolePermissions(newPermissions);
   };
@@ -60,14 +61,14 @@ const CreateOrEditRole = () => {
         setRolePermissions(allPermissions);
         return;
       } else {
-        setRolePermissions([...rolePermissions, item.id]);
+        setRolePermissions([...rolePermissions, item]);
       }
     } else {
       if (value === "all") {
         setRolePermissions([]);
         return;
       }
-      removeItem(item.id);
+      removeItem(item);
     }
   };
 
