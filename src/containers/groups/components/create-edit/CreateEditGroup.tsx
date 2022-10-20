@@ -28,6 +28,7 @@ import {
 } from "../../../../types/permission";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
+import StyledTabs from "./Tabs";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -60,9 +61,9 @@ const CreateOrEditGroup = () => {
   const navigate = useNavigate();
 
   const [value, setValue] = useState(0);
-  const [roles, setRoles] = useState<string[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<RolePermissionsDetails[]>([]);
-  const [allRoles, setAllRoles] = useState<string[]>([]);
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [status, setStatus] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
 
@@ -79,8 +80,7 @@ const CreateOrEditGroup = () => {
 
   const { data: roleData } = useQuery(GET_ROLES, {
     onCompleted: (data) => {
-      const roleIds = data?.getRoles.map((role: Role) => role.id);
-      setAllRoles([...roleIds]);
+      setAllRoles(data?.getRoles);
     },
   });
 
@@ -88,13 +88,12 @@ const CreateOrEditGroup = () => {
     skip: !id,
     variables: { id: id },
     onCompleted: (data) => {
-      const groupRoleIds = data?.getGroupRoles?.map((item: Role) => item.id);
-      setRoles([...roles, ...groupRoleIds]);
+      setRoles([...roles, ...data.getGroupRoles]);
     },
   });
 
   const removeItem = (item: string) => {
-    const itemIndex = roles.findIndex((e: string) => e === item);
+    const itemIndex = roles.findIndex((e: Role) => e.id === item);
     setRoles([...roles.slice(0, itemIndex), ...roles.slice(itemIndex + 1)]);
     const permissionIndex = permissions.findIndex(
       (e: RolePermissionsDetails) => e.roleId === item
@@ -105,10 +104,7 @@ const CreateOrEditGroup = () => {
     ]);
   };
 
-  const onChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    item?: Role
-  ) => {
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>, item: Role) => {
     const value = event.target.value;
 
     if (event.target.checked) {
@@ -117,11 +113,11 @@ const CreateOrEditGroup = () => {
         setRoles(allRoles);
         return;
       }
-      handlePermissions(item?.id as string);
+      handlePermissions(item);
       if (roles[0] === null) {
-        setRoles([item?.id as string]);
+        setRoles([item]);
       } else {
-        setRoles([...roles, item?.id as string]);
+        setRoles([...roles, item]);
       }
     } else {
       if (value === "all") {
@@ -147,7 +143,7 @@ const CreateOrEditGroup = () => {
       updateGroupRoles({
         variables: {
           id: createdGroupData?.createGroup?.id,
-          input: { roles: roles },
+          input: { roles: roles.map((role) => role.id) },
         },
       });
 
@@ -184,7 +180,7 @@ const CreateOrEditGroup = () => {
     updateGroupRoles({
       variables: {
         id: id,
-        input: { roles: roles },
+        input: { roles: roles.map((role) => role.id) },
       },
     });
 
@@ -197,33 +193,36 @@ const CreateOrEditGroup = () => {
   };
 
   useEffect(() => {
-    if ((permissions.length === 0 ) || selectAll)
+    if (permissions.length === 0 || selectAll)
       roles.forEach((role) => handlePermissions(role));
   }, [roles]);
 
   useEffect(() => {
-    if (allRoles.length === roles.length) {
+    if (allRoles?.length === roles?.length) {
       setSelectAll(true);
     } else setSelectAll(false);
-  }, [allRoles,roles]);
+  }, [allRoles, roles]);
 
-  const handlePermissions = async (role: string) => {
+  const handlePermissions = async (role: Role) => {
     setStatus(true);
     try {
       const response = await apolloClient.query({
         query: GET_ROLE_PERMISSIONS,
         variables: {
-          id: role,
+          id: role.id,
         },
       });
 
       if (response?.data?.getRolePermissions) {
         const currentPermissions = permissions;
         if (
-          !currentPermissions.some((permission) => permission.roleId === role)
+          !currentPermissions.some(
+            (permission) => permission.roleId === role.id
+          )
         ) {
           currentPermissions.push({
-            roleId: role as string,
+            roleId: role.id as string,
+            roleName: role.name,
             permissions: response?.data?.getRolePermissions,
           });
           setPermissions([...currentPermissions]);
@@ -265,7 +264,7 @@ const CreateOrEditGroup = () => {
               <div className="header">
                 Permissions summary of selected roles
               </div>
-              <div className="chips">
+              {/* <div className="chips">
                 {permissions?.map((permission, index) =>
                   permission?.permissions?.map(
                     (item: Permission, index: number) => (
@@ -277,7 +276,8 @@ const CreateOrEditGroup = () => {
                     )
                   )
                 )}
-              </div>
+              </div> */}
+              <StyledTabs permissions={permissions} />
             </Grid>
           </Grid>
         </TabPanel>
