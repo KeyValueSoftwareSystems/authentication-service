@@ -22,8 +22,6 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
-import { UserContext } from 'twilio/lib/rest/chat/v1/service/user';
-import { not } from '@hapi/joi';
 
 @Injectable()
 export default class UserService {
