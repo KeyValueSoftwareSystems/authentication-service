@@ -7,6 +7,7 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
+  TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
   UserSignupResponse,
@@ -81,6 +82,13 @@ describe('Userauth Module', () => {
           username: 'user@test.com',
           password: 's3cr3t1234567890',
         };
+        const user = {
+          id: users[0].id,
+          email: users[0].email,
+          phone: users[0].phone,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
+        };
         const tokenResponse = {
           accessToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
           eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zI
@@ -90,6 +98,7 @@ describe('Userauth Module', () => {
           eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zI
           iwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMT
           V9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo`,
+          user: user,
         };
         const obj = Object.create(null);
         passwordAuthService
@@ -99,12 +108,13 @@ describe('Userauth Module', () => {
           .post(gql)
           .send({
             query:
-              'mutation { passwordLogin(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken }}',
+              'mutation { passwordLogin(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken, user{ id, email, phone, firstName, lastName } }}',
           })
           .expect(200)
           .expect((res) => {
             expect(res.body.data.passwordLogin).toHaveProperty('accessToken');
             expect(res.body.data.passwordLogin).toHaveProperty('refreshToken');
+            expect(res.body.data.passwordLogin.user).toEqual(user);
           });
       });
     });
@@ -180,17 +190,26 @@ describe('Userauth Module', () => {
 
     it('should refresh the token', () => {
       const token = authenticationHelper.generateTokenForUser(users[0]);
-
-      tokenService.refresh(token.refreshToken).returns(Promise.resolve(token));
+      const user = {
+        id: users[0].id,
+        email: users[0].email,
+        phone: users[0].phone,
+        firstName: users[0].firstName,
+        lastName: users[0].lastName,
+      };
+      const tokenResponse: TokenResponse = { ...token, user: user };
+      tokenService
+        .refresh(token.refreshToken)
+        .returns(Promise.resolve(tokenResponse));
 
       return request(app.getHttpServer())
         .post(gql)
         .send({
-          query: `mutation { refresh(input: { refreshToken: "${token.refreshToken}"}) { accessToken refreshToken }}`,
+          query: `mutation { refresh(input: { refreshToken: "${token.refreshToken}"}) { accessToken refreshToken user { id, email, phone, firstName, lastName } }}`,
         })
         .expect(200)
         .expect((res) => {
-          expect(res.body.data.refresh).toEqual(token);
+          expect(res.body.data.refresh).toEqual(tokenResponse);
         });
     });
 

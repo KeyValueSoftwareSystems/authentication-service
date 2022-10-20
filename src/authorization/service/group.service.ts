@@ -115,6 +115,11 @@ export class GroupService {
     const permissionsInRequest = await this.permissionRepository.findByIds(
       request.permissions,
     );
+    const existingPermissionsOfGroup = await this.getGroupPermissions(id);
+    const validPermissionsInRequest: Set<string> = new Set(
+      permissionsInRequest.map((p) => p.id),
+    );
+
     if (permissionsInRequest.length !== request.permissions.length) {
       const validPermissions = permissionsInRequest.map((p) => p.id);
       throw new PermissionNotFoundException(
@@ -123,28 +128,36 @@ export class GroupService {
           .toString(),
       );
     }
+
+    const permissionsToBeRemovedFromGroup: GroupPermission[] = existingPermissionsOfGroup
+      .filter((p) => !validPermissionsInRequest.has(p.id))
+      .map((p) => ({ permissionId: p.id, groupId: id }));
+
     const groupPermission = this.groupPermissionRepository.create(
       request.permissions.map((permission) => ({
         groupId: id,
         permissionId: permission,
       })),
     );
-    const savedGroupPermissions = await this.groupPermissionRepository.save(
-      groupPermission,
-    );
-    const permissions = await this.permissionRepository.findByIds(
-      savedGroupPermissions.map((g) => g.permissionId),
-    );
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
+      await groupPermissionsRepo.remove(permissionsToBeRemovedFromGroup);
+      await groupPermissionsRepo.save(groupPermission);
+    });
+
+    const permissions = await this.getGroupPermissions(id);
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return permissions;
   }
 
   async getGroupPermissions(id: string): Promise<Permission[]> {
-    const permissions = await createQueryBuilder<Permission>('permission')
+    const permissions = await this.permissionRepository
+      .createQueryBuilder('permission')
       .leftJoinAndSelect(
         GroupPermission,
         'groupPermission',
-        'Permission.id = groupPermission.permissionId',
+        'permission.id = groupPermission.permissionId',
       )
       .where('groupPermission.groupId = :groupId', { groupId: id })
       .getMany();
@@ -201,23 +214,38 @@ export class GroupService {
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
+
+    const existingRolesOfGroup = await this.getGroupRoles(id);
     const rolesInRequest = await this.rolesRepository.findByIds(request.roles);
+    const validRolesInRequest: Set<string> = new Set(
+      rolesInRequest.map((p) => p.id),
+    );
+
     if (rolesInRequest.length !== request.roles.length) {
       const validRoles = rolesInRequest.map((r) => r.id);
       throw new RoleNotFoundException(
         request.roles.filter((r) => !validRoles.includes(r)).toString(),
       );
     }
+
+    const rolesToBeRemovedFromGroup: GroupRole[] = existingRolesOfGroup
+      .filter((p) => !validRolesInRequest.has(p.id))
+      .map((r) => ({ groupId: id, roleId: r.id }));
+
     const groupRoles = this.groupRoleRepository.create(
       request.roles.map((role) => ({
         groupId: id,
         roleId: role,
       })),
     );
-    const savedGroupRoles = await this.groupRoleRepository.save(groupRoles);
-    const roles = await this.rolesRepository.findByIds(
-      savedGroupRoles.map((groupRole) => groupRole.roleId),
-    );
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const groupRolesRepo = entityManager.getRepository(GroupRole);
+      await groupRolesRepo.remove(rolesToBeRemovedFromGroup);
+      await groupRolesRepo.save(groupRoles);
+    });
+
+    const roles = await this.getGroupRoles(id);
     await this.groupCacheService.invalidateGroupRolesByGroupId(id);
     return roles;
   }

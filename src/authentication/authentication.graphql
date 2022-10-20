@@ -39,6 +39,7 @@ input UserOTPLoginInput {
 type TokenResponse {
   refreshToken: String!
   accessToken: String!
+  user: User!
 }
 
 type UserSignupResponse {

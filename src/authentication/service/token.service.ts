@@ -21,7 +21,8 @@ export class TokenService {
     }
     const token = this.authenticationHelper.generateTokenForUser(userRecord);
     token.refreshToken = refreshToken;
-    return token;
+    const tokenResponse: TokenResponse = { ...token, user: userRecord };
+    return tokenResponse;
   }
 
   async resetToken(id: string): Promise<void> {
@@ -29,14 +30,13 @@ export class TokenService {
   }
 
   async getNewToken(userRecord: User): Promise<TokenResponse> {
-    const token: TokenResponse = this.authenticationHelper.generateTokenForUser(
-      userRecord,
-    );
+    const token = this.authenticationHelper.generateTokenForUser(userRecord);
     await this.userService.updateField(
       userRecord.id,
       'refreshToken',
       token.refreshToken,
     );
-    return token;
+    const tokenResponse: TokenResponse = { ...token, user: userRecord };
+    return tokenResponse;
   }
 }

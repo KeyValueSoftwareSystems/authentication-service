@@ -12,6 +12,7 @@ import { TokenService } from '../../../src/authentication/service/token.service'
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import {
+  TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
 } from '../../../src/schema/graphql.schema';
@@ -92,15 +93,25 @@ describe('test PasswordAuthService', () => {
       password: 's3cr3t',
     };
 
+    const token = authenticationHelper.generateTokenForUser(users[0]);
+
+    const tokenResponse: TokenResponse = {
+      refreshToken: token.refreshToken,
+      accessToken: token.accessToken,
+      user: users[0],
+    };
+
     userService
       .getUserDetailsByUsername('user@test.com', 'user@test.com')
       .returns(Promise.resolve(users[0]));
     userService
       .updateField(users[0].id, 'refreshToken', Arg.any())
       .returns(Promise.resolve(users[0]));
+    tokenService.getNewToken(users[0]).returns(Promise.resolve(tokenResponse));
     const resp = await passwordAuthService.userLogin(input);
     expect(resp).toHaveProperty('accessToken');
     expect(resp).toHaveProperty('refreshToken');
+    expect(resp.user).toEqual(users[0]);
   });
 
   it('should not login user since the user password is wrong', async () => {

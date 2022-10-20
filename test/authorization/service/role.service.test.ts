@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewRoleInput,
@@ -39,6 +39,11 @@ describe('test Role Service', () => {
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
   const roleCacheService = Substitute.for<RoleCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
+  const connectionMock = Substitute.for<Connection>();
+  const permissionQueryBuilder = Substitute.for<
+    SelectQueryBuilder<Permission>
+  >();
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -65,6 +70,10 @@ describe('test Role Service', () => {
         },
         { provide: 'RoleCacheService', useValue: roleCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
+        {
+          provide: Connection,
+          useValue: connectionMock,
+        },
       ],
     }).compile();
     roleService = moduleRef.get<RoleService>(RoleService);
@@ -130,7 +139,27 @@ describe('test Role Service', () => {
       .resolves(permissions);
 
     rolePermissionRepository.create(request).returns(request);
-    rolePermissionRepository.save(request, Arg.any()).resolves(request);
+
+    permissionRepository
+      .createQueryBuilder('permission')
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .leftJoinAndSelect(
+        RolePermission,
+        'rolePermission',
+        'permission.id = rolePermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder
+      .where('rolePermission.roleId = :roleId', {
+        roleId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder.getMany().resolves(permissions);
+
+    connectionMock.transaction(Arg.any()).resolves(request);
 
     const resp = await roleService.updateRolePermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

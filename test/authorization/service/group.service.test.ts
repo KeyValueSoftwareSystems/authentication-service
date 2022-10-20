@@ -63,6 +63,9 @@ describe('test Group Service', () => {
   const connectionMock = Substitute.for<Connection>();
   const userCacheService = Substitute.for<UserCacheService>();
   const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
+  const permissionQueryBuilder = Substitute.for<
+    SelectQueryBuilder<Permission>
+  >();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -204,7 +207,27 @@ describe('test Group Service', () => {
       .resolves(permissions);
 
     groupPermissionRepository.create(request).returns(request);
-    groupPermissionRepository.save(request, Arg.any()).resolves(request);
+
+    permissionRepository
+      .createQueryBuilder('permission')
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .leftJoinAndSelect(
+        GroupPermission,
+        'groupPermission',
+        'permission.id = groupPermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder
+      .where('groupPermission.groupId = :groupId', {
+        groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      })
+      .returns(permissionQueryBuilder);
+
+    permissionQueryBuilder.getMany().resolves(permissions);
+
+    connectionMock.transaction(Arg.any()).resolves(request);
 
     const resp = await groupService.updateGroupPermissions(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
