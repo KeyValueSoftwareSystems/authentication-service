@@ -1,0 +1,94 @@
+.table-listing-items {
+  height: 83%;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.table-component {
+  height: 100%;
+}
+
+.table-toolbar {
+  width: 100%;
+}
+
+.table-list-header {
+  font-size: 16px;
+  font-weight: bolder !important;
+  height: 60px !important;
+}
+
+.edit {
+  color: #67686cbf !important;
+}
+
+.edit:hover {
+  color: #039be5 !important;
+}
+
+.delete {
+  color: #67686cbf !important;
+}
+
+.delete:hover {
+  color: #eb272785 !important;
+}
+
+.MuiDataGrid-root .MuiDataGrid-cell {
+  border: none !important;
+  min-height: 50px !important;
+}
+
+.MuiDataGrid-root {
+  border-top: 1px solid #9d9d9d29 !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+.MuiDataGrid-columnHeaders {
+  border-bottom: 1px solid #9d9d9d29 !important;
+  color: #67686c;
+}
+
+.MuiDataGrid-footerContainer {
+  border-top: 1px solid #9d9d9d29 !important;
+  color: #67686c8c !important;
+}
+
+.MuiDataGrid-virtualScroller {
+  margin-top: 62px !important;
+}
+
+.MuiDataGrid-columnHeaders {
+  min-height: 61px !important;
+  background-color: #f4f8fb94;
+  border-radius: 0% !important;
+}
+
+.MuiDataGrid-columnHeaderTitle {
+  font-size: 18px;
+  color: #4d4d4d;
+}
+
+.MuiDataGrid-row {
+  min-height: 70px !important;
+  border-bottom: 1px solid #9d9d9d29 !important;
+}
+
+.MuiSvgIcon-root-MuiSvgIcon {
+  color: #039be5 !important;
+}
+
+.MuiCheckbox-root {
+  color: #67686c8c !important;
+}
+
+.MuiDataGrid-cellContent {
+  font-size: 16px;
+  margin-left: 35px;
+}
+
+.MuiDataGrid-cell:focus {
+  outline: none !important;
+}

@@ -15,13 +15,14 @@ const theme = createTheme({
         // Name of the slot
         root: {
           // Some CSS
+          backgroundColor: "#039BE5",
           fontSize: "1rem",
+          height:"43px",
         },
         outlined: {
-          boxShadow: 1,
-          borderRadius: 20,
-          border: "1px solid #636363",
-          color: "#636363",
+          boxShadow: 1,     
+          border: "1px solid #fafafa",
+          color: "#fafafa",
           "&:hover": {
             border: "1px solid #039BE5",
             color: "#039BE5",

@@ -1,0 +1,24 @@
+.fullname {
+  font-size: 16px;
+  margin-left: 15px;
+  font-weight: bold;
+}
+
+.avatar {
+  margin-left: 20px;
+}
+
+.email {
+  margin-left: 15px;
+}
+
+.group-list {
+  margin-left: 30px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.username-column {
+  display: flex;
+  width: 100%;
+}

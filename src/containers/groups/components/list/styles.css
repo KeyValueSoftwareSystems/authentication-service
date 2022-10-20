@@ -8,3 +8,9 @@
   display: flex;
   flex-wrap: wrap;
 }
+
+.role-list{
+  margin-left: 30px;
+  display: flex;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,17 @@
+#chip {
+  background-color: #edf6ff;
+  color: #039be5;
+  margin: 5px 10px 5px 0px;
+  padding: 7px 2px 7px 2px;
+}
+
+#cancel-icon {
+  width: 20px;
+  color: #67686cbf;
+  margin-top: 8px;
+  color: #67686c94;
+}
+
+#cancel-icon:hover {
+  cursor: pointer;
+}
