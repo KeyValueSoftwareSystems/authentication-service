@@ -61,9 +61,9 @@ const TabsList = styled(TabsListUnstyled)(`
   margin-bottom: 16px;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  align-content: space-between;
+  // align-items: center;
+  // justify-content: center;
+  // align-content: space-between;
   `);
 
 const StyledTabs: React.FC<StyledTabsProps> = ({ permissions }) => {
