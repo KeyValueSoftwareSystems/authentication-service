@@ -69,6 +69,7 @@ const theme = createTheme({
           display: "flex",
           flexDirection: "column",
           color: "#01579B",
+          backgroundColor: "#EDF6FF",
         },
         label: {
           overflowWrap: "break-word",
