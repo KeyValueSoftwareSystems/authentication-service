@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues } from "react-hook-form";
 
-import { Box, Tab, Tabs, Typography, Grid, Divider, Chip } from "@mui/material";
+import { Box, Tab, Tabs, Typography, Grid, Divider } from "@mui/material";
 
 import {
   GET_ROLES,
@@ -22,13 +22,10 @@ import GroupForm from "./GroupForm";
 import { GET_GROUP_ROLES } from "../../services/queries";
 import { getUniquePermissions } from "../../../../utils/permissions";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
-import {
-  Permission,
-  RolePermissionsDetails,
-} from "../../../../types/permission";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
-import StyledTabs from "./Tabs";
+import PermissionTabs from "../../../../components/tabs/PermissionTabs";
+import { EntityPermissionsDetails } from "../../../../types/generic";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -62,7 +59,9 @@ const CreateOrEditGroup = () => {
 
   const [value, setValue] = useState(0);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [permissions, setPermissions] = useState<RolePermissionsDetails[]>([]);
+  const [permissions, setPermissions] = useState<EntityPermissionsDetails[]>(
+    []
+  );
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [status, setStatus] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
@@ -96,7 +95,7 @@ const CreateOrEditGroup = () => {
     const itemIndex = roles.findIndex((e: Role) => e.id === item);
     setRoles([...roles.slice(0, itemIndex), ...roles.slice(itemIndex + 1)]);
     const permissionIndex = permissions.findIndex(
-      (e: RolePermissionsDetails) => e.roleId === item
+      (e: EntityPermissionsDetails) => e.id === item
     );
     setPermissions([
       ...permissions.slice(0, permissionIndex),
@@ -216,13 +215,11 @@ const CreateOrEditGroup = () => {
       if (response?.data?.getRolePermissions) {
         const currentPermissions = permissions;
         if (
-          !currentPermissions.some(
-            (permission) => permission.roleId === role.id
-          )
+          !currentPermissions.some((permission) => permission.id === role.id)
         ) {
           currentPermissions.push({
-            roleId: role.id as string,
-            roleName: role.name,
+            id: role.id as string,
+            name: role.name,
             permissions: response?.data?.getRolePermissions,
           });
           setPermissions([...currentPermissions]);
@@ -264,20 +261,7 @@ const CreateOrEditGroup = () => {
               <div className="header">
                 Permissions summary of selected roles
               </div>
-              {/* <div className="chips">
-                {permissions?.map((permission, index) =>
-                  permission?.permissions?.map(
-                    (item: Permission, index: number) => (
-                      <Chip
-                        label={item.name}
-                        key={index}
-                        className="permission-chip"
-                      />
-                    )
-                  )
-                )}
-              </div> */}
-              <StyledTabs permissions={permissions} />
+              <PermissionTabs permissions={permissions} />
             </Grid>
           </Grid>
         </TabPanel>
