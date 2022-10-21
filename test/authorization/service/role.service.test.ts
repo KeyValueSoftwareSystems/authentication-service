@@ -212,20 +212,22 @@ describe('test Role Service', () => {
     ];
     permissionRepository
       .createQueryBuilder('permission')
-      .returns(permissionQueryBuilder)
+      .returns(permissionQueryBuilder);
     permissionQueryBuilder
       .leftJoinAndSelect(
         RolePermission,
         'rolePermission',
-        'permission.id = rolePermission.permissionId')
-      .returns(permissionQueryBuilder)
+        'permission.id = rolePermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
     permissionQueryBuilder
-      .where('rolePermission.roleId = :roleId',
-        { roleId: "fcd858c6-26c5-462b-8c53-4b544830dca8" })
-      .returns(permissionQueryBuilder)
-   const resp = await roleService.getRolePermissions(
-     "fcd858c6-26c5-462b-8c53-4b544830dca8"
-     );
-    expect(resp).toEqual(permissions)
-  })
+      .where('rolePermission.roleId = :roleId', {
+        roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+      })
+      .returns(permissionQueryBuilder);
+    const resp = await roleService.getRolePermissions(
+      'fcd858c6-26c5-462b-8c53-4b544830dca8',
+    );
+    expect(resp).toEqual(permissions);
+  });
 });

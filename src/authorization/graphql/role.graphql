@@ -1,7 +1,7 @@
 type Role {
   id: ID!
   name: String!
-  permissions: [RolePermission]
+  permissions: [Permission]
 }
 
 input NewRoleInput {

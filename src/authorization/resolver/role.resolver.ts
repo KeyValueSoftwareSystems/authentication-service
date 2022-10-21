@@ -66,7 +66,7 @@ export class RoleResolver {
   }
 
   @ResolveField('permissions')
-  async getRolePermission(role: Role){
+  async getRolePermission(role: Role) {
     if (role.id) {
       return this.roleService.getRolePermissions(role.id);
     }

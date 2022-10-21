@@ -16,7 +16,6 @@ import { RoleService } from '../../../src/authorization/service/role.service';
 import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
 import Role from '../../../src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
-import RolePermission from 'src/authorization/entity/rolePermission.entity';
 import Permission from 'src/authorization/entity/permission.entity';
 
 const gql = '/graphql';
@@ -217,26 +216,25 @@ describe('Role Module', () => {
           origin: 'simple',
         },
       ];
-      const roleInPayload: Role =
-      {
+      const roleInPayload: Role = {
         id: 'cf525c1d-e64d-462c-8cdc-e55eb9234b9e',
         name: 'Role1',
       };
       const permissions: Permission[] = [
         {
-          id: "011f2222-fd50-4c35-b572-fa9c59162c7f",
-          name: "edit-entries"
+          id: '011f2222-fd50-4c35-b572-fa9c59162c7f',
+          name: 'edit-entries',
         },
         {
-          id: "357796a2-6da7-44cb-985f-b09cee0728e1",
-          name: "create-entries"
+          id: '357796a2-6da7-44cb-985f-b09cee0728e1',
+          name: 'create-entries',
         },
       ];
       const finalResponse: GqlSchema.Role[] = [
         {
-          id: "cf525c1d-e64d-462c-8cdc-e55eb9234b9e",
-          name: "Role1",
-          permissions: permissions
+          id: 'cf525c1d-e64d-462c-8cdc-e55eb9234b9e',
+          name: 'Role1',
+          permissions: permissions,
         },
       ];
       const token = authenticationHelper.generateAccessToken(users[0]);
@@ -272,19 +270,19 @@ describe('Role Module', () => {
       ];
       const permissions: Permission[] = [
         {
-          id: "011f2222-fd50-4c35-b572-fa9c59162c7f",
-          name: "edit-entries"
+          id: '011f2222-fd50-4c35-b572-fa9c59162c7f',
+          name: 'edit-entries',
         },
         {
-          id: "357796a2-6da7-44cb-985f-b09cee0728e1",
-          name: "create-entries"
+          id: '357796a2-6da7-44cb-985f-b09cee0728e1',
+          name: 'create-entries',
         },
       ];
       const finalResponse: GqlSchema.Role[] = [
         {
-          id: "2b33268a-7ff5-4cac-a87a-6bfc4430d34c",
-          name: "Customers",
-          permissions: permissions
+          id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+          name: 'Customers',
+          permissions: permissions,
         },
       ];
       const token = authenticationHelper.generateAccessToken(users[0]);
@@ -294,9 +292,7 @@ describe('Role Module', () => {
         .send({ query: '{getRoles {id name permissions{ id name }}}' })
         .expect(200)
         .expect((res) => {
-          res.body.data.getRoles[0].permissions = permissions
-          console.log(res.body.data.getRoles)
-          console.log("----------------",finalResponse)
+          res.body.data.getRoles[0].permissions = permissions;
           expect(res.body.data.getRoles).toEqual(finalResponse);
         });
     });
