@@ -133,7 +133,17 @@ export interface UserPermissionsVerification {
 }
 
 export interface FilterUserInput {
-    searchTerm?: string;
+    email?: TableStringFilterInput;
+    firstName?: TableStringFilterInput;
+    middleName?: TableStringFilterInput;
+    lastName?: TableStringFilterInput;
+}
+
+export interface TableStringFilterInput {
+    ne?: string;
+    eq?: string;
+    contains?: string;
+    notContains?: string;
 }
 
 export interface IMutation {

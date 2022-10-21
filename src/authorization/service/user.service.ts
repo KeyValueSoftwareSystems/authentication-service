@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, ILike, Repository } from 'typeorm';
+import { Connection, Equal, ILike, Not, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
   FilterUserInput,
   OperationType,
+  TableStringFilterInput,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -23,6 +24,7 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
+import { MultipleArgumentException } from '../exception/graphql.exception';
 
 @Injectable()
 export default class UserService {
@@ -50,20 +52,47 @@ export default class UserService {
   getAllUsers(input?: FilterUserInput): Promise<User[]> {
     const searchWhereCondition = [];
     if (input) {
-      if (input.searchTerm) {
-        searchWhereCondition.push({ email: ILike(`%${input.searchTerm}%`) });
+      if (input.email) {
         searchWhereCondition.push({
-          firstName: ILike(`%${input.searchTerm}%`),
+          email: this.searchConditions(input.email),
         });
+      }
+      if (input.firstName) {
         searchWhereCondition.push({
-          middleName: ILike(`%${input.searchTerm}%`),
+          firstName: this.searchConditions(input.firstName),
         });
-        searchWhereCondition.push({ lastName: ILike(`%${input.searchTerm}%`) });
+      }
+      if (input.lastName) {
+        searchWhereCondition.push({
+          lastName: this.searchConditions(input.lastName),
+        });
+      }
+      if (input.middleName) {
+        searchWhereCondition.push({
+          middleName: this.searchConditions(input.middleName),
+        });
       }
     }
     return this.usersRepository.find({
       where: searchWhereCondition,
     });
+  }
+
+  searchConditions(inputfilter: TableStringFilterInput) {
+    let filter;
+    if (Object.keys(inputfilter).length > 1) {
+      throw new MultipleArgumentException();
+    }
+    if (inputfilter.eq) {
+      filter = Equal(`${inputfilter.eq}`);
+    } else if (inputfilter.ne) {
+      filter = Not(`${inputfilter.ne}`);
+    } else if (inputfilter.contains) {
+      filter = ILike(`%${inputfilter.contains}%`);
+    } else if (inputfilter.notContains) {
+      filter = Not(ILike(`%${inputfilter.notContains}%`));
+    }
+    return filter;
   }
 
   async getUserById(id: string): Promise<User> {

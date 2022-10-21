@@ -50,7 +50,17 @@ operation: OperationType
 }
 
 input FilterUserInput {
-  searchTerm: String
+  email: TableStringFilterInput
+  firstName: TableStringFilterInput
+  middleName: TableStringFilterInput
+  lastName: TableStringFilterInput
+}
+
+input TableStringFilterInput {
+  ne: String
+  eq: String
+  contains: String
+  notContains: String
 }
 
 type Query {
