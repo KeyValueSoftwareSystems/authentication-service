@@ -15,6 +15,9 @@ import { mockedConfigService } from '../../utils/mocks/config.service';
 import { RoleService } from '../../../src/authorization/service/role.service';
 import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
 import Role from '../../../src/authorization/entity/role.entity';
+import * as GqlSchema from '../../../src/schema/graphql.schema';
+import RolePermission from 'src/authorization/entity/rolePermission.entity';
+import Permission from 'src/authorization/entity/permission.entity';
 
 const gql = '/graphql';
 
@@ -200,6 +203,101 @@ describe('Role Module', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.data.updateRolePermissions).toEqual(permissions);
+        });
+    });
+    it('should get single role with permissions', () => {
+      const users: User[] = [
+        {
+          id: 'af4def9a-47ec-4819-a448-2c00b53e95a1',
+          email: 'user@test.com',
+          phone: '9112345678910',
+          password: 's3cr3t1234567890',
+          firstName: 'Test1',
+          lastName: 'Test2',
+          origin: 'simple',
+        },
+      ];
+      const roleInPayload: Role =
+      {
+        id: 'cf525c1d-e64d-462c-8cdc-e55eb9234b9e',
+        name: 'Role1',
+      };
+      const permissions: Permission[] = [
+        {
+          id: "011f2222-fd50-4c35-b572-fa9c59162c7f",
+          name: "edit-entries"
+        },
+        {
+          id: "357796a2-6da7-44cb-985f-b09cee0728e1",
+          name: "create-entries"
+        },
+      ];
+      const finalResponse: GqlSchema.Role[] = [
+        {
+          id: "cf525c1d-e64d-462c-8cdc-e55eb9234b9e",
+          name: "Role1",
+          permissions: permissions
+        },
+      ];
+      const token = authenticationHelper.generateAccessToken(users[0]);
+      roleService
+        .getRoleById('cf525c1d-e64d-462c-8cdc-e55eb9234b9e')
+        .returns(Promise.resolve(roleInPayload));
+      roleService
+        .getRolePermissions('cf525c1d-e64d-462c-8cdc-e55eb9234b9e')
+        .returns(Promise.resolve(permissions));
+      return request(app.getHttpServer())
+        .post(gql)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query:
+            '{getRole(id: "cf525c1d-e64d-462c-8cdc-e55eb9234b9e") {id name permissions{ id name }}}',
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.getRole).toEqual(finalResponse[0]);
+        });
+    });
+    it('should get the roles', () => {
+      const users: User[] = [
+        {
+          id: '011f2222-fd50-4c35-b572-fa9c59162c7f',
+          email: 'user@test.com',
+          phone: '9112345678910',
+          password: 's3cr3t1234567890',
+          firstName: 'Test1',
+          lastName: 'Test2',
+          origin: 'simple',
+        },
+      ];
+      const permissions: Permission[] = [
+        {
+          id: "011f2222-fd50-4c35-b572-fa9c59162c7f",
+          name: "edit-entries"
+        },
+        {
+          id: "357796a2-6da7-44cb-985f-b09cee0728e1",
+          name: "create-entries"
+        },
+      ];
+      const finalResponse: GqlSchema.Role[] = [
+        {
+          id: "2b33268a-7ff5-4cac-a87a-6bfc4430d34c",
+          name: "Customers",
+          permissions: permissions
+        },
+      ];
+      const token = authenticationHelper.generateAccessToken(users[0]);
+      return request(app.getHttpServer())
+        .post(gql)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query: '{getRoles {id name permissions{ id name }}}' })
+        .expect(200)
+        .expect((res) => {
+          res.body.data.getRoles[0].permissions = permissions
+          console.log(res.body.data.getRoles)
+          console.log("----------------",finalResponse)
+          expect(res.body.data.getRoles).toEqual(finalResponse);
         });
     });
   });
