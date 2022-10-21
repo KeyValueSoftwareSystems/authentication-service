@@ -18,7 +18,7 @@ const GroupDetails: React.FC = () => {
   const [group, setGroup] = useRecoilState(groupDetailsAtom);
   const [roles, setRoles] = useRecoilState(GroupRolesAtom);
   const [permissions, setPermissions] = useRecoilState(GroupPermissionsAtom);
-  const navigate= useNavigate();
+  const navigate = useNavigate();
 
   useQuery(GET_GROUP, {
     variables: { id },
@@ -43,13 +43,13 @@ const GroupDetails: React.FC = () => {
 
   return (
     <div id="group-details">
-      <div id="back-page">
-        <ArrowBackIcon
-          id="arrowicon"
-          onClick={() => {
-            navigate("/home/groups");
-          }}
-        />
+      <div
+        id="back-page"
+        onClick={() => {
+          navigate("/home/groups");
+        }}
+      >
+        <ArrowBackIcon id="arrowicon" />
         Groups
       </div>
       <legend id="group-title"> {group.name} </legend>

@@ -99,6 +99,8 @@
   color: gray;
   margin-bottom: 3px;
   font-size: small;
+  cursor: pointer;
+  margin-top:5px;
 }
 
 #inputs {
