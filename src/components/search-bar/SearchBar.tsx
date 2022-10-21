@@ -3,7 +3,7 @@ import { GridSearchIcon } from "@mui/x-data-grid";
 import { FC } from "react";
 
 import { SearchBarProps } from "./types";
-import "./searchbar.css";
+import "./styles.css";
 
 const SearchBar: FC<SearchBarProps> = ({ searchLabel }) => {
   return (

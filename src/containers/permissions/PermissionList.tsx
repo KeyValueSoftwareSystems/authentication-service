@@ -10,7 +10,6 @@ import {
   UPDATE_PERMISSION,
 } from "./services/mutations";
 import { GET_PERMISSIONS } from "./services/queries";
-import "../../components/table-toolbar/tabletoolbar.css";
 import InlineEdit from "../../components/inline-edit";
 import { Permission } from "../../types/permission";
 import "./styles.css";
