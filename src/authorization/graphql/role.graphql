@@ -20,8 +20,12 @@ type RolePermission {
   name: String!
 }
 
+input FilterRoleInput {
+  searchTerm: String
+}
+
 type Query {
-  getRoles: [Role]!
+  getRoles(input: FilterRoleInput): [Role]!
   getRole(id: ID!): Role
   getRolePermissions(id: ID!): [RolePermission]
 }

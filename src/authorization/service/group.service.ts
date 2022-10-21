@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  FilterGroupInput,
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import { Connection, ILike, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -46,8 +47,16 @@ export class GroupService {
     private userCacheService: UserCacheService,
   ) {}
 
-  getAllGroups(): Promise<Group[]> {
-    return this.groupsRepository.find();
+  getAllGroups(input?: FilterGroupInput): Promise<Group[]> {
+    const searchWhereCondition = [];
+    if (input) {
+      if (input.searchTerm) {
+        searchWhereCondition.push({ name: ILike(`%${input.searchTerm}%`) });
+      }
+    }
+    return this.groupsRepository.find({
+      where: searchWhereCondition,
+    });
   }
 
   async getGroupById(id: string): Promise<Group> {

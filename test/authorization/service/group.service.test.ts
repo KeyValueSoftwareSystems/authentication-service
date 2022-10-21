@@ -117,7 +117,7 @@ describe('test Group Service', () => {
   });
 
   it('should get all groups', async () => {
-    groupRepository.find().returns(Promise.resolve(groups));
+    groupRepository.find({ where: [] }).returns(Promise.resolve(groups));
     const resp = await groupService.getAllGroups();
     expect(resp).toEqual(groups);
   });

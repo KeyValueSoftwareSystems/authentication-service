@@ -1,6 +1,7 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import {
+  FilterRoleInput,
   NewRoleInput,
   Permission,
   UpdateRoleInput,
@@ -17,8 +18,8 @@ export class RoleResolver {
 
   @Permissions(PermissionsType.ViewRoles)
   @Query()
-  getRoles(): Promise<Role[]> {
-    return this.roleService.getAllRoles();
+  getRoles(@Args('input') input: FilterRoleInput): Promise<Role[]> {
+    return this.roleService.getAllRoles(input);
   }
 
   @Permissions(PermissionsType.ViewRoles)

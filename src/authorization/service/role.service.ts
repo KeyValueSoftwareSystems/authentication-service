@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  FilterRoleInput,
   NewRoleInput,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import { Connection, ILike, Repository } from 'typeorm';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
 import Permission from '../entity/permission.entity';
@@ -32,8 +33,16 @@ export class RoleService {
     private connection: Connection,
   ) {}
 
-  async getAllRoles(): Promise<Role[]> {
-    return await this.rolesRepository.find();
+  async getAllRoles(input?: FilterRoleInput): Promise<Role[]> {
+    const searchWhereCondition = [];
+    if (input) {
+      if (input.searchTerm) {
+        searchWhereCondition.push({ name: ILike(`%${input.searchTerm}%`) });
+      }
+    }
+    return await this.rolesRepository.find({
+      where: searchWhereCondition,
+    });
   }
 
   async getRoleById(id: string): Promise<Role> {

@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, ILike, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
+  FilterUserInput,
   OperationType,
   UpdateUserGroupInput,
   UpdateUserInput,
@@ -46,8 +47,23 @@ export default class UserService {
     private roleCacheService: RoleCacheService,
   ) {}
 
-  getAllUsers(): Promise<User[]> {
-    return this.usersRepository.find();
+  getAllUsers(input?: FilterUserInput): Promise<User[]> {
+    const searchWhereCondition = [];
+    if (input) {
+      if (input.searchTerm) {
+        searchWhereCondition.push({ email: ILike(`%${input.searchTerm}%`) });
+        searchWhereCondition.push({
+          firstName: ILike(`%${input.searchTerm}%`),
+        });
+        searchWhereCondition.push({
+          middleName: ILike(`%${input.searchTerm}%`),
+        });
+        searchWhereCondition.push({ lastName: ILike(`%${input.searchTerm}%`) });
+      }
+    }
+    return this.usersRepository.find({
+      where: searchWhereCondition,
+    });
   }
 
   async getUserById(id: string): Promise<User> {
