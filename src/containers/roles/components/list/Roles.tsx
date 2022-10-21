@@ -21,6 +21,7 @@ const Roles: React.FC = () => {
     onCompleted: (data) => {
       setRoleList(data?.getRoles);
     },
+    fetchPolicy: "network-only",
   });
   const columns: GridColumns = [
     {
@@ -29,6 +30,7 @@ const Roles: React.FC = () => {
       width: 900,
       headerClassName: "user-list-header",
       headerAlign: "center",
+      flex: 0.7,
     },
   ];
 
@@ -40,10 +42,10 @@ const Roles: React.FC = () => {
     navigate(`edit/${id}`);
   };
 
-  const onRoleClick = (params:GridRowParams) => {
+  const onRoleClick = (params: GridRowParams) => {
     navigate(`./${params.id}`);
   };
-  
+
   return (
     <>
       <TableList

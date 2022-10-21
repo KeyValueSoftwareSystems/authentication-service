@@ -233,15 +233,17 @@ const CreateOrEditGroup = () => {
   return (
     <div className="access-settings">
       <GroupForm createGroup={onCreateGroup} editGroup={onEditGroup} />
-      <div>Access Settings and Users</div>
       <div>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={value} onChange={handleChange}>
-            <Tab label="Roles & Permissions" sx={{ textTransform: "none" }} />
+            <Tab
+              label="Roles & Permissions"
+              sx={{ textTransform: "none", fontSize: "18px" }}
+            />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
-          <Grid container spacing={1}>
+          <Grid container spacing={1} width="100%">
             <Grid item xs={10} lg={5}>
               <div>
                 <div className="header">Roles</div>
@@ -257,7 +259,7 @@ const CreateOrEditGroup = () => {
               )}
             </Grid>
             <Divider orientation="vertical" flexItem sx={{ marginLeft: 2 }} />
-            <Grid item xs={10} lg={6} sx={{ paddingLeft: 5 }}>
+            <Grid item xs={10} lg={6.7} sx={{ paddingLeft: 5 }}>
               <div className="header">
                 Permissions summary of selected roles
               </div>

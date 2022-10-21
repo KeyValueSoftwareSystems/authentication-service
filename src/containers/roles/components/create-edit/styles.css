@@ -20,6 +20,7 @@
   display: flex;
   align-items: center;
   column-gap: 5px;
+  justify-content: center;
 }
 
 .access-setting {
@@ -65,4 +66,8 @@
 .permission-header {
   font-size: large;
   font-weight: 500;
+}
+
+.roleContainer {
+  padding: 40px;
 }

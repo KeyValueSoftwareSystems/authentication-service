@@ -12,8 +12,8 @@
   overflow: hidden;
 }
 
-.logout{
- padding-right: 50px;
+.logout {
+  padding-right: 50px;
 }
 
 .sideBarContainer {
@@ -60,7 +60,7 @@
 }
 
 .body {
-  background-color: #fafafa;
+  background-color: #f5f5f5;
   display: flex;
   height: calc(-60px + 100vh);
 }
@@ -76,13 +76,13 @@
 
 .icon {
   margin-right: 10px;
-  color: #4d4d4d;
+  /* color: #4d4d4d; */
 }
 
 .navLogo {
-  margin-top: 20px;
+  /* margin-top: 20px; */
   width: 300px;
-  height: 60px;
+  /* height: 60px; */
   background-color: aliceblue;
-  padding: 6px 0px 6px 20px;
+  padding: 10px 0px 10px 20px;
 }

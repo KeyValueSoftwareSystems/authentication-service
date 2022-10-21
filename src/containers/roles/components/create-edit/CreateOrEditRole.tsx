@@ -103,7 +103,7 @@ const CreateOrEditRole = () => {
   };
 
   return (
-    <div style={{ padding: "12px" }}>
+    <div className="roleContainer">
       <RoleForm createRole={onCreateRole} editRole={onEditRole} />
       <div className="role-permissions">
         <div className="permission-header"> Permissions</div>
