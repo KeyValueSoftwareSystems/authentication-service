@@ -11,7 +11,6 @@ import TableList from "../../../../components/table";
 import { groupListAtom } from "../../../../states/groupStates";
 import TableChipElement from "../../../../components/table-chip-element";
 
-
 const GroupList: React.FC = () => {
   const navigate = useNavigate();
 
@@ -24,6 +23,7 @@ const GroupList: React.FC = () => {
     onCompleted: (data) => {
       setGroupList(data?.getGroups);
     },
+    fetchPolicy: "network-only",
   });
 
   const columns: GridColumns = [
@@ -41,17 +41,14 @@ const GroupList: React.FC = () => {
       flex: 0.5,
       renderCell: (params) => (
         <div className="role-list">
-       <TableChipElement
-            rowItems={params}
-            columnName="roles"
-          />
+          <TableChipElement rowItems={params} columnName="roles" />
         </div>
       ),
       headerAlign: "center",
     },
   ];
 
-  const onGroupClick = (params:GridRowParams) => {
+  const onGroupClick = (params: GridRowParams) => {
     navigate(`./${params.id}`);
   };
 

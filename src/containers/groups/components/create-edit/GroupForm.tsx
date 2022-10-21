@@ -46,25 +46,29 @@ const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
   };
 
   return (
-    <div className="container">
+    <div>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)} className="form">
+          <div id="back-page" onClick={onBackNavigation}>
+            <ArrowBackIcon sx={{ height: 15 }} />
+            Groups
+          </div>
           <div className="top-bar">
             <div className="title-section">
-              <div className="access-setting" onClick={onBackNavigation}>
-                <ArrowBackIcon sx={{ height: 15 }} />
-                Access setting
-              </div>
               <div className="create-group">
-                {id ? "Edit Group" : "Create Group"}
+                {id ? "Modify Group" : "Add Group"}
               </div>
             </div>
             <div className="button-section">
-              <Button variant="text" className="button" onClick={onBackNavigation}>
+              <Button variant="text" onClick={onBackNavigation}>
                 Cancel
               </Button>
-              <Button variant="outlined" className="button" type="submit">
-                {id ? "Update Group" : "Create Group"}
+              <Button
+                variant="outlined"
+                className="buttonCreateGroup"
+                type="submit"
+              >
+                {id ? "Update" : "Create"}
               </Button>
             </div>
           </div>
@@ -78,7 +82,7 @@ const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
                 className="group-name"
                 defaultText={group?.name}
               />
-              <Divider sx={{ marginTop: 2 }} />
+              {/* <Divider sx={{ marginTop: 2 }} /> */}
             </>
           )}
         </form>

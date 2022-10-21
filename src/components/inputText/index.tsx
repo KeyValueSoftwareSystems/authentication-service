@@ -9,6 +9,7 @@ export interface FormInputProps {
   setValue?: any;
   className?: any;
   defaultText?: string;
+  autoComplete?: string;
 }
 
 const FormInputText = ({
@@ -17,6 +18,7 @@ const FormInputText = ({
   type,
   className,
   defaultText,
+  autoComplete,
 }: FormInputProps) => {
   const { control } = useFormContext();
 
@@ -40,6 +42,7 @@ const FormInputText = ({
           variant="outlined"
           className={className}
           defaultValue={defaultText}
+          autoComplete={autoComplete}
         />
       )}
     />

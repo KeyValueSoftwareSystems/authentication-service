@@ -104,30 +104,29 @@ const UserForm = (props: any) => {
     }
   };
 
+  const onBackNavigation = () => {
+    navigate("/home/users");
+  };
+
   return (
     <div id="page">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)}>
           <div id="fixed">
-            <div id="back-page">
-              <ArrowBackIcon
-                id="arrowicon"
-                onClick={() => {
-                  navigate("/home/users");
-                }}
-              />
+            <div id="back-page" onClick={onBackNavigation}>
+              <ArrowBackIcon id="arrowicon" />
               Users
             </div>
 
             <div id="title">
               <legend id="bold">{isEdit ? "Modify user" : "Add user"}</legend>
               <div id="add-cancel">
-                <Button id="cancel">
-                  <Link id="cancel" to="/home/users">
-                    Cancel
-                  </Link>
+                <Button variant="text" onClick={onBackNavigation}>
+                  {/* <Link  to="/home/users"> */}
+                  Cancel
+                  {/* </Link> */}
                 </Button>
-                <Button id="add" type="submit">
+                <Button id="add" type="submit" variant="outlined">
                   {isEdit ? "Update" : "Add"}
                 </Button>
               </div>
@@ -179,6 +178,7 @@ const UserForm = (props: any) => {
                   label="Password*"
                   type="password"
                   className="fields"
+                  autoComplete="new-password"
                 />
               </div>
             )}
@@ -186,7 +186,7 @@ const UserForm = (props: any) => {
         </form>
       </FormProvider>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      {/* <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tab
           label="Groups & Permissions"
           sx={{
@@ -195,7 +195,9 @@ const UserForm = (props: any) => {
             fontWeight: "bolder",
           }}
         />
-      </Box>
+      </Box> */}
+
+      <div className="userGroups"> {"Groups & Permissions"}</div>
 
       <div id="groups-permissions">
         <ChecklistComponent
@@ -209,10 +211,10 @@ const UserForm = (props: any) => {
           <div id="permission-header">
             <div> Permissions </div>
           </div>
-          <div id="permission-list">
+          <div>
             {userPermissions?.map((group: GroupPermissionsDetails) => {
               return (
-                <div key={group.groupId}>
+                <div key={group.groupId} id="permission-list">
                   {group?.permissions.map((permission: Permission) => {
                     return (
                       <Chip
