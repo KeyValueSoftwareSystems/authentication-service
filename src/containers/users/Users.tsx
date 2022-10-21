@@ -1,24 +1,27 @@
 import React from "react";
 import { useRecoilState } from "recoil";
 import { useMutation, useQuery } from "@apollo/client";
-import { GridColumns, GridRowParams } from "@mui/x-data-grid";
-import { Chip } from "@mui/material";
+import { Avatar } from "@mui/material";
+import { GridColumns } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 
-import { GET_USERS, GET_USER_GROUPS } from "./services/queries";
+import { GET_USERS } from "./services/queries";
+import "./styles.css";
 import { DELETE_USER } from "./services/mutations";
 import { userListAtom } from "../../states/userStates";
 import TableList from "../../components/table/Table";
+import TableChipElement from "../../components/table-chip-element";
+import { stringAvatar } from "../../utils/table";
 import "./components/create-edit-user/styles.css";
 
 const Users: React.FC = () => {
+  const [userList, setUserList] = useRecoilState(userListAtom);
+
   const navigate = useNavigate();
 
   useMutation(DELETE_USER, {
     refetchQueries: [{ query: GET_USERS }],
   });
-
-  const [userList, setUserList] = useRecoilState(userListAtom);
 
   useQuery(GET_USERS, {
     onCompleted: (data) => {
@@ -38,21 +41,30 @@ const Users: React.FC = () => {
     {
       field: "firstName",
       headerName: "User",
-      width: 300,
+      width: 320,
       headerClassName: "user-list-header",
-      headerAlign: "left",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <div className="username-column">
+          <GetFullName {...params} />
+        </div>
+      ),
     },
     {
       field: "groups",
       headerName: "Member Of",
       headerClassName: "user-list-header",
-      flex: 1,
-      renderCell: (params) => <ShowGroupList {...params} />,
+      flex: 0.5,
+      renderCell: (params) => (
+        <div className="group-list">
+          <TableChipElement rowItems={params} columnName="groups" />
+        </div>
+      ),
       headerAlign: "center",
     },
   ];
 
-  const onUserClick = (params: GridRowParams) => {
+  const onUserClick = (params: any) => {
     navigate(`./${params.id}`);
   };
 
@@ -74,29 +86,17 @@ const Users: React.FC = () => {
   );
 };
 
-const ShowGroupList = (props: any) => {
+const GetFullName = (props: any) => {
   const { row } = props;
-  const [groupList, setGroupList] = React.useState([]);
-
-  useQuery(GET_USER_GROUPS, {
-    variables: {
-      id: row.id,
-    },
-    onCompleted: (data) => {
-      setGroupList(data?.getUserGroups);
-    },
-  });
-
+  let fullName = row.firstName.concat(" ", row.lastName);
   return (
-    <div className="chips">
-      {groupList?.map((group: any) => (
-        <Chip
-          label={group.name}
-          key={group.id}
-          sx={{ marginRight: 1, marginTop: 1, fontSize: "14px" }}
-        />
-      ))}
-    </div>
+    <>
+      <Avatar {...stringAvatar(fullName)} className="avatar" />
+      <div>
+        <div className="fullname">{fullName}</div>
+        <div className="email">{row.email}</div>
+      </div>
+    </>
   );
 };
 

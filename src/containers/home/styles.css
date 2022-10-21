@@ -66,8 +66,8 @@
 }
 .outlet {
   width: 80%;
-  margin: 20px;
-  padding: 20px;
+  margin: 35px;
+  /* padding: 20px; */
   box-shadow: 6px 6px 6px 6px #9d9d9d29;
   border-radius: 10px;
   background-color: white;
@@ -76,6 +76,7 @@
 
 .icon {
   margin-right: 10px;
+  color: #4d4d4d;
 }
 
 .navLogo {

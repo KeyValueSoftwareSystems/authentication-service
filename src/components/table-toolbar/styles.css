@@ -1,0 +1,45 @@
+.table-toolbar {
+  padding: 15px 0px;
+  box-sizing: border-box;
+  border-radius: 5px 5px 0px 0px;
+  display: flex;
+  justify-content: space-between;
+  height: 90px;
+  border-bottom: none;
+}
+
+.search-button {
+  display: flex;
+  margin-right: 40px;
+}
+
+.legend-title {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 25px;
+  margin-left: 35px;
+}
+
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+#add-button {
+  height: 49px;
+  width: 150px;
+}
+
+@media screen and (max-width: 1103px) {
+  div.search {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 670px) {
+  div.search-button {
+    display: none;
+  }
+}

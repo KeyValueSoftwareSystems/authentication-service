@@ -12,12 +12,13 @@
 }
 
 .search-bar {
-  width: 218px;
+  width: 268px;
   border-radius: 25px;
   background-color: #f4f8fb;
   font-size: 13;
-  padding-left: 20px;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-left: 24px;
+  padding-right: -2px;
+  padding-top: 8px;
+  padding-bottom: 8px;
   font-size: 14px;
 }

@@ -1,13 +1,13 @@
 import { DataGrid, GridActionsCellItem, GridColumns } from "@mui/x-data-grid";
 import { FC } from "react";
 import { Tooltip } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useMutation } from "@apollo/client";
 
 import { TableProps } from "./types";
 import TableToolBar from "../table-toolbar/TableToolBar";
-import "./table.css";
+import "./styles.css";
 
 const TableList: FC<TableProps> = ({
   rows,
@@ -31,31 +31,30 @@ const TableList: FC<TableProps> = ({
       type: "actions",
       headerName: "Actions",
       headerClassName: "table-list-header",
-      flex: 0.5,
+      flex: 0.3,
       cellClassName: "actions",
       headerAlign: "center",
       getActions: ({ id }) => {
         return [
-          <Tooltip title="Edit" arrow>
+          <Tooltip title="Edit" arrow placement="top">
             <GridActionsCellItem
               icon={
-                <EditIcon
+                <EditOutlinedIcon
                   onClick={() => {
                     onEdit(id);
                   }}
                 />
               }
               label="Edit"
-              className="textPrimary"
-              color="inherit"
+              className="edit"
               onClick={() => onEdit(id)}
             />
           </Tooltip>,
-          <Tooltip title="Delete" arrow>
+          <Tooltip title="Delete" arrow placement="top">
             <GridActionsCellItem
-              icon={<DeleteIcon />}
+              icon={<DeleteOutlinedIcon className="delete" />}
               label="Delete"
-              color="inherit"
+              className="delete"
               onClick={() => {
                 deleteItem({
                   variables: {
@@ -89,6 +88,7 @@ const TableList: FC<TableProps> = ({
           style={{
             borderRadius: "0px 0px 5px 5px",
           }}
+          disableSelectionOnClick
           onRowClick={handleRowClick}
         />
       </div>
