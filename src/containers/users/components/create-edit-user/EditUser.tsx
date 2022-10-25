@@ -7,21 +7,19 @@ import {
   UPDATE_USER_GROUPS,
   UPDATE_USER_PERMISSIONS,
 } from "../../services/mutations";
-import { GET_USER_GROUPS } from "../../services/queries";
+import { GET_USER_GROUPS, GET_USER_PERMISSIONS } from "../../services/queries";
 import { EditUserformSchema } from "../../userSchema";
 import UserForm from "./UserForm";
-import { getUniquePermissions } from "../../../../utils/permissions";
-import { GroupPermissionsDetails } from "../../../../types/permission";
 import "./styles.css";
-import { Group } from "../../../../types/user";
+import { Group, Permission } from "../../../../types/user";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-
-  const [userPermissions] = useState<
-    GroupPermissionsDetails[]
-  >([]);
   const [userGroups,setUserGroups]=useState<Group[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
+    []
+  );
+  
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
@@ -38,11 +36,20 @@ const EditUser: React.FC = () => {
     },
   });
 
+  useQuery(GET_USER_PERMISSIONS, {
+    variables: { id },
+    onCompleted: (data) => {
+      console.log(data?.getUserPermissions)
+      const permissionList=data?.getUserPermissions;
+      setSelectedPermissions(permissionList)
+    },
+  });
+
+  console.log(selectedPermissions)
 
   const onUpdateUser = (
     inputs: any,
     userGroups: Group[],
-    userPermissions: GroupPermissionsDetails[]
   ) => {
 
     console.log(userGroups.map((group)=>group.id));
@@ -71,7 +78,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          permissions: getUniquePermissions(userPermissions),
+          permissions: selectedPermissions.map((permission)=>permission.id),
         },
       },
       onCompleted: () => {
@@ -87,6 +94,7 @@ const EditUser: React.FC = () => {
       updateUser={onUpdateUser}
       userformSchema={EditUserformSchema}
       currentGroups={userGroups}
+      currentPermissions={selectedPermissions}
     />
   );
 };
