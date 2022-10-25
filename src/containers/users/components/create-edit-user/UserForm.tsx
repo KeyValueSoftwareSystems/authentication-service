@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm, FormProvider, FieldValues } from "react-hook-form";
-import { Box, Button, Chip, Tab } from "@mui/material";
+import { Box, Button, Chip, Divider, Grid, Tab } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
@@ -237,12 +237,20 @@ const UserForm = (props: any) => {
           onChange={handleChange}
         />
 
-        <div id="add-items">
+          <Divider orientation="vertical" flexItem sx={{ marginLeft: 2 }} />
+          <div id="add-items">
+          <Grid item xs={10} lg={6.7} sx={{ paddingLeft: 5 }}>
+            <div className="header">Permissions summary of selected roles</div>
+            <PermissionTabs permissions={userPermissions} />
+          </Grid>
+          </div>
+        </div>
+        {/* <div id="add-items">
           <span>Permissions</span>
           <PermissionTabs permissions={userPermissions} />
-        </div>
+        </div> */}
       </div>
-    </div>
+
   );
 };
 

@@ -61,7 +61,6 @@ const TabsList = styled(TabsListUnstyled)(`
   min-width: 400px;
   background-color: #fff ;
   border-radius: 12px;
-  margin-bottom: 16px;
   display: flex;
   flex-wrap: wrap;
   `);
