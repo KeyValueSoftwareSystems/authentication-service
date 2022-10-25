@@ -47,7 +47,7 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
   };
 
   return (
-    <div className="container">
+    <div>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)} className="form">
           <div className="horizontal-bar">
@@ -57,15 +57,19 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
                 Roles Listing
               </div>
               <div className="create-role">
-                {id ? "Edit Role" : "Create Role"}
+                {id ? "Modify Role" : "Create Role"}
               </div>
             </div>
-            <div className="submit-section" >
-              <Button variant="text" className="button" onClick={onBackNavigation}>
+            <div className="submit-section">
+              <Button
+                variant="text"
+                className="button"
+                onClick={onBackNavigation}
+              >
                 Cancel
               </Button>
               <Button variant="outlined" className="button" type="submit">
-                {id ? "Update Role" : "Create Role"}
+                {id ? "Update" : "Create"}
               </Button>
             </div>
           </div>

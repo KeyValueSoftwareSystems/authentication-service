@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues } from "react-hook-form";
 
-import { Box, Tab, Tabs, Typography, Grid, Divider, Chip } from "@mui/material";
+import { Box, Tab, Tabs, Typography, Grid, Divider } from "@mui/material";
 
 import {
   GET_ROLES,
@@ -22,13 +22,10 @@ import GroupForm from "./GroupForm";
 import { GET_GROUP_ROLES } from "../../services/queries";
 import { getUniquePermissions } from "../../../../utils/permissions";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
-import {
-  Permission,
-  RolePermissionsDetails,
-} from "../../../../types/permission";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
-import StyledTabs from "./Tabs";
+import PermissionTabs from "../../../../components/tabs/PermissionTabs";
+import { EntityPermissionsDetails } from "../../../../types/generic";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -62,7 +59,9 @@ const CreateOrEditGroup = () => {
 
   const [value, setValue] = useState(0);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [permissions, setPermissions] = useState<RolePermissionsDetails[]>([]);
+  const [permissions, setPermissions] = useState<EntityPermissionsDetails[]>(
+    []
+  );
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [status, setStatus] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
@@ -96,7 +95,7 @@ const CreateOrEditGroup = () => {
     const itemIndex = roles.findIndex((e: Role) => e.id === item);
     setRoles([...roles.slice(0, itemIndex), ...roles.slice(itemIndex + 1)]);
     const permissionIndex = permissions.findIndex(
-      (e: RolePermissionsDetails) => e.roleId === item
+      (e: EntityPermissionsDetails) => e.id === item
     );
     setPermissions([
       ...permissions.slice(0, permissionIndex),
@@ -216,13 +215,11 @@ const CreateOrEditGroup = () => {
       if (response?.data?.getRolePermissions) {
         const currentPermissions = permissions;
         if (
-          !currentPermissions.some(
-            (permission) => permission.roleId === role.id
-          )
+          !currentPermissions.some((permission) => permission.id === role.id)
         ) {
           currentPermissions.push({
-            roleId: role.id as string,
-            roleName: role.name,
+            id: role.id as string,
+            name: role.name,
             permissions: response?.data?.getRolePermissions,
           });
           setPermissions([...currentPermissions]);
@@ -236,15 +233,17 @@ const CreateOrEditGroup = () => {
   return (
     <div className="access-settings">
       <GroupForm createGroup={onCreateGroup} editGroup={onEditGroup} />
-      <div>Access Settings and Users</div>
       <div>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={value} onChange={handleChange}>
-            <Tab label="Roles & Permissions" sx={{ textTransform: "none" }} />
+            <Tab
+              label="Roles & Permissions"
+              sx={{ textTransform: "none", fontSize: "18px" }}
+            />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
-          <Grid container spacing={1}>
+          <Grid container spacing={1} width="100%">
             <Grid item xs={10} lg={5}>
               <div>
                 <div className="header">Roles</div>
@@ -260,24 +259,11 @@ const CreateOrEditGroup = () => {
               )}
             </Grid>
             <Divider orientation="vertical" flexItem sx={{ marginLeft: 2 }} />
-            <Grid item xs={10} lg={6} sx={{ paddingLeft: 5 }}>
+            <Grid item xs={10} lg={6.7} sx={{ paddingLeft: 5 }}>
               <div className="header">
                 Permissions summary of selected roles
               </div>
-              {/* <div className="chips">
-                {permissions?.map((permission, index) =>
-                  permission?.permissions?.map(
-                    (item: Permission, index: number) => (
-                      <Chip
-                        label={item.name}
-                        key={index}
-                        className="permission-chip"
-                      />
-                    )
-                  )
-                )}
-              </div> */}
-              <StyledTabs permissions={permissions} />
+              <PermissionTabs permissions={permissions} />
             </Grid>
           </Grid>
         </TabPanel>

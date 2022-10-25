@@ -1,11 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import { Chip } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 import { RoleDetailsAtom } from "../../../../states/roleStates";
 import { RolePermissionsAtom } from "../../../../states/permissionsStates";
-import "../../../groups/components/details/styles.css";
-import { Chip } from "@mui/material";
+import "../../styles.css";
 import { GET_ROLE, GET_ROLE_PERMISSIONS } from "../../services/queries";
 
 const RoleDetails: React.FC = () => {
@@ -43,7 +44,7 @@ const RoleDetails: React.FC = () => {
       <div id="rolesandpermissions">
         <div id="roles">
           <legend id="bold"> Role Permissions </legend>
-          <div id="item-list">
+          <div id="item-list-details">
             {permissions.map((item) => (
               <Chip id="item" key={item.id} label={item.name} />
             ))}

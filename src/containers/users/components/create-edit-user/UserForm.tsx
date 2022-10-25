@@ -12,12 +12,12 @@ import {
 import { useLazyQuery, useQuery } from "@apollo/client";
 import FormInputText from "../../../../components/inputText";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
-import { GroupPermissionsDetails } from "../../../../types/permission";
 import { GET_USER } from "../../services/queries";
 import { Group, User } from "../../../../types/user";
 import "./styles.css";
 import apolloClient from "../../../../services/apolloClient";
-import StyledTabs from "./Tabs";
+import PermissionTabs from "../../../../components/tabs/PermissionTabs";
+import { EntityPermissionsDetails } from "../../../../types/generic";
 
 const UserForm = (props: any) => {
   const { isEdit, updateUser, createUser, userformSchema, currentGroups } =
@@ -28,7 +28,7 @@ const UserForm = (props: any) => {
   const [user, setUser] = useState<User>();
   const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [userPermissions, setUserPermissions] = useState<
-    GroupPermissionsDetails[]
+    EntityPermissionsDetails[]
   >([]);
   const [allGroups, setAllGroups] = useState<Group[]>([]);
 
@@ -51,13 +51,11 @@ const UserForm = (props: any) => {
     if (response) {
       const currentPermissions = userPermissions;
       if (
-        !currentPermissions.some(
-          (permission) => permission.groupId === group.id
-        )
+        !currentPermissions.some((permission) => permission.id === group.id)
       ) {
         currentPermissions.push({
-          groupId: group.id,
-          groupName: group.name,
+          id: group.id,
+          name: group.name,
           permissions: response?.data?.getGroupPermissions,
         });
       }
@@ -103,7 +101,7 @@ const UserForm = (props: any) => {
       userGroups.filter((groupDetails) => groupDetails.id !== group.id)
     );
     setUserPermissions(
-      userPermissions.filter((permission) => permission.groupId !== group.id)
+      userPermissions.filter((permission) => permission.id !== group.id)
     );
   };
 
@@ -130,8 +128,8 @@ const UserForm = (props: any) => {
             setUserPermissions([
               ...userPermissions,
               {
-                groupId: group.id,
-                groupName: group.name,
+                id: group.id,
+                name: group.name,
                 permissions: data?.getGroupPermissions,
               },
             ]);
@@ -147,30 +145,29 @@ const UserForm = (props: any) => {
     }
   };
 
+  const onBackNavigation = () => {
+    navigate("/home/users");
+  };
+
   return (
     <div id="page">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmitForm)}>
           <div id="fixed">
-            <div id="back-page">
-              <ArrowBackIcon
-                id="arrowicon"
-                onClick={() => {
-                  navigate("/home/users");
-                }}
-              />
+            <div id="back-page" onClick={onBackNavigation}>
+              <ArrowBackIcon id="arrowicon" />
               Users
             </div>
 
             <div id="title">
               <legend id="bold">{isEdit ? "Modify user" : "Add user"}</legend>
               <div id="add-cancel">
-                <Button id="cancel">
-                  <Link id="cancel" to="/home/users">
-                    Cancel
-                  </Link>
+                <Button variant="text" onClick={onBackNavigation}>
+                  {/* <Link  to="/home/users"> */}
+                  Cancel
+                  {/* </Link> */}
                 </Button>
-                <Button id="add" type="submit">
+                <Button id="add" type="submit" variant="outlined">
                   {isEdit ? "Update" : "Add"}
                 </Button>
               </div>
@@ -222,6 +219,7 @@ const UserForm = (props: any) => {
                   label="Password*"
                   type="password"
                   className="fields"
+                  autoComplete="new-password"
                 />
               </div>
             )}
@@ -229,16 +227,7 @@ const UserForm = (props: any) => {
         </form>
       </FormProvider>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tab
-          label="Groups & Permissions"
-          sx={{
-            textTransform: "none",
-            color: " rgb(23, 119, 240);",
-            fontWeight: "bolder",
-          }}
-        />
-      </Box>
+      <div className="userGroups"> {"Groups & Permissions"}</div>
 
       <div id="groups-permissions">
         <ChecklistComponent
@@ -250,7 +239,7 @@ const UserForm = (props: any) => {
 
         <div id="add-items">
           <span>Permissions</span>
-          <StyledTabs userPermissions={userPermissions} />
+          <PermissionTabs permissions={userPermissions} />
         </div>
       </div>
     </div>
