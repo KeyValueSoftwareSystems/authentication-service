@@ -14,27 +14,34 @@ import {
 import RoleForm from "./RoleForm";
 import "./styles.css";
 import { Permission } from "../../../../types/user";
+import FilterChips from "../../../../components/filter-chips/FilterChips";
 
 const CreateOrEditRole = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
-  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
+
+  const handleClick = (permission: Permission) => {
+    if (
+      rolePermissions
+        .map((permission) => permission.id)
+        .includes(permission.id)
+    ) {
+      console.log(permission.name);
+      setRolePermissions(
+        rolePermissions.filter(
+          (role_permission) => role_permission.id !== permission.id
+        )
+      );
+    } else setRolePermissions([...rolePermissions, permission]);
+  };
+
 
   const [createRole, { data: createdRoleData }] = useMutation(CREATE_ROLE);
   const [updateRole, { data: updatedRoleData }] = useMutation(UPDATE_ROLE);
   const [updateRolePermissions, { data: updatedRolePermissionsData }] =
     useMutation(UPDATE_ROLE_PERMISSIONS);
-
-  const { data: permissionsData } = useQuery(GET_PERMISSIONS, {
-    onCompleted: (data) => {
-      const permissions = data?.getPermissions.map(
-        (permission: any) => permission
-      );
-      setAllPermissions([...permissions]);
-    },
-  });
 
   const { loading } = useQuery(GET_ROLE_PERMISSIONS, {
     skip: !id,
@@ -47,37 +54,12 @@ const CreateOrEditRole = () => {
     },
   });
 
-  const removeItem = (item: Permission) => {
-    const newPermissions: Permission[] = rolePermissions.filter(
-      (e: Permission) => e !== item
-    );
-    setRolePermissions(newPermissions);
-  };
-
-  const onChange = (event: any, item?: any) => {
-    const value = event.target.value;
-    if (event.target.checked) {
-      if (value === "all") {
-        setRolePermissions(allPermissions);
-        return;
-      } else {
-        setRolePermissions([...rolePermissions, item]);
-      }
-    } else {
-      if (value === "all") {
-        setRolePermissions([]);
-        return;
-      }
-      removeItem(item);
-    }
-  };
-
   useEffect(() => {
     if (createdRoleData)
       updateRolePermissions({
         variables: {
           id: createdRoleData?.createRole?.id,
-          input: { permissions: rolePermissions },
+          input: { permissions: rolePermissions.map((permission)=>permission.id) },
         },
         onCompleted: () => navigate("/home/roles"),
       });
@@ -97,7 +79,7 @@ const CreateOrEditRole = () => {
     updateRolePermissions({
       variables: {
         id: id,
-        input: { permissions: rolePermissions },
+        input: { permissions: rolePermissions.map((permission)=>permission.id) },
       },
     });
   };
@@ -108,12 +90,10 @@ const CreateOrEditRole = () => {
       <div className="role-permissions">
         <div className="permission-header"> Permissions</div>
         {!loading && (
-          <ChecklistComponent
-            mapList={permissionsData?.getPermissions}
-            name="Select Permissions"
-            onChange={onChange}
-            currentCheckedItems={rolePermissions}
-          />
+          <FilterChips
+          selectedPermissions={rolePermissions}
+          handleClick={handleClick}
+        />
         )}
       </div>
     </div>

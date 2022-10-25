@@ -66,6 +66,7 @@
 .permission-header {
   font-size: large;
   font-weight: 500;
+  margin-bottom: 30px;
 }
 
 .roleContainer {
