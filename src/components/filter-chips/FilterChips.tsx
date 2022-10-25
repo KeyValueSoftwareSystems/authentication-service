@@ -1,0 +1,56 @@
+import { useQuery } from "@apollo/client";
+import { Chip } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
+import { useState } from "react";
+import "./styles.css";
+import { GET_PERMISSIONS } from "../../containers/permissions/services/queries";
+import { Permission } from "../../types/user";
+
+interface FilterChipsProps {
+
+  selectedPermissions: Permission[];
+  handleClick: (permission:Permission) => void;
+}
+
+const FilterChips: React.FC<FilterChipsProps> = (
+props:FilterChipsProps
+) => {
+  const {handleClick,selectedPermissions} = props;
+  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
+  useQuery(GET_PERMISSIONS, {
+    onCompleted: (data) => {
+      setAllPermissions(data?.getPermissions);
+    },
+  });
+
+  return (
+    <div className="chips-stack">
+      {allPermissions?.map((permission: Permission) => {
+        const selected = selectedPermissions
+          .map((selected:Permission) => selected.id)
+          .includes(permission.id);
+        return (
+          <Chip
+            sx={selected?{
+              alignItems: "center",
+              display: "inline-flex",
+              fontSize: "medium",
+              borderColor:'#01579B'
+            }:{
+              alignItems: "center",
+              display: "inline-flex",
+              fontSize: "medium",
+            }}
+            key={permission.id}
+            label={permission.name}
+            onClick={() => handleClick(permission)}
+            variant="outlined"
+            icon={selected ? <DoneIcon /> : <DoneIcon visibility="hidden" />}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+export default FilterChips;
