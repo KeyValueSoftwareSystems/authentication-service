@@ -45,7 +45,7 @@ props:FilterChipsProps
             label={permission.name}
             onClick={() => handleClick(permission)}
             variant="outlined"
-            icon={selected ? <DoneIcon /> : <DoneIcon visibility="hidden" />}
+            icon={selected ? <DoneIcon /> : <> </>}
           />
         );
       })}
