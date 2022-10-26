@@ -257,7 +257,7 @@ const UserForm = (props: any) => {
               </TabList>
             </Box>
             <TabPanel value="groups" id="groups-permissions">
-              <div id="add-items">
+              <div id="user-groups">
                 <ChecklistComponent
                   name="Select Groups"
                   mapList={groupData?.getGroups}
@@ -267,7 +267,7 @@ const UserForm = (props: any) => {
                 />
               </div>
               <Divider orientation="vertical" flexItem sx={{ marginLeft: 2 }} />
-              <div id="add-items">
+              <div id="user-groups">
                 <Grid item xs={10} lg={6.7} sx={{ paddingLeft: 5 }}>
                   <div className="header">
                     Permissions summary of selected roles

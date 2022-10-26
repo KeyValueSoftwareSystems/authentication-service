@@ -18,6 +18,12 @@
   padding-right: 5px;
 }
 
+#user-groups {
+  margin-top: 10px;
+  width: 50%;
+  padding-right: 5px;
+}
+
 #titleChecklist {
   font-size: 16px;
   color: #040404;
