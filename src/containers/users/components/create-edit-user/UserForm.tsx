@@ -156,7 +156,7 @@ const UserForm = (props: any) => {
     navigate("/home/users");
   };
 
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>("groups");
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
