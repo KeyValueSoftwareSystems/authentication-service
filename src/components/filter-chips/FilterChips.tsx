@@ -32,13 +32,9 @@ props:FilterChipsProps
         return (
           <Chip
             sx={selected?{
-              alignItems: "center",
-              display: "inline-flex",
               fontSize: "medium",
               borderColor:'#01579B'
             }:{
-              alignItems: "center",
-              display: "inline-flex",
               fontSize: "medium",
             }}
             key={permission.id}
