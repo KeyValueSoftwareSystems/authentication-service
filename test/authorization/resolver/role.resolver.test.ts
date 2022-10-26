@@ -29,6 +29,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: 'active',
   },
 ];
 
@@ -214,6 +215,7 @@ describe('Role Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
+          status: 'active',
         },
       ];
       const roleInPayload: Role = {
@@ -266,6 +268,7 @@ describe('Role Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
+          status: 'active',
         },
       ];
       const permissions: Permission[] = [

@@ -25,6 +25,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: 'active',
   },
 ];
 const permissions: Permission[] = [

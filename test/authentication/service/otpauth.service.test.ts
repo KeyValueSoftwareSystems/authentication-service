@@ -26,6 +26,7 @@ let users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: 'active',
   },
 ];
 
@@ -69,6 +70,7 @@ describe('test OTPAuthService', () => {
         lastName: 'Test2',
         refreshToken: token.refreshToken,
         origin: 'simple',
+        status: 'active',
       },
     ];
   });
@@ -84,6 +86,7 @@ describe('test OTPAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
 
@@ -121,6 +124,7 @@ describe('test OTPAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
     const input: UserOTPLoginInput = {
@@ -146,6 +150,7 @@ describe('test OTPAuthService', () => {
         firstName: users[0].firstName,
         lastName: users[0].lastName,
         origin: 'simple',
+        status: 'active',
       },
     ];
     const userSignup: UserOTPSignupInput = {
@@ -172,6 +177,7 @@ describe('test OTPAuthService', () => {
       firstName: resp.firstName,
       lastName: resp.lastName,
       origin: 'simple',
+      status: 'active',
     };
 
     const expectedUser = users[0];
@@ -187,6 +193,7 @@ describe('test OTPAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
     const userSignup: UserOTPSignupInput = {

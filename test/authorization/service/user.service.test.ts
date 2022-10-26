@@ -29,6 +29,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: 'active',
   },
 ];
 
@@ -149,6 +150,7 @@ describe('test UserService', () => {
       firstName: 'Test1',
       lastName: 'Test2',
       origin: 'simple',
+      status: 'active',
     };
     userRepository.create(input).returns(users[0]);
 

@@ -41,6 +41,7 @@ describe('test TokenService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
     const token = authenticationHelper.generateTokenForUser(users[0]);
@@ -65,6 +66,7 @@ describe('test TokenService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
     userService
@@ -86,6 +88,7 @@ describe('test TokenService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
     userService

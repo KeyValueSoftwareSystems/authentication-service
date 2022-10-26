@@ -26,6 +26,7 @@ let users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: 'active',
   },
 ];
 
@@ -69,6 +70,7 @@ describe('test PasswordAuthService', () => {
         lastName: 'Test2',
         refreshToken: token.refreshToken,
         origin: 'simple',
+        status: 'active',
       },
     ];
   });
@@ -85,6 +87,7 @@ describe('test PasswordAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
 
@@ -138,6 +141,7 @@ describe('test PasswordAuthService', () => {
         firstName: users[0].firstName,
         lastName: users[0].lastName,
         origin: 'simple',
+        status: 'active',
       },
     ];
 
@@ -164,6 +168,7 @@ describe('test PasswordAuthService', () => {
       firstName: resp.firstName,
       lastName: resp.lastName,
       origin: 'simple',
+      status: 'active',
     };
 
     const expectedUser = users[0];
@@ -181,6 +186,7 @@ describe('test PasswordAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: 'active',
       },
     ];
     const userSingup: UserPasswordSignupInput = {

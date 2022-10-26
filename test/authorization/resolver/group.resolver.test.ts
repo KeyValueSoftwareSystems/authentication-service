@@ -29,6 +29,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: 'active',
   },
 ];
 
@@ -215,6 +216,7 @@ describe('Group Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
+          status: 'active',
         },
       ];
       const groupInPayload: Group[] = [
@@ -267,6 +269,7 @@ describe('Group Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
+          status: 'active',
         },
       ];
       const roles: Role[] = [
