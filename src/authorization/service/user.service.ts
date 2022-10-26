@@ -9,7 +9,10 @@ import {
   UpdateUserInput,
   UpdateUserPermissionInput,
 } from '../../schema/graphql.schema';
-import { UserNotFoundException } from '../exception/user.exception';
+import {
+  AccountIsInactive,
+  UserNotFoundException,
+} from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
@@ -190,6 +193,10 @@ export default class UserService {
     if (!user) {
       throw new UserNotFoundException(id);
     }
+    if (user.status == 'inactive') {
+      throw new AccountIsInactive();
+    }
+    await this.updateField(id, 'status', 'inactive');
     await this.usersRepository.softDelete(id);
     await this.userCacheService.invalidateUserPermissionsCache(id);
     await this.userCacheService.invalidateUserGroupsCache(id);

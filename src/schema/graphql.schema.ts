@@ -240,6 +240,7 @@ export interface User {
     firstName: string;
     middleName?: string;
     lastName: string;
+    status: string;
     groups?: Group[];
     permissions?: Permission[];
 }

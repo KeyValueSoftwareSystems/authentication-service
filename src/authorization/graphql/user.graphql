@@ -5,6 +5,7 @@ type User {
   firstName: String!
   middleName: String
   lastName: String!
+  status: String!
   groups: [Group]
   permissions: [Permission]
 }

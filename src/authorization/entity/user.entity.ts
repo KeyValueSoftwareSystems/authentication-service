@@ -38,6 +38,12 @@ class User extends BaseEntity {
 
   @Column({ nullable: true, default: false })
   public twoFAEnabled?: boolean;
+
+  @Column({ default: 'inactive' })
+  public status!: string;
+
+  @Column({ nullable: true })
+  public inviteToken?: string;
 }
 
 export default User;
