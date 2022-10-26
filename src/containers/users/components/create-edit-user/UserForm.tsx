@@ -24,8 +24,14 @@ import { EntityPermissionsDetails } from "../../../../types/generic";
 import FilterChips from "../../../../components/filter-chips/FilterChips";
 
 const UserForm = (props: any) => {
-  const { isEdit, updateUser, createUser, userformSchema, currentGroups, currentPermissions } =
-    props;
+  const {
+    isEdit,
+    updateUser,
+    createUser,
+    userformSchema,
+    currentGroups,
+    currentPermissions,
+  } = props;
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -41,14 +47,17 @@ const UserForm = (props: any) => {
   );
 
   const handleClick = (permission: Permission) => {
-    if (selectedPermissions.map((permission)=>permission.id).includes(permission.id)){
-      console.log(permission.name)
+    if (
+      selectedPermissions
+        .map((permission) => permission.id)
+        .includes(permission.id)
+    ) {
       setSelectedPermissions(
         selectedPermissions.filter(
           (selected_permission) => selected_permission.id !== permission.id
         )
-      )}
-    else setSelectedPermissions([...selectedPermissions, permission]);
+      );
+    } else setSelectedPermissions([...selectedPermissions, permission]);
   };
 
   useEffect(() => {
@@ -57,7 +66,7 @@ const UserForm = (props: any) => {
         handlePermissions(group);
       });
       setUserGroups(currentGroups);
-      setSelectedPermissions(currentPermissions)
+      setSelectedPermissions(currentPermissions);
     }
   }, [currentGroups]);
 
@@ -176,9 +185,7 @@ const UserForm = (props: any) => {
               <legend id="bold">{isEdit ? "Modify user" : "Add user"}</legend>
               <div id="add-cancel">
                 <Button variant="text" onClick={onBackNavigation}>
-                  {/* <Link  to="/home/users"> */}
                   Cancel
-                  {/* </Link> */}
                 </Button>
                 <Button id="add" type="submit" variant="outlined">
                   {isEdit ? "Update" : "Add"}
