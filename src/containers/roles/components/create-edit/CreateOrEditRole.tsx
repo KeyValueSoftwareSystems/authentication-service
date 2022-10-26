@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { GET_ROLE_PERMISSIONS } from "../../services/queries";
-import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { NewRole } from "../../../../types/role";
-import { GET_PERMISSIONS } from "../../../permissions/services/queries";
 import {
   CREATE_ROLE,
   UPDATE_ROLE,
@@ -24,11 +22,8 @@ const CreateOrEditRole = () => {
 
   const handleClick = (permission: Permission) => {
     if (
-      rolePermissions
-        .map((permission) => permission.id)
-        .includes(permission.id)
+      rolePermissions.map((permission) => permission.id).includes(permission.id)
     ) {
-      console.log(permission.name);
       setRolePermissions(
         rolePermissions.filter(
           (role_permission) => role_permission.id !== permission.id
@@ -36,7 +31,6 @@ const CreateOrEditRole = () => {
       );
     } else setRolePermissions([...rolePermissions, permission]);
   };
-
 
   const [createRole, { data: createdRoleData }] = useMutation(CREATE_ROLE);
   const [updateRole, { data: updatedRoleData }] = useMutation(UPDATE_ROLE);
@@ -59,7 +53,9 @@ const CreateOrEditRole = () => {
       updateRolePermissions({
         variables: {
           id: createdRoleData?.createRole?.id,
-          input: { permissions: rolePermissions.map((permission)=>permission.id) },
+          input: {
+            permissions: rolePermissions.map((permission) => permission.id),
+          },
         },
         onCompleted: () => navigate("/home/roles"),
       });
@@ -79,7 +75,9 @@ const CreateOrEditRole = () => {
     updateRolePermissions({
       variables: {
         id: id,
-        input: { permissions: rolePermissions.map((permission)=>permission.id) },
+        input: {
+          permissions: rolePermissions.map((permission) => permission.id),
+        },
       },
     });
   };
@@ -91,9 +89,9 @@ const CreateOrEditRole = () => {
         <div className="permission-header"> Permissions</div>
         {!loading && (
           <FilterChips
-          selectedPermissions={rolePermissions}
-          handleClick={handleClick}
-        />
+            selectedPermissions={rolePermissions}
+            handleClick={handleClick}
+          />
         )}
       </div>
     </div>

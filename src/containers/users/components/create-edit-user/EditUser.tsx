@@ -15,11 +15,11 @@ import { Group, Permission } from "../../../../types/user";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-  const [userGroups,setUserGroups]=useState<Group[]>([]);
+  const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
     []
   );
-  
+
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
@@ -31,29 +31,20 @@ const EditUser: React.FC = () => {
   useQuery(GET_USER_GROUPS, {
     variables: { id },
     onCompleted: (data) => {
-      const groupList=data?.getUserGroups.map((group: any) => group);
-      setUserGroups(groupList)
+      const groupList = data?.getUserGroups.map((group: any) => group);
+      setUserGroups(groupList);
     },
   });
 
   useQuery(GET_USER_PERMISSIONS, {
     variables: { id },
     onCompleted: (data) => {
-      console.log(data?.getUserPermissions)
-      const permissionList=data?.getUserPermissions;
-      setSelectedPermissions(permissionList)
+      const permissionList = data?.getUserPermissions;
+      setSelectedPermissions(permissionList);
     },
   });
 
-  console.log(selectedPermissions)
-
-  const onUpdateUser = (
-    inputs: any,
-    userGroups: Group[],
-  ) => {
-
-    console.log(userGroups.map((group)=>group.id));
-    console.log(id)
+  const onUpdateUser = (inputs: any, userGroups: Group[]) => {
     updateUser({
       variables: {
         id: id,
@@ -69,7 +60,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          groups: userGroups.map((group)=>group.id),
+          groups: userGroups.map((group) => group.id),
         },
       },
     });
@@ -78,7 +69,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          permissions: selectedPermissions.map((permission)=>permission.id),
+          permissions: selectedPermissions.map((permission) => permission.id),
         },
       },
       onCompleted: () => {

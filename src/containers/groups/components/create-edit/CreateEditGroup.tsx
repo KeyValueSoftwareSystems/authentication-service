@@ -20,7 +20,6 @@ import {
 import "./styles.css";
 import GroupForm from "./GroupForm";
 import { GET_GROUP_PERMISSIONS, GET_GROUP_ROLES } from "../../services/queries";
-import { getUniquePermissions } from "../../../../utils/permissions";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
@@ -100,8 +99,6 @@ const CreateOrEditGroup = () => {
     skip: !id,
     variables: { id },
     onCompleted: (data) => {
-      console.log(id)
-      console.log(data?.getGroupPermissions);
       const permissionList = data?.getGroupPermissions;
       setSelectedPermissions(permissionList);
     },
@@ -113,7 +110,6 @@ const CreateOrEditGroup = () => {
         .map((permission) => permission.id)
         .includes(permission.id)
     ) {
-      console.log(permission.name);
       setSelectedPermissions(
         selectedPermissions.filter(
           (selected_permission) => selected_permission.id !== permission.id
@@ -177,7 +173,9 @@ const CreateOrEditGroup = () => {
       updateGroupPermissions({
         variables: {
           id: createdGroupData?.createGroup?.id,
-          input: { permissions: selectedPermissions.map((permission)=>permission.id) },
+          input: {
+            permissions: selectedPermissions.map((permission) => permission.id),
+          },
         },
       });
     }
@@ -214,7 +212,9 @@ const CreateOrEditGroup = () => {
     updateGroupPermissions({
       variables: {
         id: id,
-        input: { permissions: selectedPermissions.map((permission)=>permission.id) },
+        input: {
+          permissions: selectedPermissions.map((permission) => permission.id),
+        },
       },
     });
   };
