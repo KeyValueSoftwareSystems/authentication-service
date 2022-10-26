@@ -8,7 +8,7 @@ const AddUserformSchema = yup.object({
 });
 
 const EditUserformSchema = yup.object({
-  firstName: yup.string().required("First name can not be empty"),
+  firstName: yup.string(),
   lastName: yup.string(),
 });
 
