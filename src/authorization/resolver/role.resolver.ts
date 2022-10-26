@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   NewRoleInput,
   Permission,
@@ -63,5 +63,12 @@ export class RoleResolver {
     @Args('id', ParseUUIDPipe) id: string,
   ): Promise<Permission[]> {
     return this.roleService.getRolePermissions(id);
+  }
+
+  @ResolveField('permissions')
+  async getRolePermission(role: Role) {
+    if (role.id) {
+      return this.roleService.getRolePermissions(role.id);
+    }
   }
 }

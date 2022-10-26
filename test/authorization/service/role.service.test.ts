@@ -202,4 +202,32 @@ describe('test Role Service', () => {
     );
     expect(resp).toEqual(roles[0]);
   });
+
+  it('should return all permissions of the role', async () => {
+    const permissions: Permission[] = [
+      {
+        id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+        name: 'Customers',
+      },
+    ];
+    permissionRepository
+      .createQueryBuilder('permission')
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .leftJoinAndSelect(
+        RolePermission,
+        'rolePermission',
+        'permission.id = rolePermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .where('rolePermission.roleId = :roleId', {
+        roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+      })
+      .returns(permissionQueryBuilder);
+    const resp = await roleService.getRolePermissions(
+      'fcd858c6-26c5-462b-8c53-4b544830dca8',
+    );
+    expect(resp).toEqual(permissions);
+  });
 });
