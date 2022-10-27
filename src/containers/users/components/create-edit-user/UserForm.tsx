@@ -29,8 +29,6 @@ const UserForm = (props: any) => {
     updateUser,
     createUser,
     userformSchema,
-    currentGroups,
-    currentPermissions,
   } = props;
 
   const { id } = useParams();
@@ -38,7 +36,7 @@ const UserForm = (props: any) => {
   const [user, setUser] = useState<User>();
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [userGroups, setUserGroups] = useState<Group[]>([]);
-  const [userPermissions, setUserPermissions] = useState<
+  const [groupPermissions, setGroupPermissions] = useState<
     EntityPermissionsDetails[]
   >([]);
   const [allGroups, setAllGroups] = useState<Group[]>([]);
@@ -62,13 +60,11 @@ const UserForm = (props: any) => {
 
   useEffect(() => {
     if (id) {
-      currentGroups.forEach((group: Group) => {
+      userGroups.forEach((group: Group) => {
         handlePermissions(group);
       });
-      setUserGroups(currentGroups);
-      setSelectedPermissions(currentPermissions);
     }
-  }, [currentGroups]);
+  }, [userGroups]);
 
   const handlePermissions = async (group: Group) => {
     const response = await apolloClient.query({
@@ -78,7 +74,7 @@ const UserForm = (props: any) => {
       },
     });
     if (response) {
-      const currentPermissions = userPermissions;
+      const currentPermissions = groupPermissions;
       if (
         !currentPermissions.some((permission) => permission.id === group.id)
       ) {
@@ -88,7 +84,7 @@ const UserForm = (props: any) => {
           permissions: response?.data?.getGroupPermissions,
         });
       }
-      setUserPermissions([...currentPermissions]);
+      setGroupPermissions([...currentPermissions]);
     }
   };
 
@@ -104,12 +100,10 @@ const UserForm = (props: any) => {
     variables: { id: id },
     onCompleted: (data) => {
       setUser(data?.getUser);
+      setUserGroups(data?.getUser.groups);
+      setSelectedPermissions(data?.getUser.permissions)
     },
   });
-
-  useEffect(() => {
-    if (isEdit) setUserGroups(currentGroups);
-  }, [isEdit, currentGroups]);
 
   const methods = useForm({
     resolver: yupResolver(userformSchema),
@@ -127,8 +121,8 @@ const UserForm = (props: any) => {
     setUserGroups(
       userGroups.filter((groupDetails) => groupDetails.id !== group.id)
     );
-    setUserPermissions(
-      userPermissions.filter((permission) => permission.id !== group.id)
+    setGroupPermissions(
+      groupPermissions.filter((permission) => permission.id !== group.id)
     );
   };
 
@@ -154,7 +148,7 @@ const UserForm = (props: any) => {
     } else {
       if (value === "all") {
         setUserGroups([]);
-        setUserPermissions([]);
+        setGroupPermissions([]);
         setSelectAll(false);
       }
       removeGroup(group);
@@ -272,7 +266,7 @@ const UserForm = (props: any) => {
                   <div className="header">
                     Permissions summary of selected roles
                   </div>
-                  <PermissionTabs permissions={userPermissions} />
+                  <PermissionTabs permissions={groupPermissions} />
                 </Grid>
               </div>
             </TabPanel>
