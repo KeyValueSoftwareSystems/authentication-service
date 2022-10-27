@@ -1,13 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import {
+  Connection,
+  Equal,
+  FindOperator,
+  ILike,
+  Like,
+  Not,
+  Repository,
+} from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
   OperationType,
+  SearchCondition,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
+  UserInputFilter,
+  UserSearchInput,
 } from '../../schema/graphql.schema';
 import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
@@ -46,8 +57,90 @@ export default class UserService {
     private roleCacheService: RoleCacheService,
   ) {}
 
-  getAllUsers(): Promise<User[]> {
-    return this.usersRepository.find();
+  getAllUsers(input?: UserInputFilter): Promise<User[]> {
+    let searchTerm;
+    if (input) {
+      if (input.search) {
+        searchTerm = this.generateSearchTermForUsers(input.search);
+      }
+    }
+    return this.usersRepository.find({
+      where: searchTerm,
+    });
+  }
+
+  generateSearchTermForUsers(
+    input: UserSearchInput,
+  ): {
+    [key: string]: FindOperator<string | undefined>;
+  }[] {
+    const searchWhereCondition = [];
+    const andConditions: {
+      [key: string]: FindOperator<string | undefined>;
+    } = {};
+    if (input.and) {
+      if (input.and.email) {
+        andConditions[`email`] = this.generateWhereClauseForSearchTerm(
+          input.and.email,
+        );
+      }
+      if (input.and.firstName) {
+        andConditions[`firstName`] = this.generateWhereClauseForSearchTerm(
+          input.and.firstName,
+        );
+      }
+      if (input.and.middleName) {
+        andConditions[`middleName`] = this.generateWhereClauseForSearchTerm(
+          input.and.middleName,
+        );
+      }
+      if (input.and.lastName) {
+        andConditions[`lastName`] = this.generateWhereClauseForSearchTerm(
+          input.and.lastName,
+        );
+      }
+    }
+    if (Object.keys(andConditions).length) {
+      searchWhereCondition.push(andConditions);
+    }
+
+    if (input.or) {
+      if (input.or.email) {
+        searchWhereCondition.push({
+          email: this.generateWhereClauseForSearchTerm(input.or.email),
+        });
+      }
+      if (input.or.firstName) {
+        searchWhereCondition.push({
+          firstName: this.generateWhereClauseForSearchTerm(input.or.firstName),
+        });
+      }
+      if (input.or.middleName) {
+        searchWhereCondition.push({
+          middleName: this.generateWhereClauseForSearchTerm(
+            input.or.middleName,
+          ),
+        });
+      }
+      if (input.or.lastName) {
+        searchWhereCondition.push({
+          lastName: this.generateWhereClauseForSearchTerm(input.or.lastName),
+        });
+      }
+    }
+    return searchWhereCondition;
+  }
+
+  generateWhereClauseForSearchTerm(
+    input: SearchCondition,
+  ): FindOperator<string | undefined> {
+    if (input.contains) {
+      return ILike(`%${input.contains}%`);
+    } else if (input.equals) {
+      return Equal(input.equals);
+    } else {
+      return Like(`%%`);
+    }
   }
 
   async getUserById(id: string): Promise<User> {

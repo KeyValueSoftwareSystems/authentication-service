@@ -124,6 +124,27 @@ export interface UserPermissionsVerification {
     operation?: OperationType;
 }
 
+export interface UserInputFilter {
+    search?: UserSearchInput;
+}
+
+export interface UserSearchInput {
+    and?: UserSearchCondition;
+    or?: UserSearchCondition;
+}
+
+export interface UserSearchCondition {
+    email?: SearchCondition;
+    firstName?: SearchCondition;
+    middleName?: SearchCondition;
+    lastName?: SearchCondition;
+}
+
+export interface SearchCondition {
+    contains?: string;
+    equals?: string;
+}
+
 export interface IMutation {
     passwordLogin(input: UserPasswordLoginInput): TokenResponse | Promise<TokenResponse>;
     passwordSignup(input: UserPasswordSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
@@ -193,7 +214,7 @@ export interface IQuery {
     getRoles(): Role[] | Promise<Role[]>;
     getRole(id: string): Role | Promise<Role>;
     getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
-    getUsers(): User[] | Promise<User[]>;
+    getUsers(input?: UserInputFilter): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
