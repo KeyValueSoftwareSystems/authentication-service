@@ -125,7 +125,7 @@ describe('test UserService', () => {
   });
 
   it('should get all users', async () => {
-    userRepository.find().returns(Promise.resolve(users));
+    userRepository.find({ where: [] }).returns(Promise.resolve(users));
     const resp = await userService.getAllUsers();
     expect(resp).toEqual(users);
   });

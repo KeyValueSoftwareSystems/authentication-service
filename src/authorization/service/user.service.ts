@@ -58,7 +58,7 @@ export default class UserService {
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<User[]> {
-    let searchTerm;
+    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
     if (input) {
       if (input.search) {
         searchTerm = this.generateSearchTermForUsers(input.search);
