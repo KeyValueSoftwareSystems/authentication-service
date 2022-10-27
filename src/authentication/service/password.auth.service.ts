@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  Status,
   TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -8,7 +9,7 @@ import {
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
 import {
-  AccountIsInactive,
+  InactiveAccountException,
   UserNotFoundException,
 } from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
@@ -48,7 +49,7 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.firstName = userDetails.firstName;
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
-    userFromInput.status = 'active';
+    userFromInput.status = Status.ACTIVE;
 
     const plainTextPassword = userDetails.password as string;
     userFromInput.password = this.authenticationHelper.generatePasswordHash(
@@ -68,8 +69,8 @@ export default class PasswordAuthService implements Authenticatable {
     if (!userRecord) {
       throw new UserNotFoundException(userDetails.username);
     }
-    if (userRecord?.status == 'inactive') {
-      throw new AccountIsInactive();
+    if (userRecord?.status == Status.INACTIVE) {
+      throw new InactiveAccountException();
     }
     const token = await this.loginWithPassword(userRecord, userDetails);
     if (!token) {

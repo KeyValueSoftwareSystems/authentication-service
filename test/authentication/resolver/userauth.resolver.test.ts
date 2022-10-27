@@ -7,6 +7,7 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
+  Status,
   TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -30,7 +31,7 @@ const users: User[] = [
     firstName: 'Test',
     lastName: 'User',
     origin: 'simple',
-    status: 'active',
+    status: Status.ACTIVE,
   },
 ];
 

@@ -29,7 +29,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
-    status: 'active',
+    status: GqlSchema.Status.ACTIVE,
   },
 ];
 
@@ -216,7 +216,7 @@ describe('Group Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
-          status: 'active',
+          status: GqlSchema.Status.ACTIVE,
         },
       ];
       const groupInPayload: Group[] = [
@@ -269,7 +269,7 @@ describe('Group Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
-          status: 'active',
+          status: GqlSchema.Status.ACTIVE,
         },
       ];
       const roles: Role[] = [

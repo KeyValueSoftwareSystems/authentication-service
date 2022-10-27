@@ -5,12 +5,13 @@ import { Connection, Repository } from 'typeorm';
 import User from '../entity/user.entity';
 import {
   OperationType,
+  Status,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
 } from '../../schema/graphql.schema';
 import {
-  AccountIsInactive,
+  InactiveAccountException,
   UserNotFoundException,
 } from '../exception/user.exception';
 import Group from '../entity/group.entity';
@@ -193,11 +194,16 @@ export default class UserService {
     if (!user) {
       throw new UserNotFoundException(id);
     }
-    if (user.status == 'inactive') {
-      throw new AccountIsInactive();
+    if (user.status == Status.INACTIVE) {
+      throw new InactiveAccountException();
     }
-    await this.updateField(id, 'status', 'inactive');
-    await this.usersRepository.softDelete(id);
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const usersRepo = entityManager.getRepository(User);
+      await usersRepo.update(id, { status: Status.INACTIVE });
+      await usersRepo.softDelete(id);
+    });
+
     await this.userCacheService.invalidateUserPermissionsCache(id);
     await this.userCacheService.invalidateUserGroupsCache(id);
     return user;

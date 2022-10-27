@@ -6,6 +6,7 @@ import * as request from 'supertest';
 import {
   Entity,
   NewEntityInput,
+  Status,
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../../src/schema/graphql.schema';
@@ -27,7 +28,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
-    status: 'active',
+    status: Status.ACTIVE,
   },
 ];
 

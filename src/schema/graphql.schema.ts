@@ -7,6 +7,12 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum Status {
+    INVITED = "INVITED",
+    INACTIVE = "INACTIVE",
+    ACTIVE = "ACTIVE"
+}
+
 export enum OperationType {
     AND = "AND",
     OR = "OR"
@@ -240,7 +246,7 @@ export interface User {
     firstName: string;
     middleName?: string;
     lastName: string;
-    status: string;
+    status: Status;
     groups?: Group[];
     permissions?: Permission[];
 }

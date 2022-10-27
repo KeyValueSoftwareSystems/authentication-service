@@ -5,6 +5,7 @@ import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
 import {
   NewPermissionInput,
+  Status,
   UpdatePermissionInput,
 } from '../../../src/schema/graphql.schema';
 import { PermissionService } from '../../../src/authorization/service/permission.service';
@@ -25,7 +26,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
-    status: 'active',
+    status: Status.ACTIVE,
   },
 ];
 const permissions: Permission[] = [

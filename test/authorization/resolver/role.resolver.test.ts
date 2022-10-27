@@ -29,7 +29,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
-    status: 'active',
+    status: GqlSchema.Status.ACTIVE,
   },
 ];
 
@@ -215,7 +215,7 @@ describe('Role Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
-          status: 'active',
+          status: GqlSchema.Status.ACTIVE,
         },
       ];
       const roleInPayload: Role = {
@@ -268,7 +268,7 @@ describe('Role Module', () => {
           firstName: 'Test1',
           lastName: 'Test2',
           origin: 'simple',
-          status: 'active',
+          status: GqlSchema.Status.ACTIVE,
         },
       ];
       const permissions: Permission[] = [

@@ -12,6 +12,7 @@ import { TokenService } from '../../../src/authentication/service/token.service'
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import {
+  Status,
   TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -26,7 +27,7 @@ let users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
-    status: 'active',
+    status: Status.ACTIVE,
   },
 ];
 
@@ -70,7 +71,7 @@ describe('test PasswordAuthService', () => {
         lastName: 'Test2',
         refreshToken: token.refreshToken,
         origin: 'simple',
-        status: 'active',
+        status: Status.ACTIVE,
       },
     ];
   });
@@ -87,7 +88,7 @@ describe('test PasswordAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
-        status: 'active',
+        status: Status.ACTIVE,
       },
     ];
 
@@ -141,7 +142,7 @@ describe('test PasswordAuthService', () => {
         firstName: users[0].firstName,
         lastName: users[0].lastName,
         origin: 'simple',
-        status: 'active',
+        status: Status.ACTIVE,
       },
     ];
 
@@ -168,7 +169,7 @@ describe('test PasswordAuthService', () => {
       firstName: resp.firstName,
       lastName: resp.lastName,
       origin: 'simple',
-      status: 'active',
+      status: Status.ACTIVE,
     };
 
     const expectedUser = users[0];
@@ -186,7 +187,7 @@ describe('test PasswordAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
-        status: 'active',
+        status: Status.ACTIVE,
       },
     ];
     const userSingup: UserPasswordSignupInput = {

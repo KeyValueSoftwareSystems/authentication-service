@@ -27,7 +27,7 @@ const users: User[] = [
     firstName: 'Test',
     lastName: 'User',
     origin: 'simple',
-    status: 'active',
+    status: GqlSchema.Status.ACTIVE,
   },
 ];
 
@@ -131,7 +131,7 @@ describe('User Module', () => {
           firstName: users[0].firstName,
           lastName: users[0].lastName,
           origin: 'simple',
-          status: 'active',
+          status: GqlSchema.Status.ACTIVE,
         };
 
         const finalResponse: GqlSchema.User = {
@@ -141,7 +141,7 @@ describe('User Module', () => {
           firstName: users[0].firstName,
           lastName: users[0].lastName,
           permissions: permissions,
-          status: 'active',
+          status: GqlSchema.Status.ACTIVE,
         };
 
         const token = authenticationHelper.generateAccessToken(userInPayload);

@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 
 export class UserNotFoundException extends NotFoundException {
@@ -7,7 +7,7 @@ export class UserNotFoundException extends NotFoundException {
   }
 }
 
-export class AccountIsInactive extends BadRequestException {
+export class InactiveAccountException extends ForbiddenException {
   constructor() {
     super(`Account is inactive`);
   }
