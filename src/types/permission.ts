@@ -4,13 +4,19 @@ export interface Permission {
 }
 
 export interface RolePermissionsDetails {
-  roleId: string;
-  roleName: string;
+  id: string;
+  name: string;
   permissions: Permission[];
 }
 
 export interface GroupPermissionsDetails {
-  groupId: string;
-  groupName:string;
+  id: string;
+  name: string;
+  permissions: Permission[];
+}
+
+export interface EntityPermissionsDetails {
+  id: string;
+  name: string;
   permissions: Permission[];
 }

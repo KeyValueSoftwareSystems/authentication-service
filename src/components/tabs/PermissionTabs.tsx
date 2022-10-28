@@ -10,6 +10,7 @@ import { Chip } from "@mui/material";
 import { getOverallPermissions } from "../../utils/permissions";
 import "./styles.css";
 import { EntityPermissionsDetails } from "../../types/generic";
+import { Permission } from "../../types/user";
 
 interface StyledTabsProps {
   permissions: EntityPermissionsDetails[];
@@ -85,10 +86,10 @@ const PermissionTabs: React.FC<StyledTabsProps> = ({ permissions }) => {
     );
   };
 
-  const getPermissionsValues = (permissions: any) => {
+  const getPermissionsValues = (permissions: Permission[]) => {
     return (
       <div id="permission-list">
-        {permissions.map((p: any) => (
+        {permissions.map((p: Permission) => (
           <Chip label={p?.name} className="permission-chip" />
         ))}
       </div>

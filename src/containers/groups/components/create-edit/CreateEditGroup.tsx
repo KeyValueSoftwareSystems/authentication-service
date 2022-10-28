@@ -25,7 +25,7 @@ import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
 import PermissionTabs from "../../../../components/tabs/PermissionTabs";
-import { EntityPermissionsDetails } from "../../../../types/generic";
+import { Entity, EntityPermissionsDetails } from "../../../../types/generic";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -103,7 +103,10 @@ const CreateOrEditGroup = () => {
     ]);
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>, item: Role) => {
+  const onChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    item?: Entity
+  ) => {
     const value = event.target.value;
 
     if (event.target.checked) {
@@ -112,11 +115,13 @@ const CreateOrEditGroup = () => {
         setRoles(allRoles);
         return;
       }
-      handlePermissions(item);
-      if (roles[0] === null) {
-        setRoles([item]);
-      } else {
-        setRoles([...roles, item]);
+      if (item) {
+        handlePermissions(item);
+        if (roles[0] === null) {
+          setRoles([item]);
+        } else {
+          setRoles([...roles, item]);
+        }
       }
     } else {
       if (value === "all") {

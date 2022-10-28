@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useForm, FormProvider, FieldValues } from "react-hook-form";
-import { Box, Button, Chip, Divider, Grid, Tab } from "@mui/material";
+import { Button, Divider, Grid, Tab } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
@@ -17,23 +17,41 @@ import { Group, User } from "../../../../types/user";
 import "./styles.css";
 import apolloClient from "../../../../services/apolloClient";
 import PermissionTabs from "../../../../components/tabs/PermissionTabs";
-import { EntityPermissionsDetails } from "../../../../types/generic";
+import { Entity } from "../../../../types/generic";
+import { GroupPermissionsDetails } from "../../../../types/permission";
+import { AddUserformSchema, EditUserformSchema } from "../../userSchema";
 
-const UserForm = (props: any) => {
-  const { isEdit, updateUser, createUser, userformSchema, currentGroups } =
-    props;
+interface UserProps {
+  isEdit?: boolean;
+  updateUser?: (
+    inputs: FieldValues,
+    userGroups: Group[],
+    userPermissions: GroupPermissionsDetails[]
+  ) => void;
+  createUser?: (
+    inputs: FieldValues,
+    userGroups: Group[],
+    userPermissions: GroupPermissionsDetails[]
+  ) => void;
+  currentGroups?: Group[];
+}
+
+const UserForm = (props: UserProps) => {
+  const { isEdit, updateUser, createUser, currentGroups } = props;
+
+  const userformSchema = isEdit ? EditUserformSchema : AddUserformSchema;
 
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<User>();
   const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [userPermissions, setUserPermissions] = useState<
-    EntityPermissionsDetails[]
+    GroupPermissionsDetails[]
   >([]);
   const [allGroups, setAllGroups] = useState<Group[]>([]);
 
   useEffect(() => {
-    if (id) {
+    if (currentGroups) {
       currentGroups.forEach((group: Group) => {
         handlePermissions(group);
       });
@@ -78,10 +96,6 @@ const UserForm = (props: any) => {
     },
   });
 
-  useEffect(() => {
-    if (isEdit) setUserGroups(currentGroups);
-  }, [isEdit, currentGroups]);
-
   const methods = useForm({
     resolver: yupResolver(userformSchema),
   });
@@ -89,9 +103,8 @@ const UserForm = (props: any) => {
   const { handleSubmit } = methods;
 
   const onSubmitForm = (inputs: FieldValues) => {
-    isEdit
-      ? updateUser(inputs, userGroups, userPermissions)
-      : createUser(inputs, userGroups, userPermissions);
+    if (updateUser) updateUser(inputs, userGroups, userPermissions);
+    else if (createUser) createUser(inputs, userGroups, userPermissions);
   };
 
   const [getGroupPermissionsData] = useLazyQuery(GET_GROUP_PERMISSIONS);
@@ -107,41 +120,27 @@ const UserForm = (props: any) => {
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    group: Group
+    group?: Entity
   ) => {
     const value = event.target.value;
-
     if (event.target.checked) {
-      if (event.target.checked) {
-        if (value === "all") {
-          setUserGroups(allGroups);
-          allGroups.forEach((group) => {
-            handlePermissions(group);
-          });
-        } else {
-          setUserGroups([...userGroups, group]);
-        }
-        getGroupPermissionsData({
-          variables: { id: group.id },
-          fetchPolicy: "no-cache",
-          onCompleted: (data) => {
-            setUserPermissions([
-              ...userPermissions,
-              {
-                id: group.id,
-                name: group.name,
-                permissions: data?.getGroupPermissions,
-              },
-            ]);
-          },
+      if (value === "all") {
+        setUserGroups(allGroups);
+        allGroups.forEach((group) => {
+          handlePermissions(group);
         });
+      } else {
+        if (group) {
+          setUserGroups([...userGroups, group]);
+          handlePermissions(group);
+        }
       }
     } else {
       if (value === "all") {
         setUserGroups([]);
         setUserPermissions([]);
       }
-      removeGroup(group);
+      if (group) removeGroup(group);
     }
   };
 
@@ -163,9 +162,7 @@ const UserForm = (props: any) => {
               <legend id="bold">{isEdit ? "Modify user" : "Add user"}</legend>
               <div id="add-cancel">
                 <Button variant="text" onClick={onBackNavigation}>
-                  {/* <Link  to="/home/users"> */}
                   Cancel
-                  {/* </Link> */}
                 </Button>
                 <Button id="add" type="submit" variant="outlined">
                   {isEdit ? "Update" : "Add"}
@@ -237,20 +234,19 @@ const UserForm = (props: any) => {
           onChange={handleChange}
         />
 
-          <Divider orientation="vertical" flexItem sx={{ marginLeft: 2 }} />
-          <div id="add-items">
+        <Divider orientation="vertical" flexItem sx={{ marginLeft: 2 }} />
+        <div id="add-items">
           <Grid item xs={10} lg={6.7} sx={{ paddingLeft: 5 }}>
             <div className="header">Permissions summary of selected roles</div>
             <PermissionTabs permissions={userPermissions} />
           </Grid>
-          </div>
         </div>
-        {/* <div id="add-items">
+      </div>
+      {/* <div id="add-items">
           <span>Permissions</span>
           <PermissionTabs permissions={userPermissions} />
         </div> */}
-      </div>
-
+    </div>
   );
 };
 

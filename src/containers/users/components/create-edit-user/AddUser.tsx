@@ -11,7 +11,10 @@ import "./styles.css";
 import UserForm from "./UserForm";
 import { AddUserformSchema } from "../../userSchema";
 import { getUniquePermissions } from "../../../../utils/permissions";
-import { GroupPermissionsDetails } from "../../../../types/permission";
+import {
+  EntityPermissionsDetails,
+  GroupPermissionsDetails,
+} from "../../../../types/permission";
 import { FieldValues } from "react-hook-form";
 import { Group } from "../../../../types/user";
 
@@ -54,7 +57,7 @@ const AddUser: React.FC = () => {
       variables: {
         id: data?.passwordSignup.id,
         input: {
-          groups: userGroups.map((group)=>group.id),
+          groups: userGroups.map((group) => group.id),
         },
       },
     });
@@ -74,9 +77,7 @@ const AddUser: React.FC = () => {
     });
   };
 
-  return (
-    <UserForm createUser={onCreateUser} userformSchema={AddUserformSchema} />
-  );
+  return <UserForm createUser={onCreateUser} />;
 };
 
 export default AddUser;

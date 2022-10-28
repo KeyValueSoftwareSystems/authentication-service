@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { GET_ROLE_PERMISSIONS } from "../../services/queries";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
-import { NewRole } from "../../../../types/role";
 import { GET_PERMISSIONS } from "../../../permissions/services/queries";
 import {
   CREATE_ROLE,
@@ -14,6 +13,7 @@ import {
 import RoleForm from "./RoleForm";
 import "./styles.css";
 import { Permission } from "../../../../types/user";
+import { FieldValues } from "react-hook-form";
 
 const CreateOrEditRole = () => {
   const { id } = useParams();
@@ -77,7 +77,9 @@ const CreateOrEditRole = () => {
       updateRolePermissions({
         variables: {
           id: createdRoleData?.createRole?.id,
-          input: { permissions: rolePermissions },
+          input: {
+            permissions: rolePermissions.map((permission) => permission.id),
+          },
         },
         onCompleted: () => navigate("/home/roles"),
       });
@@ -88,19 +90,22 @@ const CreateOrEditRole = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatedRoleData, updatedRolePermissionsData]);
 
-  const onCreateRole = (inputs: NewRole) => {
+  const onCreateRole = (inputs: FieldValues) => {
     createRole({ variables: { input: inputs } });
   };
 
-  const onEditRole = (inputs: NewRole) => {
+  const onEditRole = (inputs: FieldValues) => {
     updateRole({ variables: { id: id, input: inputs } });
     updateRolePermissions({
       variables: {
         id: id,
-        input: { permissions: rolePermissions },
+        input: {
+          permissions: rolePermissions.map((permission) => permission.id),
+        },
       },
     });
   };
+  console.log(rolePermissions);
 
   return (
     <div className="roleContainer">

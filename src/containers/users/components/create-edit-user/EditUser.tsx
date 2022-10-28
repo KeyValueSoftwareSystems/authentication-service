@@ -14,14 +14,13 @@ import { getUniquePermissions } from "../../../../utils/permissions";
 import { GroupPermissionsDetails } from "../../../../types/permission";
 import "./styles.css";
 import { Group } from "../../../../types/user";
+import { FieldValues } from "react-hook-form";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
 
-  const [userPermissions] = useState<
-    GroupPermissionsDetails[]
-  >([]);
-  const [userGroups,setUserGroups]=useState<Group[]>([]);
+  const [userPermissions] = useState<GroupPermissionsDetails[]>([]);
+  const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
@@ -33,20 +32,18 @@ const EditUser: React.FC = () => {
   useQuery(GET_USER_GROUPS, {
     variables: { id },
     onCompleted: (data) => {
-      const groupList=data?.getUserGroups.map((group: any) => group);
-      setUserGroups(groupList)
+      const groupList = data?.getUserGroups.map((group: Group) => group);
+      setUserGroups(groupList);
     },
   });
 
-
   const onUpdateUser = (
-    inputs: any,
+    inputs: FieldValues,
     userGroups: Group[],
     userPermissions: GroupPermissionsDetails[]
   ) => {
-
-    console.log(userGroups.map((group)=>group.id));
-    console.log(id)
+    console.log(userGroups.map((group) => group.id));
+    console.log(id);
     updateUser({
       variables: {
         id: id,
@@ -62,7 +59,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          groups: userGroups.map((group)=>group.id),
+          groups: userGroups.map((group) => group.id),
         },
       },
     });
@@ -82,12 +79,7 @@ const EditUser: React.FC = () => {
   };
 
   return (
-    <UserForm
-      isEdit
-      updateUser={onUpdateUser}
-      userformSchema={EditUserformSchema}
-      currentGroups={userGroups}
-    />
+    <UserForm isEdit updateUser={onUpdateUser} currentGroups={userGroups} />
   );
 };
 
