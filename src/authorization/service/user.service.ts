@@ -194,9 +194,6 @@ export default class UserService {
     if (!user) {
       throw new UserNotFoundException(id);
     }
-    if (user.status == Status.INACTIVE) {
-      throw new InactiveAccountException();
-    }
 
     await this.connection.manager.transaction(async (entityManager) => {
       const usersRepo = entityManager.getRepository(User);
