@@ -86,3 +86,32 @@
   background-color: aliceblue;
   padding: 10px 0px 10px 20px;
 }
+
+.navbar-avatar {
+  padding: 0 !important;
+  margin-left: 7px;
+}
+
+.userdetails {
+  display: flex;
+  align-items: center;
+  margin-right: 28px;
+}
+
+.user-name {
+  font-size: 16px;
+  margin-left: 4px;
+  height: 20px;
+  font-weight: bold;
+}
+
+.user-email {
+  font-size: 13px;
+  margin-left: 4px;
+  color: #6d6d6d;
+}
+
+.details-icon {
+  margin-right: 10px;
+  color: #6d6d6d;
+}

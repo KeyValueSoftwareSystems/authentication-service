@@ -5,6 +5,13 @@ export const LOGIN = gql`
     passwordLogin(input: $input) {
       refreshToken
       accessToken
+      user {
+        id
+        firstName
+        lastName
+        email
+        phone
+      }
     }
   }
 `;
