@@ -39,4 +39,9 @@ export class TokenService {
     const tokenResponse: TokenResponse = { ...token, user: userRecord };
     return tokenResponse;
   }
+
+  async revokeToken( id: string ): Promise<string> {
+    await this.userService.updateField(id, 'inviteToken', null);
+    return 'Success';
+  }
 }

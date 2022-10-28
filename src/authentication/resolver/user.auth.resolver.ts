@@ -1,4 +1,4 @@
-import { UseGuards, UsePipes } from '@nestjs/common';
+import { ParseUUIDPipe, UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
   GenerateOtpInput,
@@ -67,6 +67,11 @@ export default class UserAuthResolver {
     request: UserPasswordForInviteInput,
   ): Promise<UserSignupResponse> {
     return this.passwordAuthService.setPasswordForInvite(request);
+  }
+
+  @Mutation('revokeToken')
+  async revokeToken(@Args('id', ParseUUIDPipe) id: string) {
+    return this.tokenService.revokeToken(id);
   }
 
   @Mutation('otpLogin')
