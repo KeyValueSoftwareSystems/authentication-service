@@ -20,14 +20,13 @@ import {
 import "./styles.css";
 import GroupForm from "./GroupForm";
 import { GET_GROUP_PERMISSIONS, GET_GROUP_ROLES } from "../../services/queries";
-import { getUniquePermissions } from "../../../../utils/permissions";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
 import PermissionTabs from "../../../../components/tabs/PermissionTabs";
-import { EntityPermissionsDetails } from "../../../../types/generic";
 import FilterChips from "../../../../components/filter-chips/FilterChips";
 import { Permission } from "../../../../types/user";
+import { Entity, EntityPermissionsDetails } from "../../../../types/generic";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -95,12 +94,13 @@ const CreateOrEditGroup = () => {
       setRoles([...roles, ...data.getGroupRoles]);
     },
   });
+  console.log(roles);
 
   useQuery(GET_GROUP_PERMISSIONS, {
     skip: !id,
     variables: { id },
     onCompleted: (data) => {
-      console.log(id)
+      console.log(id);
       console.log(data?.getGroupPermissions);
       const permissionList = data?.getGroupPermissions;
       setSelectedPermissions(permissionList);
@@ -131,7 +131,10 @@ const CreateOrEditGroup = () => {
     );
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>, item: Role) => {
+  const onChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    item?: Entity
+  ) => {
     const value = event.target.value;
 
     if (event.target.checked) {
@@ -140,11 +143,13 @@ const CreateOrEditGroup = () => {
         setRoles(allRoles);
         return;
       }
-      handlePermissions(item);
-      if (roles[0] === null) {
-        setRoles([item]);
-      } else {
-        setRoles([...roles, item]);
+      if (item) {
+        handlePermissions(item);
+        if (roles[0] === null) {
+          setRoles([item]);
+        } else {
+          setRoles([...roles, item]);
+        }
       }
     } else {
       if (value === "all") {
@@ -177,7 +182,9 @@ const CreateOrEditGroup = () => {
       updateGroupPermissions({
         variables: {
           id: createdGroupData?.createGroup?.id,
-          input: { permissions: selectedPermissions.map((permission)=>permission.id) },
+          input: {
+            permissions: selectedPermissions.map((permission) => permission.id),
+          },
         },
       });
     }
@@ -214,7 +221,9 @@ const CreateOrEditGroup = () => {
     updateGroupPermissions({
       variables: {
         id: id,
-        input: { permissions: selectedPermissions.map((permission)=>permission.id) },
+        input: {
+          permissions: selectedPermissions.map((permission) => permission.id),
+        },
       },
     });
   };

@@ -20,16 +20,32 @@ import { Group, Permission, User } from "../../../../types/user";
 import "./styles.css";
 import apolloClient from "../../../../services/apolloClient";
 import PermissionTabs from "../../../../components/tabs/PermissionTabs";
-import { EntityPermissionsDetails } from "../../../../types/generic";
+import { Entity } from "../../../../types/generic";
+import {
+  EntityPermissionsDetails,
+  GroupPermissionsDetails,
+} from "../../../../types/permission";
+import { AddUserformSchema, EditUserformSchema } from "../../userSchema";
 import FilterChips from "../../../../components/filter-chips/FilterChips";
 
-const UserForm = (props: any) => {
-  const {
-    isEdit,
-    updateUser,
-    createUser,
-    userformSchema,
-  } = props;
+interface UserProps {
+  isEdit?: boolean;
+  updateUser?: (
+    inputs: FieldValues,
+    userGroups: Group[],
+    userPermissions: Permission[]
+  ) => void;
+  createUser?: (
+    inputs: FieldValues,
+    userGroups: Group[],
+    userPermissions: Permission[]
+  ) => void;
+}
+
+const UserForm = (props: UserProps) => {
+  const { isEdit, updateUser, createUser } = props;
+
+  const userformSchema = isEdit ? EditUserformSchema : AddUserformSchema;
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -101,7 +117,7 @@ const UserForm = (props: any) => {
     onCompleted: (data) => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser.groups);
-      setSelectedPermissions(data?.getUser.permissions)
+      setSelectedPermissions(data?.getUser.permissions);
     },
   });
 
@@ -112,9 +128,8 @@ const UserForm = (props: any) => {
   const { handleSubmit } = methods;
 
   const onSubmitForm = (inputs: FieldValues) => {
-    isEdit
-      ? updateUser(inputs, userGroups, selectedPermissions)
-      : createUser(inputs, userGroups, selectedPermissions);
+    if (updateUser) updateUser(inputs, userGroups, selectedPermissions);
+    else if (createUser) createUser(inputs, userGroups, selectedPermissions);
   };
 
   const removeGroup = (group: Group) => {
@@ -128,10 +143,9 @@ const UserForm = (props: any) => {
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    group: Group
+    group?: Entity
   ) => {
     const value = event.target.value;
-
     if (event.target.checked) {
       if (event.target.checked) {
         if (value === "all") {
@@ -139,19 +153,20 @@ const UserForm = (props: any) => {
           allGroups.forEach((group) => {
             handlePermissions(group);
           });
-          setSelectAll(true);
         } else {
-          setUserGroups([...userGroups, group]);
+          if (group) {
+            setUserGroups([...userGroups, group]);
+            handlePermissions(group);
+          }
         }
-        handlePermissions(group);
+      } else {
+        if (value === "all") {
+          setUserGroups([]);
+          setGroupPermissions([]);
+          setSelectAll(false);
+        }
+        if (group) removeGroup(group);
       }
-    } else {
-      if (value === "all") {
-        setUserGroups([]);
-        setGroupPermissions([]);
-        setSelectAll(false);
-      }
-      removeGroup(group);
     }
   };
 

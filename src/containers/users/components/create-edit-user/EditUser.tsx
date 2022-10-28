@@ -7,14 +7,14 @@ import {
   UPDATE_USER_GROUPS,
   UPDATE_USER_PERMISSIONS,
 } from "../../services/mutations";
-import { EditUserformSchema } from "../../userSchema";
 import UserForm from "./UserForm";
 import "./styles.css";
 import { Group, Permission } from "../../../../types/user";
+import { FieldValues } from "react-hook-form";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-  
+
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
@@ -24,11 +24,10 @@ const EditUser: React.FC = () => {
   const navigate = useNavigate();
 
   const onUpdateUser = (
-    inputs: any,
+    inputs: FieldValues,
     userGroups: Group[],
-    selectedPermissions:Permission[]
+    selectedPermissions: Permission[]
   ) => {
-
     updateUser({
       variables: {
         id: id,
@@ -44,7 +43,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          groups: userGroups.map((group)=>group.id),
+          groups: userGroups.map((group) => group.id),
         },
       },
     });
@@ -53,7 +52,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          permissions: selectedPermissions.map((permission)=>permission.id),
+          permissions: selectedPermissions.map((permission) => permission.id),
         },
       },
       onCompleted: () => {
@@ -63,13 +62,7 @@ const EditUser: React.FC = () => {
     });
   };
 
-  return (
-    <UserForm
-      isEdit
-      updateUser={onUpdateUser}
-      userformSchema={EditUserformSchema}
-    />
-  );
+  return <UserForm isEdit updateUser={onUpdateUser} />;
 };
 
 export default EditUser;

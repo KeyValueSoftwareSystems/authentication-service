@@ -9,7 +9,6 @@ import {
 } from "../../services/mutations";
 import "./styles.css";
 import UserForm from "./UserForm";
-import { AddUserformSchema } from "../../userSchema";
 import { GroupPermissionsDetails } from "../../../../types/permission";
 import { FieldValues } from "react-hook-form";
 import { Group, Permission } from "../../../../types/user";
@@ -21,7 +20,7 @@ const AddUser: React.FC = () => {
     GroupPermissionsDetails[]
   >([]);
   const [userGroups, setUserGroups] = useState<Group[]>([]);
-  const [permissions, setPermissions]= useState<string[]>([]);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [createUser, { error: createUserError, data }] =
     useMutation(CREATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
@@ -37,7 +36,7 @@ const AddUser: React.FC = () => {
   const onCreateUser = (
     inputs: FieldValues,
     userGroups: Group[],
-    selectedPermissions:Permission[]
+    selectedPermissions: Permission[]
   ) => {
     createUser({
       variables: {
@@ -46,7 +45,7 @@ const AddUser: React.FC = () => {
     });
     setUserPermissions(userPermissions);
     setUserGroups(userGroups);
-    setPermissions(selectedPermissions.map((permission)=>permission.id));
+    setPermissions(selectedPermissions.map((permission) => permission.id));
   };
 
   const updateUserInfo = () => {
@@ -54,7 +53,7 @@ const AddUser: React.FC = () => {
       variables: {
         id: data?.passwordSignup.id,
         input: {
-          groups: userGroups.map((group)=>group.id),
+          groups: userGroups.map((group) => group.id),
         },
       },
     });
@@ -74,9 +73,7 @@ const AddUser: React.FC = () => {
     });
   };
 
-  return (
-    <UserForm createUser={onCreateUser} userformSchema={AddUserformSchema} />
-  );
+  return <UserForm createUser={onCreateUser} />;
 };
 
 export default AddUser;
