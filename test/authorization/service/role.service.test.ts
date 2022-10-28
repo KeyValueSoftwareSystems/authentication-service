@@ -17,6 +17,7 @@ import Role from '../../../src/authorization/entity/role.entity';
 import { RoleService } from '../../../src/authorization/service/role.service';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 import RoleCacheService from '../../../src/authorization/service/rolecache.service';
+import UserService from '../../../src/authorization/service/user.service';
 const roles: Role[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -39,6 +40,7 @@ describe('test Role Service', () => {
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
   const roleCacheService = Substitute.for<RoleCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
+  const userService = Substitute.for<UserService>();
   const connectionMock = Substitute.for<Connection>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
@@ -70,6 +72,7 @@ describe('test Role Service', () => {
         },
         { provide: 'RoleCacheService', useValue: roleCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
+        { provide: 'UserService', useValue: userService },
         {
           provide: Connection,
           useValue: connectionMock,
@@ -80,7 +83,7 @@ describe('test Role Service', () => {
   });
 
   it('should get all roles', async () => {
-    rolesRepository.find().returns(Promise.resolve(roles));
+    rolesRepository.find({ where: [] }).returns(Promise.resolve(roles));
     const resp = await roleService.getAllRoles();
     expect(resp).toEqual(roles);
   });

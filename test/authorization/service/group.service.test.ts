@@ -21,6 +21,7 @@ import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import Role from '../../../src/authorization/entity/role.entity';
 import User from '../../../src/authorization/entity/user.entity';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
+import UserService from '../../../src/authorization/service/user.service';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -62,6 +63,7 @@ describe('test Group Service', () => {
   const roleRepository = Substitute.for<Repository<Role>>();
   const connectionMock = Substitute.for<Connection>();
   const userCacheService = Substitute.for<UserCacheService>();
+  const userService = Substitute.for<UserService>();
   const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
@@ -107,6 +109,7 @@ describe('test Group Service', () => {
         { provide: 'UserCacheService', useValue: userCacheService },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
+        { provide: 'UserService', useValue: userService },
         {
           provide: Connection,
           useValue: connectionMock,
@@ -117,7 +120,7 @@ describe('test Group Service', () => {
   });
 
   it('should get all groups', async () => {
-    groupRepository.find().returns(Promise.resolve(groups));
+    groupRepository.find({ where: [] }).returns(Promise.resolve(groups));
     const resp = await groupService.getAllGroups();
     expect(resp).toEqual(groups);
   });
