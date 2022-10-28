@@ -131,7 +131,7 @@ export default class UserService {
     return searchWhereCondition;
   }
 
-  generateWhereClauseForSearchTerm(
+  public generateWhereClauseForSearchTerm(
     input: SearchCondition,
   ): FindOperator<string | undefined> {
     if (input.contains) {

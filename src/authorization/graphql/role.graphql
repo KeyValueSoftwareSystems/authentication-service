@@ -21,8 +21,21 @@ type RolePermission {
   name: String!
 }
 
+input RoleInputFilter {
+  search: RoleSearchInput
+}
+
+input RoleSearchInput {
+  and: RoleSearchCondition
+  or: RoleSearchCondition
+}
+
+input RoleSearchCondition {
+  name: SearchCondition
+}
+
 type Query {
-  getRoles: [Role]!
+  getRoles(input: RoleInputFilter): [Role]!
   getRole(id: ID!): Role
   getRolePermissions(id: ID!): [RolePermission]
 }

@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   NewRoleInput,
+  RoleInputFilter,
+  RoleSearchInput,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import { Connection, FindOperator, Repository } from 'typeorm';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
 import Permission from '../entity/permission.entity';
@@ -16,6 +18,7 @@ import {
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import RoleCacheService from './rolecache.service';
 import GroupRole from '../entity/groupRole.entity';
+import UserService from './user.service';
 
 @Injectable()
 export class RoleService {
@@ -30,10 +33,51 @@ export class RoleService {
     private permissionRepository: Repository<Permission>,
     private roleCacheService: RoleCacheService,
     private connection: Connection,
+    private userService: UserService,
   ) {}
 
-  async getAllRoles(): Promise<Role[]> {
-    return await this.rolesRepository.find();
+  async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
+    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    if (input) {
+      if (input.search) {
+        searchTerm = this.generateSearchTermForRole(input.search);
+      }
+    }
+    return await this.rolesRepository.find({
+      where: searchTerm,
+    });
+  }
+
+  generateSearchTermForRole(
+    input: RoleSearchInput,
+  ): {
+    [key: string]: FindOperator<string | undefined>;
+  }[] {
+    const searchWhereCondition = [];
+    const andConditions: {
+      [key: string]: FindOperator<string | undefined>;
+    } = {};
+    if (input.and) {
+      if (input.and.name) {
+        andConditions[
+          `name`
+        ] = this.userService.generateWhereClauseForSearchTerm(input.and.name);
+      }
+    }
+    if (Object.keys(andConditions).length) {
+      searchWhereCondition.push(andConditions);
+    }
+
+    if (input.or) {
+      if (input.or.name) {
+        searchWhereCondition.push({
+          name: this.userService.generateWhereClauseForSearchTerm(
+            input.or.name,
+          ),
+        });
+      }
+    }
+    return searchWhereCondition;
   }
 
   async getRoleById(id: string): Promise<Role> {

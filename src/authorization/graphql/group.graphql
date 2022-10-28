@@ -32,8 +32,21 @@ type GroupRole {
   name: String!
 }
 
+input GroupInputFilter {
+  search: GroupSearchInput
+}
+
+input GroupSearchInput {
+  and: GroupSearchCondition
+  or: GroupSearchCondition
+}
+
+input GroupSearchCondition {
+  name: SearchCondition
+}
+
 type Query {
-  getGroups: [Group]!
+  getGroups(input: GroupInputFilter): [Group]!
   getGroup(id: ID!): Group
   getGroupPermissions(id: ID!): [GroupPermission]
   getGroupRoles(id: ID!): [GroupRole]

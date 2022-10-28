@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  GroupInputFilter,
+  GroupSearchInput,
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import {
+  Connection,
+  createQueryBuilder,
+  FindOperator,
+  Repository,
+} from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -23,6 +30,7 @@ import { RoleNotFoundException } from '../exception/role.exception';
 import { UserNotFoundException } from '../exception/user.exception';
 import UserCacheService from './usercache.service';
 import User from '../entity/user.entity';
+import UserService from './user.service';
 
 @Injectable()
 export class GroupService {
@@ -44,10 +52,51 @@ export class GroupService {
     private userRepository: Repository<User>,
     private connection: Connection,
     private userCacheService: UserCacheService,
+    private userService: UserService,
   ) {}
 
-  getAllGroups(): Promise<Group[]> {
-    return this.groupsRepository.find();
+  getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
+    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    if (input) {
+      if (input.search) {
+        searchTerm = this.generateSearchTermForGroups(input.search);
+      }
+    }
+    return this.groupsRepository.find({
+      where: searchTerm,
+    });
+  }
+
+  generateSearchTermForGroups(
+    input: GroupSearchInput,
+  ): {
+    [key: string]: FindOperator<string | undefined>;
+  }[] {
+    const searchWhereCondition = [];
+    const andConditions: {
+      [key: string]: FindOperator<string | undefined>;
+    } = {};
+    if (input.and) {
+      if (input.and.name) {
+        andConditions[
+          `name`
+        ] = this.userService.generateWhereClauseForSearchTerm(input.and.name);
+      }
+    }
+    if (Object.keys(andConditions).length) {
+      searchWhereCondition.push(andConditions);
+    }
+
+    if (input.or) {
+      if (input.or.name) {
+        searchWhereCondition.push({
+          name: this.userService.generateWhereClauseForSearchTerm(
+            input.or.name,
+          ),
+        });
+      }
+    }
+    return searchWhereCondition;
   }
 
   async getGroupById(id: string): Promise<Group> {
