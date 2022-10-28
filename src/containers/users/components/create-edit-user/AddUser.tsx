@@ -9,12 +9,8 @@ import {
 } from "../../services/mutations";
 import "./styles.css";
 import UserForm from "./UserForm";
-import { AddUserformSchema } from "../../userSchema";
 import { getUniquePermissions } from "../../../../utils/permissions";
-import {
-  EntityPermissionsDetails,
-  GroupPermissionsDetails,
-} from "../../../../types/permission";
+import { GroupPermissionsDetails } from "../../../../types/permission";
 import { FieldValues } from "react-hook-form";
 import { Group } from "../../../../types/user";
 

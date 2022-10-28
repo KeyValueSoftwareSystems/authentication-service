@@ -1,9 +1,4 @@
-import {
-  EntityPermissionsDetails,
-  Permission,
-  RolePermissionsDetails,
-} from "../types/permission";
-import { Role } from "../types/role";
+import { EntityPermissionsDetails, Permission } from "../types/permission";
 
 export const getUniquePermissions = (
   permissions: EntityPermissionsDetails[]

@@ -8,7 +8,6 @@ import {
   UPDATE_USER_PERMISSIONS,
 } from "../../services/mutations";
 import { GET_USER_GROUPS } from "../../services/queries";
-import { EditUserformSchema } from "../../userSchema";
 import UserForm from "./UserForm";
 import { getUniquePermissions } from "../../../../utils/permissions";
 import { GroupPermissionsDetails } from "../../../../types/permission";
@@ -18,8 +17,6 @@ import { FieldValues } from "react-hook-form";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-
-  const [userPermissions] = useState<GroupPermissionsDetails[]>([]);
   const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =

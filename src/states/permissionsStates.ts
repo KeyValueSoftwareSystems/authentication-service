@@ -1,5 +1,4 @@
 import { atom } from "recoil";
-import { GroupPermissionsDetails } from "../types/permission";
 import { Permission } from "../types/user";
 
 export const permissionsListAtom = atom<Permission[]>({

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm, FormProvider, FieldValues } from "react-hook-form";
-import { Button, Divider, Grid, Tab } from "@mui/material";
+import { Button, Divider, Grid } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
@@ -106,8 +106,6 @@ const UserForm = (props: UserProps) => {
     if (updateUser) updateUser(inputs, userGroups, userPermissions);
     else if (createUser) createUser(inputs, userGroups, userPermissions);
   };
-
-  const [getGroupPermissionsData] = useLazyQuery(GET_GROUP_PERMISSIONS);
 
   const removeGroup = (group: Group) => {
     setUserGroups(
