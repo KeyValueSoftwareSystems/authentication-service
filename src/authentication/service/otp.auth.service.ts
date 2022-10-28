@@ -3,6 +3,7 @@ import User from '../../authorization/entity/user.entity';
 import { UserNotFoundException } from '../../authorization/exception/user.exception';
 import UserService from '../../authorization/service/user.service';
 import {
+  Status,
   TokenResponse,
   UserOTPLoginInput,
   UserOTPSignupInput,
@@ -44,6 +45,7 @@ export default class OTPAuthService implements Authenticatable {
     userFromInput.firstName = userDetails.firstName;
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
+    userFromInput.status = Status.ACTIVE;
 
     return this.userService.createUser(userFromInput);
   }

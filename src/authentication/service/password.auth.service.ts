@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  Status,
   TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -45,6 +46,7 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.firstName = userDetails.firstName;
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
+    userFromInput.status = Status.ACTIVE;
 
     const plainTextPassword = userDetails.password as string;
     userFromInput.password = this.authenticationHelper.generatePasswordHash(
