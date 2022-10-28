@@ -5,6 +5,14 @@ export const GET_GROUPS = gql`
     getGroups {
       id
       name
+      roles {
+        id
+        name
+      }
+      users {
+        firstName
+        lastName
+      }
     }
   }
 `;

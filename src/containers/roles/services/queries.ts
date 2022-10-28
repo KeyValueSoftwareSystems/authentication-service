@@ -5,6 +5,10 @@ export const GET_ROLES = gql`
     getRoles {
       id
       name
+      permissions {
+        id
+        name
+      }
     }
   }
 `;

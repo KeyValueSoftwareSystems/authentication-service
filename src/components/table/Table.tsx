@@ -90,6 +90,7 @@ const TableList: FC<TableProps> = ({
           }}
           disableSelectionOnClick
           onRowClick={handleRowClick}
+          disableColumnMenu
         />
       </div>
     </div>
