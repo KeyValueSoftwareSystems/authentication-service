@@ -70,6 +70,11 @@ export interface UserInviteTokenSignupInput {
     lastName: string;
 }
 
+export interface UserPasswordForInviteInput {
+    inviteToken: string;
+    password: string;
+}
+
 export interface NewEntityInput {
     name: string;
 }
@@ -142,6 +147,7 @@ export interface IMutation {
     passwordLogin(input: UserPasswordLoginInput): TokenResponse | Promise<TokenResponse>;
     passwordSignup(input: UserPasswordSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     inviteTokenSignup(input?: UserInviteTokenSignupInput): InviteTokenResponse | Promise<InviteTokenResponse>;
+    setPasswordForInvite(input?: UserPasswordForInviteInput): UserSignupResponse | Promise<UserSignupResponse>;
     otpLogin(input: UserOTPLoginInput): TokenResponse | Promise<TokenResponse>;
     otpSignup(input: UserOTPSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;

@@ -93,3 +93,8 @@ export const UserInviteTokenSignupInputSchema = Joi.object({
 })
   .options({ abortEarly: false })
   .or('email', 'phone');
+
+export const UserPasswordForInviteInputSchema = Joi.object({
+  inviteToken: Joi.string().required(),
+  password: Joi.string().required().min(10),
+}).options({ abortEarly: false });

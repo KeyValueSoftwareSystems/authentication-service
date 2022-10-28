@@ -2,6 +2,7 @@ type Mutation {
     passwordLogin(input: UserPasswordLoginInput!): TokenResponse
     passwordSignup(input: UserPasswordSignupInput!): UserSignupResponse
     inviteTokenSignup(input: UserInviteTokenSignupInput): InviteTokenResponse
+    setPasswordForInvite(input: UserPasswordForInviteInput): UserSignupResponse
     otpLogin(input: UserOTPLoginInput!): TokenResponse
     otpSignup(input: UserOTPSignupInput!): UserSignupResponse
     changePassword(input: UserPasswordInput!): User
@@ -79,4 +80,9 @@ input UserInviteTokenSignupInput {
 
 type InviteTokenResponse {
   inviteToken: String!
+}
+
+input UserPasswordForInviteInput {
+  inviteToken: String!
+  password: String!
 }

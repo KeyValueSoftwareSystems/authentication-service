@@ -4,13 +4,14 @@ import {
   Status,
   TokenResponse,
   UserInviteTokenSignupInput,
+  UserPasswordForInviteInput,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
   UserSignupResponse,
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
-import { UserNotFoundException } from '../../authorization/exception/user.exception';
+import { PasswordAlreadySetException, UserNotFoundException } from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
 import {
   InvalidCredentialsException,
@@ -85,6 +86,24 @@ export default class PasswordAuthService implements Authenticatable {
     );
     await this.userService.updateField(savedUser.id, 'inviteToken', token);
     return { inviteToken: token };
+  }
+
+  async setPasswordForInvite(
+    passwordDetails: UserPasswordForInviteInput,
+  ): Promise<UserSignupResponse> {
+    const verificationResponse: any = this.authenticationHelper.validateInvitationToken(passwordDetails.inviteToken);
+    const user = await this.userService.getUserById(verificationResponse.id);
+    if (user.password) {
+      throw new PasswordAlreadySetException(user.id);
+    }
+    const plainTextPassword = passwordDetails.password as string;
+    const hashedPassword = this.authenticationHelper.generatePasswordHash(
+      plainTextPassword,
+    );
+    user.password = hashedPassword;
+    user.status = Status.ACTIVE;
+    const updatedUser = this.userService.updateUser(user.id, user)
+    return updatedUser;
   }
 
   async userLogin(userDetails: UserPasswordLoginInput): Promise<TokenResponse> {

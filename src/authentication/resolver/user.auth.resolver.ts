@@ -7,6 +7,7 @@ import {
   TokenResponse,
   UserInviteTokenSignupInput,
   UserOTPLoginInput,
+  UserPasswordForInviteInput,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
   UserSignupResponse,
@@ -18,6 +19,7 @@ import {
   UserInviteTokenSignupInputSchema,
   UserOTPLoginInputSchema,
   UserOTPSignupInputSchema,
+  UserPasswordForInviteInputSchema,
   UserPasswordInputSchema,
   UserPasswordLoginInputSchema,
   UserPasswordSignupInputSchema,
@@ -57,6 +59,14 @@ export default class UserAuthResolver {
     request: UserInviteTokenSignupInput,
   ): Promise<InviteTokenResponse> {
     return this.passwordAuthService.inviteTokenSignup(request);
+  }
+
+  @Mutation('setPasswordForInvite')
+  async setPasswordForInvite(
+    @Args('input', new ValidationPipe(UserPasswordForInviteInputSchema))
+    request: UserPasswordForInviteInput,
+  ): Promise<UserSignupResponse> {
+    return this.passwordAuthService.setPasswordForInvite(request);
   }
 
   @Mutation('otpLogin')
