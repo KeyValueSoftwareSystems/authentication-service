@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import User from '../../authorization/entity/user.entity';
-import {
-  InactiveAccountException,
-  UserNotFoundException,
-} from '../../authorization/exception/user.exception';
+import { UserNotFoundException } from '../../authorization/exception/user.exception';
 import UserService from '../../authorization/service/user.service';
 import {
   Status,
@@ -62,9 +59,6 @@ export default class OTPAuthService implements Authenticatable {
     );
     if (!userRecord) {
       throw new UserNotFoundException(userDetails.username);
-    }
-    if (userRecord?.status == Status.INACTIVE) {
-      throw new InactiveAccountException();
     }
     const token = await this.loginWithOTP(
       userDetails.otp as string,

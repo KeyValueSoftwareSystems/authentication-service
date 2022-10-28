@@ -10,10 +10,7 @@ import {
   UpdateUserInput,
   UpdateUserPermissionInput,
 } from '../../schema/graphql.schema';
-import {
-  InactiveAccountException,
-  UserNotFoundException,
-} from '../exception/user.exception';
+import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';

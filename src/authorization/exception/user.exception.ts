@@ -6,9 +6,3 @@ export class UserNotFoundException extends NotFoundException {
     super(`User ${userId} not found`);
   }
 }
-
-export class InactiveAccountException extends ForbiddenException {
-  constructor() {
-    super(`Account is inactive`);
-  }
-}

@@ -8,10 +8,7 @@ import {
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
-import {
-  InactiveAccountException,
-  UserNotFoundException,
-} from '../../authorization/exception/user.exception';
+import { UserNotFoundException } from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
 import {
   InvalidCredentialsException,
@@ -68,9 +65,6 @@ export default class PasswordAuthService implements Authenticatable {
     );
     if (!userRecord) {
       throw new UserNotFoundException(userDetails.username);
-    }
-    if (userRecord?.status == Status.INACTIVE) {
-      throw new InactiveAccountException();
     }
     const token = await this.loginWithPassword(userRecord, userDetails);
     if (!token) {
