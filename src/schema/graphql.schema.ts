@@ -62,6 +62,14 @@ export interface Enable2FAInput {
     code: string;
 }
 
+export interface UserInviteTokenSignupInput {
+    email?: string;
+    phone?: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+}
+
 export interface NewEntityInput {
     name: string;
 }
@@ -133,6 +141,7 @@ export interface UserPermissionsVerification {
 export interface IMutation {
     passwordLogin(input: UserPasswordLoginInput): TokenResponse | Promise<TokenResponse>;
     passwordSignup(input: UserPasswordSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
+    inviteTokenSignup(input?: UserInviteTokenSignupInput): InviteTokenResponse | Promise<InviteTokenResponse>;
     otpLogin(input: UserOTPLoginInput): TokenResponse | Promise<TokenResponse>;
     otpSignup(input: UserOTPSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
@@ -174,6 +183,10 @@ export interface UserSignupResponse {
     firstName: string;
     middleName?: string;
     lastName: string;
+}
+
+export interface InviteTokenResponse {
+    inviteToken: string;
 }
 
 export interface Entity {

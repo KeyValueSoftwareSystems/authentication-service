@@ -2,8 +2,10 @@ import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
   GenerateOtpInput,
+  InviteTokenResponse,
   RefreshTokenInput,
   TokenResponse,
+  UserInviteTokenSignupInput,
   UserOTPLoginInput,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -13,6 +15,7 @@ import User from '../../authorization/entity/user.entity';
 import { AuthGuard } from '../authentication.guard';
 import {
   GenerateOtpInputSchema,
+  UserInviteTokenSignupInputSchema,
   UserOTPLoginInputSchema,
   UserOTPSignupInputSchema,
   UserPasswordInputSchema,
@@ -46,6 +49,14 @@ export default class UserAuthResolver {
     request: UserPasswordSignupInput,
   ): Promise<UserSignupResponse> {
     return this.passwordAuthService.userSignup(request);
+  }
+
+  @Mutation('inviteTokenSignup')
+  async inviteTokenSignup(
+    @Args('input', new ValidationPipe(UserInviteTokenSignupInputSchema))
+    request: UserInviteTokenSignupInput,
+  ): Promise<InviteTokenResponse> {
+    return this.passwordAuthService.inviteTokenSignup(request);
   }
 
   @Mutation('otpLogin')

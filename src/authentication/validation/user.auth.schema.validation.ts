@@ -77,3 +77,19 @@ export const EnableUser2FASchema = Joi.object({
   phone: Joi.string().trim(),
   email: Joi.string().trim(),
 }).xor('phone', 'email');
+
+export const UserInviteTokenSignupInputSchema = Joi.object({
+  email: Joi.string().email({ tlds: { allow: false } }),
+  phone: Joi.number(),
+  firstName: Joi.string()
+    .regex(/^[a-zA-Z ]*$/)
+    .required(),
+  middleName: Joi.string()
+    .regex(/^[a-zA-Z ]*$/)
+    .allow('', null),
+  lastName: Joi.string()
+    .regex(/^[a-zA-Z ]*$/)
+    .required(),
+})
+  .options({ abortEarly: false })
+  .or('email', 'phone');

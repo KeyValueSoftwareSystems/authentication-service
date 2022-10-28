@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import {
+  InviteTokenResponse,
   Status,
   TokenResponse,
+  UserInviteTokenSignupInput,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
   UserSignupResponse,
@@ -54,6 +56,35 @@ export default class PasswordAuthService implements Authenticatable {
     );
 
     return this.userService.createUser(userFromInput);
+  }
+
+  async inviteTokenSignup(
+    userDetails: UserInviteTokenSignupInput,
+  ): Promise<InviteTokenResponse> {
+    const verifyObj = await this.userService.verifyDuplicateUser(
+      userDetails.email,
+      userDetails.phone,
+    );
+    if (verifyObj.existingUserDetails) {
+        throw new UserExistsException(
+          verifyObj.existingUserDetails,
+          verifyObj.duplicate,
+        );
+    }
+    const userFromInput = new User();
+    userFromInput.email = userDetails.email;
+    userFromInput.phone = userDetails.phone;
+    userFromInput.firstName = userDetails.firstName;
+    userFromInput.middleName = userDetails.middleName;
+    userFromInput.lastName = userDetails.lastName;
+    userFromInput.status = Status.INVITED;
+    const savedUser = await this.userService.createUser(userFromInput);
+    const token = this.authenticationHelper.generateInvitationToken(
+      { id: savedUser.id },
+      '7d',
+    );
+    await this.userService.updateField(savedUser.id, 'inviteToken', token);
+    return { inviteToken: token };
   }
 
   async userLogin(userDetails: UserPasswordLoginInput): Promise<TokenResponse> {
