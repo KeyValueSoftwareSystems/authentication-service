@@ -39,8 +39,6 @@ const EditUser: React.FC = () => {
     userGroups: Group[],
     userPermissions: GroupPermissionsDetails[]
   ) => {
-    console.log(userGroups.map((group) => group.id));
-    console.log(id);
     updateUser({
       variables: {
         id: id,

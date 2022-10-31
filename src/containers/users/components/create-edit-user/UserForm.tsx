@@ -9,7 +9,7 @@ import {
   GET_GROUPS,
   GET_GROUP_PERMISSIONS,
 } from "../../../groups/services/queries";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import FormInputText from "../../../../components/inputText";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { GET_USER } from "../../services/queries";
@@ -26,12 +26,12 @@ interface UserProps {
   updateUser?: (
     inputs: FieldValues,
     userGroups: Group[],
-    userPermissions: GroupPermissionsDetails[]
+    groupPermissions: GroupPermissionsDetails[]
   ) => void;
   createUser?: (
     inputs: FieldValues,
     userGroups: Group[],
-    userPermissions: GroupPermissionsDetails[]
+    groupPermissions: GroupPermissionsDetails[]
   ) => void;
   currentGroups?: Group[];
 }
@@ -45,7 +45,7 @@ const UserForm = (props: UserProps) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User>();
   const [userGroups, setUserGroups] = useState<Group[]>([]);
-  const [userPermissions, setUserPermissions] = useState<
+  const [groupPermissions, setGroupPermissions] = useState<
     GroupPermissionsDetails[]
   >([]);
   const [allGroups, setAllGroups] = useState<Group[]>([]);
@@ -67,17 +67,14 @@ const UserForm = (props: UserProps) => {
       },
     });
     if (response) {
-      const currentPermissions = userPermissions;
-      if (
-        !currentPermissions.some((permission) => permission.id === group.id)
-      ) {
-        currentPermissions.push({
+      setGroupPermissions((previousState) => [
+        ...previousState,
+        {
           id: group.id,
           name: group.name,
           permissions: response?.data?.getGroupPermissions,
-        });
-      }
-      setUserPermissions([...currentPermissions]);
+        },
+      ]);
     }
   };
 
@@ -103,16 +100,16 @@ const UserForm = (props: UserProps) => {
   const { handleSubmit } = methods;
 
   const onSubmitForm = (inputs: FieldValues) => {
-    if (updateUser) updateUser(inputs, userGroups, userPermissions);
-    else if (createUser) createUser(inputs, userGroups, userPermissions);
+    if (updateUser) updateUser(inputs, userGroups, groupPermissions);
+    else if (createUser) createUser(inputs, userGroups, groupPermissions);
   };
 
   const removeGroup = (group: Group) => {
     setUserGroups(
       userGroups.filter((groupDetails) => groupDetails.id !== group.id)
     );
-    setUserPermissions(
-      userPermissions.filter((permission) => permission.id !== group.id)
+    setGroupPermissions(
+      groupPermissions.filter((permission) => permission.id !== group.id)
     );
   };
 
@@ -136,7 +133,7 @@ const UserForm = (props: UserProps) => {
     } else {
       if (value === "all") {
         setUserGroups([]);
-        setUserPermissions([]);
+        setGroupPermissions([]);
       }
       if (group) removeGroup(group);
     }
@@ -236,13 +233,13 @@ const UserForm = (props: UserProps) => {
         <div id="add-items">
           <Grid item xs={10} lg={6.7} sx={{ paddingLeft: 5 }}>
             <div className="header">Permissions summary of selected roles</div>
-            <PermissionTabs permissions={userPermissions} />
+            <PermissionTabs permissions={groupPermissions} />
           </Grid>
         </div>
       </div>
       {/* <div id="add-items">
           <span>Permissions</span>
-          <PermissionTabs permissions={userPermissions} />
+          <PermissionTabs permissions={groupPermissions} />
         </div> */}
     </div>
   );

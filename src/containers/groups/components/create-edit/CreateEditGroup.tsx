@@ -218,17 +218,14 @@ const CreateOrEditGroup = () => {
       });
 
       if (response?.data?.getRolePermissions) {
-        const currentPermissions = permissions;
-        if (
-          !currentPermissions.some((permission) => permission.id === role.id)
-        ) {
-          currentPermissions.push({
-            id: role.id as string,
+        setPermissions((previousState) => [
+          ...previousState,
+          {
+            id: role.id,
             name: role.name,
             permissions: response?.data?.getRolePermissions,
-          });
-          setPermissions([...currentPermissions]);
-        }
+          },
+        ]);
       }
     } finally {
       setStatus(false);

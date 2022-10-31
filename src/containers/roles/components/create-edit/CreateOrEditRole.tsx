@@ -105,7 +105,6 @@ const CreateOrEditRole = () => {
       },
     });
   };
-  console.log(rolePermissions);
 
   return (
     <div className="roleContainer">
