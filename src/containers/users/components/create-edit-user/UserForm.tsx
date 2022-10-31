@@ -111,7 +111,6 @@ const UserForm = (props: UserProps) => {
     onCompleted: (data) => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser.groups);
-      console.log(data?.getUser.permissions);
       setSelectedPermissions(data?.getUser.permissions);
     },
   });

@@ -43,7 +43,7 @@ const FilterChips: React.FC<FilterChipsProps> = (props: FilterChipsProps) => {
             label={permission.name}
             onClick={() => handleClick(permission)}
             variant="outlined"
-            icon={selected ? <DoneIcon /> : <> </>}
+            icon={selected ? <DoneIcon style={{ color: "green" }} /> : <> </>}
           />
         );
       })}
