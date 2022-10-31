@@ -4,6 +4,7 @@ import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewGroupInput,
+  Status,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
 } from '../../../src/schema/graphql.schema';
@@ -45,6 +46,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: Status.ACTIVE,
   },
 ];
 

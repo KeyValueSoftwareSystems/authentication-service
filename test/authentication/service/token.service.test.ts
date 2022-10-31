@@ -1,6 +1,7 @@
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
+import { Status } from '../../../src/schema/graphql.schema';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
@@ -41,6 +42,7 @@ describe('test TokenService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
     const token = authenticationHelper.generateTokenForUser(users[0]);
@@ -65,6 +67,7 @@ describe('test TokenService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
     userService
@@ -86,6 +89,7 @@ describe('test TokenService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
     userService

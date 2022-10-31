@@ -7,6 +7,7 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
+  Status,
   TokenResponse,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
@@ -30,6 +31,7 @@ const users: User[] = [
     firstName: 'Test',
     lastName: 'User',
     origin: 'simple',
+    status: Status.ACTIVE,
   },
 ];
 
@@ -88,6 +90,7 @@ describe('Userauth Module', () => {
           phone: users[0].phone,
           firstName: users[0].firstName,
           lastName: users[0].lastName,
+          status: users[0].status,
         };
         const tokenResponse = {
           accessToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
@@ -108,7 +111,7 @@ describe('Userauth Module', () => {
           .post(gql)
           .send({
             query:
-              'mutation { passwordLogin(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken, user{ id, email, phone, firstName, lastName } }}',
+              'mutation { passwordLogin(input: { username: "user@test.com" password: "s3cr3t1234567890" }) { accessToken, refreshToken, user{ id, email, phone, firstName, lastName, status } }}',
           })
           .expect(200)
           .expect((res) => {
@@ -196,6 +199,7 @@ describe('Userauth Module', () => {
         phone: users[0].phone,
         firstName: users[0].firstName,
         lastName: users[0].lastName,
+        status: users[0].status,
       };
       const tokenResponse: TokenResponse = { ...token, user: user };
       tokenService
@@ -205,7 +209,7 @@ describe('Userauth Module', () => {
       return request(app.getHttpServer())
         .post(gql)
         .send({
-          query: `mutation { refresh(input: { refreshToken: "${token.refreshToken}"}) { accessToken refreshToken user { id, email, phone, firstName, lastName } }}`,
+          query: `mutation { refresh(input: { refreshToken: "${token.refreshToken}"}) { accessToken refreshToken user { id, email, phone, firstName, lastName, status} }}`,
         })
         .expect(200)
         .expect((res) => {

@@ -14,6 +14,7 @@ import User from '../entity/user.entity';
 import {
   OperationType,
   SearchCondition,
+  Status,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -283,7 +284,13 @@ export default class UserService {
     if (!user) {
       throw new UserNotFoundException(id);
     }
-    await this.usersRepository.softDelete(id);
+
+    await this.connection.manager.transaction(async (entityManager) => {
+      const usersRepo = entityManager.getRepository(User);
+      await usersRepo.update(id, { status: Status.INACTIVE });
+      await usersRepo.softDelete(id);
+    });
+
     await this.userCacheService.invalidateUserPermissionsCache(id);
     await this.userCacheService.invalidateUserGroupsCache(id);
     return user;

@@ -1,3 +1,4 @@
+import { Status } from '../../schema/graphql.schema';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import BaseEntity from './base.entity';
 
@@ -38,6 +39,9 @@ class User extends BaseEntity {
 
   @Column({ nullable: true, default: false })
   public twoFAEnabled?: boolean;
+
+  @Column({ type: 'enum', enum: Status, default: Status.INACTIVE })
+  public status!: Status;
 }
 
 export default User;

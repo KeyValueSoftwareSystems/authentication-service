@@ -27,6 +27,7 @@ const users: User[] = [
     firstName: 'Test',
     lastName: 'User',
     origin: 'simple',
+    status: GqlSchema.Status.ACTIVE,
   },
 ];
 
@@ -130,6 +131,7 @@ describe('User Module', () => {
           firstName: users[0].firstName,
           lastName: users[0].lastName,
           origin: 'simple',
+          status: GqlSchema.Status.ACTIVE,
         };
 
         const finalResponse: GqlSchema.User = {
@@ -139,6 +141,7 @@ describe('User Module', () => {
           firstName: users[0].firstName,
           lastName: users[0].lastName,
           permissions: permissions,
+          status: GqlSchema.Status.ACTIVE,
         };
 
         const token = authenticationHelper.generateAccessToken(userInPayload);
@@ -156,7 +159,7 @@ describe('User Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f9") { id email phone firstName lastName permissions { id name } }}',
+              '{getUser(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f9") { id email phone firstName lastName status permissions { id name } }}',
           })
           .expect(200)
           .expect((res) => {

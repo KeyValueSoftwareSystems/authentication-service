@@ -12,6 +12,7 @@ import TwilioOTPService from '../../../src/authentication/service/twilio.otp.ser
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import {
+  Status,
   TokenResponse,
   UserOTPLoginInput,
   UserOTPSignupInput,
@@ -26,6 +27,7 @@ let users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: Status.ACTIVE,
   },
 ];
 
@@ -69,6 +71,7 @@ describe('test OTPAuthService', () => {
         lastName: 'Test2',
         refreshToken: token.refreshToken,
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
   });
@@ -84,6 +87,7 @@ describe('test OTPAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
 
@@ -121,6 +125,7 @@ describe('test OTPAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
     const input: UserOTPLoginInput = {
@@ -146,6 +151,7 @@ describe('test OTPAuthService', () => {
         firstName: users[0].firstName,
         lastName: users[0].lastName,
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
     const userSignup: UserOTPSignupInput = {
@@ -172,6 +178,7 @@ describe('test OTPAuthService', () => {
       firstName: resp.firstName,
       lastName: resp.lastName,
       origin: 'simple',
+      status: Status.ACTIVE,
     };
 
     const expectedUser = users[0];
@@ -187,6 +194,7 @@ describe('test OTPAuthService', () => {
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',
+        status: Status.ACTIVE,
       },
     ];
     const userSignup: UserOTPSignupInput = {

@@ -20,6 +20,7 @@ import PermissionCacheService from '../../../src/authorization/service/permissio
 import RoleCacheService from '../../../src/authorization/service/rolecache.service';
 import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
+import { Status } from '../../../src/schema/graphql.schema';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -29,6 +30,7 @@ const users: User[] = [
     firstName: 'Test1',
     lastName: 'Test2',
     origin: 'simple',
+    status: Status.ACTIVE,
   },
 ];
 
@@ -149,6 +151,7 @@ describe('test UserService', () => {
       firstName: 'Test1',
       lastName: 'Test2',
       origin: 'simple',
+      status: Status.ACTIVE,
     };
     userRepository.create(input).returns(users[0]);
 
