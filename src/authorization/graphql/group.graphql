@@ -42,7 +42,7 @@ input GroupSearchInput {
 }
 
 input GroupSearchCondition {
-  name: SearchCondition
+  name: StringSearchCondition
 }
 
 type Query {

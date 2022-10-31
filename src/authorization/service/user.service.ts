@@ -13,8 +13,8 @@ import {
 import User from '../entity/user.entity';
 import {
   OperationType,
-  SearchCondition,
   Status,
+  StringSearchCondition,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
@@ -34,6 +34,7 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
+import SearchService from './search.service';
 
 @Injectable()
 export default class UserService {
@@ -55,6 +56,7 @@ export default class UserService {
     private permissionCacheService: PermissionCacheService,
     private cacheManager: RedisCacheService,
     private connection: Connection,
+    private searchService: SearchService,
     private roleCacheService: RoleCacheService,
   ) {}
 
@@ -81,22 +83,30 @@ export default class UserService {
     } = {};
     if (input.and) {
       if (input.and.email) {
-        andConditions[`email`] = this.generateWhereClauseForSearchTerm(
+        andConditions[
+          `email`
+        ] = this.searchService.generateWhereClauseForStringSearch(
           input.and.email,
         );
       }
       if (input.and.firstName) {
-        andConditions[`firstName`] = this.generateWhereClauseForSearchTerm(
+        andConditions[
+          `firstName`
+        ] = this.searchService.generateWhereClauseForStringSearch(
           input.and.firstName,
         );
       }
       if (input.and.middleName) {
-        andConditions[`middleName`] = this.generateWhereClauseForSearchTerm(
+        andConditions[
+          `middleName`
+        ] = this.searchService.generateWhereClauseForStringSearch(
           input.and.middleName,
         );
       }
       if (input.and.lastName) {
-        andConditions[`lastName`] = this.generateWhereClauseForSearchTerm(
+        andConditions[
+          `lastName`
+        ] = this.searchService.generateWhereClauseForStringSearch(
           input.and.lastName,
         );
       }
@@ -108,40 +118,34 @@ export default class UserService {
     if (input.or) {
       if (input.or.email) {
         searchWhereCondition.push({
-          email: this.generateWhereClauseForSearchTerm(input.or.email),
+          email: this.searchService.generateWhereClauseForStringSearch(
+            input.or.email,
+          ),
         });
       }
       if (input.or.firstName) {
         searchWhereCondition.push({
-          firstName: this.generateWhereClauseForSearchTerm(input.or.firstName),
+          firstName: this.searchService.generateWhereClauseForStringSearch(
+            input.or.firstName,
+          ),
         });
       }
       if (input.or.middleName) {
         searchWhereCondition.push({
-          middleName: this.generateWhereClauseForSearchTerm(
+          middleName: this.searchService.generateWhereClauseForStringSearch(
             input.or.middleName,
           ),
         });
       }
       if (input.or.lastName) {
         searchWhereCondition.push({
-          lastName: this.generateWhereClauseForSearchTerm(input.or.lastName),
+          lastName: this.searchService.generateWhereClauseForStringSearch(
+            input.or.lastName,
+          ),
         });
       }
     }
     return searchWhereCondition;
-  }
-
-  public generateWhereClauseForSearchTerm(
-    input: SearchCondition,
-  ): FindOperator<string | undefined> {
-    if (input.contains) {
-      return ILike(`%${input.contains}%`);
-    } else if (input.equals) {
-      return Equal(input.equals);
-    } else {
-      return Like(`%%`);
-    }
   }
 
   async getUserById(id: string): Promise<User> {

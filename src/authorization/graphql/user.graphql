@@ -60,18 +60,18 @@ input UserInputFilter {
 }
 
 input UserSearchInput {
-  and: UserSearchCondition
-  or: UserSearchCondition
+  and: UserSearchParameter
+  or: UserSearchParameter
 }
 
-input UserSearchCondition {
-  email: SearchCondition
-  firstName: SearchCondition
-  middleName: SearchCondition
-  lastName: SearchCondition
+input UserSearchParameter {
+  email: StringSearchCondition
+  firstName: StringSearchCondition
+  middleName: StringSearchCondition
+  lastName: StringSearchCondition
 }
 
-input SearchCondition {
+input StringSearchCondition {
   contains: String
   equals: String
   #----Can Include-----#

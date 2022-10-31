@@ -31,6 +31,7 @@ import { UserNotFoundException } from '../exception/user.exception';
 import UserCacheService from './usercache.service';
 import User from '../entity/user.entity';
 import UserService from './user.service';
+import SearchService from './search.service';
 
 @Injectable()
 export class GroupService {
@@ -52,7 +53,7 @@ export class GroupService {
     private userRepository: Repository<User>,
     private connection: Connection,
     private userCacheService: UserCacheService,
-    private userService: UserService,
+    private searchService: SearchService,
   ) {}
 
   getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
@@ -80,7 +81,9 @@ export class GroupService {
       if (input.and.name) {
         andConditions[
           `name`
-        ] = this.userService.generateWhereClauseForSearchTerm(input.and.name);
+        ] = this.searchService.generateWhereClauseForStringSearch(
+          input.and.name,
+        );
       }
     }
     if (Object.keys(andConditions).length) {
@@ -90,7 +93,7 @@ export class GroupService {
     if (input.or) {
       if (input.or.name) {
         searchWhereCondition.push({
-          name: this.userService.generateWhereClauseForSearchTerm(
+          name: this.searchService.generateWhereClauseForStringSearch(
             input.or.name,
           ),
         });

@@ -19,6 +19,7 @@ import { PermissionNotFoundException } from '../exception/permission.exception';
 import RoleCacheService from './rolecache.service';
 import GroupRole from '../entity/groupRole.entity';
 import UserService from './user.service';
+import SearchService from './search.service';
 
 @Injectable()
 export class RoleService {
@@ -33,7 +34,7 @@ export class RoleService {
     private permissionRepository: Repository<Permission>,
     private roleCacheService: RoleCacheService,
     private connection: Connection,
-    private userService: UserService,
+    private searchService: SearchService,
   ) {}
 
   async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
@@ -61,7 +62,9 @@ export class RoleService {
       if (input.and.name) {
         andConditions[
           `name`
-        ] = this.userService.generateWhereClauseForSearchTerm(input.and.name);
+        ] = this.searchService.generateWhereClauseForStringSearch(
+          input.and.name,
+        );
       }
     }
     if (Object.keys(andConditions).length) {
@@ -71,7 +74,7 @@ export class RoleService {
     if (input.or) {
       if (input.or.name) {
         searchWhereCondition.push({
-          name: this.userService.generateWhereClauseForSearchTerm(
+          name: this.searchService.generateWhereClauseForStringSearch(
             input.or.name,
           ),
         });

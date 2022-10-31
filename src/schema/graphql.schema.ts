@@ -101,7 +101,7 @@ export interface GroupSearchInput {
 }
 
 export interface GroupSearchCondition {
-    name?: SearchCondition;
+    name?: StringSearchCondition;
 }
 
 export interface NewPermissionInput {
@@ -134,7 +134,7 @@ export interface RoleSearchInput {
 }
 
 export interface RoleSearchCondition {
-    name?: SearchCondition;
+    name?: StringSearchCondition;
 }
 
 export interface UpdateUserInput {
@@ -161,18 +161,18 @@ export interface UserInputFilter {
 }
 
 export interface UserSearchInput {
-    and?: UserSearchCondition;
-    or?: UserSearchCondition;
+    and?: UserSearchParameter;
+    or?: UserSearchParameter;
 }
 
-export interface UserSearchCondition {
-    email?: SearchCondition;
-    firstName?: SearchCondition;
-    middleName?: SearchCondition;
-    lastName?: SearchCondition;
+export interface UserSearchParameter {
+    email?: StringSearchCondition;
+    firstName?: StringSearchCondition;
+    middleName?: StringSearchCondition;
+    lastName?: StringSearchCondition;
 }
 
-export interface SearchCondition {
+export interface StringSearchCondition {
     contains?: string;
     equals?: string;
 }
