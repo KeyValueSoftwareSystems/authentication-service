@@ -1,20 +1,42 @@
-
 import { useMutation } from "@apollo/client";
 import { Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Button } from "@mui/material";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
+import {
+  Avatar,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import React from "react";
+import { useRecoilState } from "recoil";
 
 import { LOGO_URL } from "../../config";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
 import { LOGOUT } from "../auth/services/mutations";
-
+import { currentUserAtom } from "../../states/loginStates";
+import { stringAvatar, stringToColor } from "../../utils/table";
 
 const HomePage = () => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const navigate = useNavigate();
+
+  const [currentUserDetails] = useRecoilState(currentUserAtom);
 
   const [logout] = useMutation(LOGOUT, {
     onCompleted: () => {
@@ -33,14 +55,61 @@ const HomePage = () => {
           <div className="navLogo">
             <img alt="logo" src={LOGO_URL} />
           </div>
-          <div className="logout">
-            <Button
-              variant="outlined"
-              onClick={onLogout}
-              sx={{ textTransform: "none" }}
+          <div className="userdetails">
+            <Avatar
+              {...stringAvatar(
+                `${currentUserDetails.firstName} ${currentUserDetails.lastName}`
+              )}
+            />
+            <Tooltip title="Account Details">
+              <IconButton className="navbar-avatar" onClick={handleClick}>
+                <ArrowDropDownOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              onClick={handleClose}
+              className="menu-styles"
+              PaperProps={{
+                elevation: 0,
+              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-              Logout
-            </Button>
+              <MenuItem>
+                <Avatar
+                  {...stringAvatar(
+                    `${currentUserDetails.firstName} ${currentUserDetails.lastName}`
+                  )}
+                  sx={{
+                    marginLeft: "0px !important",
+                    bgcolor: stringToColor(
+                      `${currentUserDetails.firstName} ${currentUserDetails.lastName}`
+                    ),
+                  }}
+                />
+                <div>
+                  <div className="user-name">{`${currentUserDetails.firstName} ${currentUserDetails.lastName}`}</div>
+                  <div className="user-email">{currentUserDetails.email}</div>
+                </div>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  navigate(`./users/${currentUserDetails.id}`);
+                }}
+                sx={{ color: "#6d6d6d" }}
+              >
+                <AccountCircleOutlinedIcon className="details-icon" />
+                View Profile
+              </MenuItem>
+              <MenuItem onClick={onLogout} sx={{ color: "#6d6d6d" }}>
+                <LogoutOutlinedIcon className="details-icon" />
+                Logout
+              </MenuItem>
+            </Menu>
           </div>
         </div>
 

@@ -3,16 +3,16 @@ import React, { FC } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 import "./styles.css";
-
-const DEFAULT_SIZE = 6;
 interface TableChipElementProps {
   rowItems: any;
   columnName: string;
+  defaultSize: number;
 }
 
 const TableChipElement: FC<TableChipElementProps> = ({
   rowItems,
   columnName,
+  defaultSize,
 }) => {
   const { row } = rowItems;
 
@@ -41,13 +41,13 @@ const TableChipElement: FC<TableChipElementProps> = ({
         <>
           {row[columnName]?.map(
             (item: any, i: number) =>
-              i < DEFAULT_SIZE && (
+              i < defaultSize && (
                 <Chip label={item?.name} key={item?.id} id="chip" />
               )
           )}
-          {row[columnName]?.length > DEFAULT_SIZE && (
+          {row[columnName]?.length > defaultSize && (
             <Chip
-              label={`+${row[columnName]?.length - DEFAULT_SIZE}`}
+              label={`+${row[columnName]?.length - defaultSize}`}
               key="click-to-see-more"
               id="chip"
               onClick={onClickShowMore}

@@ -14,7 +14,7 @@
 }
 
 .group-list {
-  margin-left: 30px;
+  margin-left: 22px;
   display: flex;
   flex-wrap: wrap;
 }
@@ -23,4 +23,8 @@
   display: flex;
   width: 100%;
   cursor: pointer;
+}
+
+.user-list-header div {
+  margin-left: 7px;
 }

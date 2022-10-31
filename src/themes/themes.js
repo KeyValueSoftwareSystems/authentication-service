@@ -10,6 +10,33 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          minWidth: "250px !important",
+          overflow: "visible !important",
+          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32)) !important",
+          mt: "1.5 !important",
+          "& .MuiAvatar-root": {
+            width: 38,
+            height: 38,
+            marginRight: 6,
+          },
+          "&:before": {
+            content: '""',
+            display: "block",
+            position: "absolute",
+            top: 0,
+            right: 14,
+            width: 10,
+            height: 10,
+            backgroundColor: "#fff !important",
+            transform: "translateY(-50%) rotate(45deg)",
+            zIndex: 0,
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         // Name of the slot

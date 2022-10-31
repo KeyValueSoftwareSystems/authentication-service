@@ -24,17 +24,21 @@ const FilterChips: React.FC<FilterChipsProps> = (props: FilterChipsProps) => {
   return (
     <div className="chips-stack">
       {allPermissions?.map((permission: Permission) => {
-        const selected = selectedPermissions
-          .map((selected: Permission) => selected.id)
-          .includes(permission.id);
+        const selected = selectedPermissions.some(
+          (selected: Permission) => selected.id === permission.id
+        );
         return (
           <Chip
-            sx={selected?{
-              fontSize: "medium",
-              borderColor:'#01579B'
-            }:{
-              fontSize: "medium",
-            }}
+            sx={
+              selected
+                ? {
+                    fontSize: "medium",
+                    borderColor: "#01579B",
+                  }
+                : {
+                    fontSize: "medium",
+                  }
+            }
             key={permission.id}
             label={permission.name}
             onClick={() => handleClick(permission)}
