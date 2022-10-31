@@ -24,7 +24,6 @@ const CreateOrEditRole = () => {
     if (
       rolePermissions.map((permission) => permission.id).includes(permission.id)
     ) {
-      console.log(permission.name);
       setRolePermissions(
         rolePermissions.filter(
           (role_permission) => role_permission.id !== permission.id
@@ -82,7 +81,6 @@ const CreateOrEditRole = () => {
       },
     });
   };
-  console.log(rolePermissions);
 
   return (
     <div className="roleContainer">

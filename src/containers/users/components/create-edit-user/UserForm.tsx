@@ -21,10 +21,7 @@ import "./styles.css";
 import apolloClient from "../../../../services/apolloClient";
 import PermissionTabs from "../../../../components/tabs/PermissionTabs";
 import { Entity } from "../../../../types/generic";
-import {
-  EntityPermissionsDetails,
-  GroupPermissionsDetails,
-} from "../../../../types/permission";
+import { EntityPermissionsDetails } from "../../../../types/permission";
 import { AddUserformSchema, EditUserformSchema } from "../../userSchema";
 import FilterChips from "../../../../components/filter-chips/FilterChips";
 
@@ -62,9 +59,9 @@ const UserForm = (props: UserProps) => {
 
   const handleClick = (permission: Permission) => {
     if (
-      selectedPermissions
-        .map((permission) => permission.id)
-        .includes(permission.id)
+      selectedPermissions.some(
+        (selected_permission) => selected_permission.id === permission.id
+      )
     ) {
       setSelectedPermissions(
         selectedPermissions.filter(
@@ -90,17 +87,14 @@ const UserForm = (props: UserProps) => {
       },
     });
     if (response) {
-      const currentPermissions = groupPermissions;
-      if (
-        !currentPermissions.some((permission) => permission.id === group.id)
-      ) {
-        currentPermissions.push({
+      setGroupPermissions((previousState) => [
+        ...previousState,
+        {
           id: group.id,
           name: group.name,
           permissions: response?.data?.getGroupPermissions,
-        });
-      }
-      setGroupPermissions([...currentPermissions]);
+        },
+      ]);
     }
   };
 
@@ -117,6 +111,7 @@ const UserForm = (props: UserProps) => {
     onCompleted: (data) => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser.groups);
+      console.log(data?.getUser.permissions);
       setSelectedPermissions(data?.getUser.permissions);
     },
   });

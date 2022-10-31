@@ -94,14 +94,11 @@ const CreateOrEditGroup = () => {
       setRoles([...roles, ...data.getGroupRoles]);
     },
   });
-  console.log(roles);
 
   useQuery(GET_GROUP_PERMISSIONS, {
     skip: !id,
     variables: { id },
     onCompleted: (data) => {
-      console.log(id);
-      console.log(data?.getGroupPermissions);
       const permissionList = data?.getGroupPermissions;
       setSelectedPermissions(permissionList);
     },
@@ -109,11 +106,10 @@ const CreateOrEditGroup = () => {
 
   const handleClick = (permission: Permission) => {
     if (
-      selectedPermissions
-        .map((permission) => permission.id)
-        .includes(permission.id)
+      selectedPermissions.some(
+        (selected_permission) => selected_permission.id === permission.id
+      )
     ) {
-      console.log(permission.name);
       setSelectedPermissions(
         selectedPermissions.filter(
           (selected_permission) => selected_permission.id !== permission.id
@@ -250,17 +246,14 @@ const CreateOrEditGroup = () => {
       });
 
       if (response?.data?.getRolePermissions) {
-        const currentPermissions = permissions;
-        if (
-          !currentPermissions.some((permission) => permission.id === role.id)
-        ) {
-          currentPermissions.push({
-            id: role.id as string,
+        setPermissions((previousState) => [
+          ...previousState,
+          {
+            id: role.id,
             name: role.name,
             permissions: response?.data?.getRolePermissions,
-          });
-          setPermissions([...currentPermissions]);
-        }
+          },
+        ]);
       }
     } finally {
       setStatus(false);
