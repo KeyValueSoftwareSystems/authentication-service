@@ -72,12 +72,18 @@ const UserForm = (props: UserProps) => {
   };
 
   useEffect(() => {
-    if (id) {
+    if (groupPermissions.length === 0 || selectAll) {
       userGroups.forEach((group: Group) => {
         handlePermissions(group);
       });
     }
   }, [userGroups]);
+
+  useEffect(() => {
+    if (allGroups.length === userGroups.length) {
+      setSelectAll(true);
+    } else setSelectAll(false);
+  }, [allGroups, userGroups]);
 
   const handlePermissions = async (group: Group) => {
     const response = await apolloClient.query({
@@ -141,26 +147,26 @@ const UserForm = (props: UserProps) => {
   ) => {
     const value = event.target.value;
     if (event.target.checked) {
-      if (event.target.checked) {
-        if (value === "all") {
-          setUserGroups(allGroups);
-          allGroups.forEach((group) => {
-            handlePermissions(group);
-          });
-        } else {
-          if (group) {
-            setUserGroups([...userGroups, group]);
-            handlePermissions(group);
-          }
-        }
+      if (value === "all") {
+        setUserGroups(allGroups);
+        allGroups.forEach((group) => {
+          handlePermissions(group);
+        });
+        setSelectAll(true);
       } else {
-        if (value === "all") {
-          setUserGroups([]);
-          setGroupPermissions([]);
-          setSelectAll(false);
+        setSelectAll(false);
+        if (group) {
+          setUserGroups([...userGroups, group]);
+          handlePermissions(group);
         }
-        if (group) removeGroup(group);
       }
+    } else {
+      setSelectAll(false);
+      if (value === "all") {
+        setUserGroups([]);
+        setGroupPermissions([]);
+      }
+      if (group) removeGroup(group);
     }
   };
 
