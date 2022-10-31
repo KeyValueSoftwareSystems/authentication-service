@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
-import { TokenResponse } from '../../schema/graphql.schema';
+import { InviteTokenResponse, TokenResponse } from '../../schema/graphql.schema';
 import { AuthenticationHelper } from '../authentication.helper';
 
 @Injectable()
@@ -27,6 +27,16 @@ export class TokenService {
 
   async resetToken(id: string): Promise<void> {
     await this.userService.updateField(id, 'refreshToken', '');
+  }
+
+  async refreshInviteToken(id: string): Promise<InviteTokenResponse> {
+    const userDetails = await this.userService.getUserById(id);
+    const token = this.authenticationHelper.generateInvitationToken(
+      { id: userDetails.id },
+      '7d',
+    );
+    await this.userService.updateField(userDetails.id, 'inviteToken', token);
+    return { inviteToken: token };
   }
 
   async getNewToken(userRecord: User): Promise<TokenResponse> {

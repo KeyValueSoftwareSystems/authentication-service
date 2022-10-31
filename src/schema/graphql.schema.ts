@@ -147,6 +147,7 @@ export interface IMutation {
     passwordLogin(input: UserPasswordLoginInput): TokenResponse | Promise<TokenResponse>;
     passwordSignup(input: UserPasswordSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     inviteTokenSignup(input?: UserInviteTokenSignupInput): InviteTokenResponse | Promise<InviteTokenResponse>;
+    refreshInviteToken(id: string): InviteTokenResponse | Promise<InviteTokenResponse>;
     setPasswordForInvite(input?: UserPasswordForInviteInput): UserSignupResponse | Promise<UserSignupResponse>;
     revokeToken(id: string): string | Promise<string>;
     otpLogin(input: UserOTPLoginInput): TokenResponse | Promise<TokenResponse>;

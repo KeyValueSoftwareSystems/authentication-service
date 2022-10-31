@@ -69,6 +69,13 @@ export default class UserAuthResolver {
     return this.passwordAuthService.setPasswordForInvite(request);
   }
 
+  @Mutation('refreshInviteToken')
+  async refreshInviteToken(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<InviteTokenResponse> {
+    return this.tokenService.refreshInviteToken(id);
+  }
+
   @Mutation('revokeToken')
   async revokeToken(@Args('id', ParseUUIDPipe) id: string) {
     return this.tokenService.revokeToken(id);
