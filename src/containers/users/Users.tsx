@@ -44,7 +44,7 @@ const Users: React.FC = () => {
       headerName: "User",
       width: 320,
       headerClassName: "user-list-header",
-      headerAlign: "center",
+      headerAlign: "left",
       renderCell: (params) => (
         <div className="username-column">
           <GetFullName {...params} />
@@ -58,10 +58,15 @@ const Users: React.FC = () => {
       flex: 0.5,
       renderCell: (params) => (
         <div className="group-list">
-          <TableChipElement rowItems={params} columnName="groups" />
+          <TableChipElement
+            rowItems={params}
+            columnName="groups"
+            defaultSize={6}
+          />
         </div>
       ),
-      headerAlign: "center",
+      headerAlign: "left",
+      sortable: false,
     },
   ];
 
@@ -89,12 +94,14 @@ const Users: React.FC = () => {
 
 const GetFullName = (props: any) => {
   const { row } = props;
-  let fullName = row.firstName.concat(" ", row.lastName);
   return (
     <>
-      <Avatar {...stringAvatar(fullName)} className="avatar" />
+      <Avatar
+        {...stringAvatar(`${row.firstName} ${row.lastName}`?.toUpperCase())}
+        className="avatar"
+      />
       <div>
-        <div className="fullname">{fullName}</div>
+        <div className="fullname">{`${row.firstName} ${row.lastName}`}</div>
         <div className="email">{row.email}</div>
       </div>
     </>

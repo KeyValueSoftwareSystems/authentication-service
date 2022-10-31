@@ -10,6 +10,7 @@ import { GET_GROUPS } from "../../services/queries";
 import TableList from "../../../../components/table";
 import { groupListAtom } from "../../../../states/groupStates";
 import TableChipElement from "../../../../components/table-chip-element";
+import AvatarList from "../../../../components/avatar-list/AvatarList";
 
 const GroupList: React.FC = () => {
   const navigate = useNavigate();
@@ -29,22 +30,40 @@ const GroupList: React.FC = () => {
   const columns: GridColumns = [
     {
       field: "name",
-      headerName: "Groups",
+      headerName: "Group",
       headerClassName: "user-list-header",
-      headerAlign: "center",
+      headerAlign: "left",
       width: 280,
     },
     {
       field: "roles",
       headerName: "Roles",
       headerClassName: "user-list-header",
+      flex: 0.6,
+      renderCell: (params) => (
+        <div className="role-list">
+          <TableChipElement
+            rowItems={params}
+            columnName="roles"
+            defaultSize={5}
+          />
+        </div>
+      ),
+      headerAlign: "left",
+      sortable: false,
+    },
+    {
+      field: "users",
+      headerName: "Members",
+      headerClassName: "user-list-header",
       flex: 0.5,
       renderCell: (params) => (
         <div className="role-list">
-          <TableChipElement rowItems={params} columnName="roles" />
+          <AvatarList {...params} />
         </div>
       ),
-      headerAlign: "center",
+      headerAlign: "left",
+      sortable: false,
     },
   ];
 
