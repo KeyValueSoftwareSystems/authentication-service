@@ -22,7 +22,7 @@ import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import Role from '../../../src/authorization/entity/role.entity';
 import User from '../../../src/authorization/entity/user.entity';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
-import UserService from '../../../src/authorization/service/user.service';
+import SearchService from '../../../src/authorization/service/search.service';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -65,7 +65,7 @@ describe('test Group Service', () => {
   const roleRepository = Substitute.for<Repository<Role>>();
   const connectionMock = Substitute.for<Connection>();
   const userCacheService = Substitute.for<UserCacheService>();
-  const userService = Substitute.for<UserService>();
+  const searchService = Substitute.for<SearchService>();
   const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
@@ -111,7 +111,7 @@ describe('test Group Service', () => {
         { provide: 'UserCacheService', useValue: userCacheService },
         { provide: 'GroupCacheService', useValue: groupCacheService },
         { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'UserService', useValue: userService },
+        { provide: 'SearchService', useValue: searchService },
         {
           provide: Connection,
           useValue: connectionMock,
