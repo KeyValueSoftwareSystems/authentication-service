@@ -21,7 +21,7 @@ export const GET_USERS = gql`
       firstName
       middleName
       lastName
-      groups{
+      groups {
         id
         name
       }
