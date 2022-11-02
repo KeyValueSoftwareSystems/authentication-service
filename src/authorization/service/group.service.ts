@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  GroupInputFilter,
   NewGroupInput,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import { Connection, FindOperator, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -23,6 +24,8 @@ import { RoleNotFoundException } from '../exception/role.exception';
 import { UserNotFoundException } from '../exception/user.exception';
 import UserCacheService from './usercache.service';
 import User from '../entity/user.entity';
+import SearchService from './search.service';
+import { SearchEntity } from '../../constants/search.entity.enum';
 
 @Injectable()
 export class GroupService {
@@ -44,10 +47,22 @@ export class GroupService {
     private userRepository: Repository<User>,
     private connection: Connection,
     private userCacheService: UserCacheService,
+    private searchService: SearchService,
   ) {}
 
-  getAllGroups(): Promise<Group[]> {
-    return this.groupsRepository.find();
+  getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
+    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    if (input) {
+      if (input.search) {
+        searchTerm = this.searchService.generateSearchTermForEntity(
+          SearchEntity.GROUP,
+          input.search,
+        );
+      }
+    }
+    return this.groupsRepository.find({
+      where: searchTerm,
+    });
   }
 
   async getGroupById(id: string): Promise<Group> {

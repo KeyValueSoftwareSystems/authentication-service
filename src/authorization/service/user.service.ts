@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, FindOperator, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -9,20 +9,21 @@ import {
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
+  UserInputFilter,
 } from '../../schema/graphql.schema';
 import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
-import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
+import SearchService from './search.service';
+import { SearchEntity } from '../../constants/search.entity.enum';
 
 @Injectable()
 export default class UserService {
@@ -37,18 +38,27 @@ export default class UserService {
     private userPermissionRepository: Repository<UserPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
-    @InjectRepository(GroupPermission)
-    private groupPermissionRepository: Repository<GroupPermission>,
     private userCacheService: UserCacheService,
     private groupCacheService: GroupCacheService,
     private permissionCacheService: PermissionCacheService,
-    private cacheManager: RedisCacheService,
     private connection: Connection,
+    private searchService: SearchService,
     private roleCacheService: RoleCacheService,
   ) {}
 
-  getAllUsers(): Promise<User[]> {
-    return this.usersRepository.find();
+  getAllUsers(input?: UserInputFilter): Promise<User[]> {
+    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    if (input) {
+      if (input.search) {
+        searchTerm = this.searchService.generateSearchTermForEntity(
+          SearchEntity.USER,
+          input.search,
+        );
+      }
+    }
+    return this.usersRepository.find({
+      where: searchTerm,
+    });
   }
 
   async getUserById(id: string): Promise<User> {

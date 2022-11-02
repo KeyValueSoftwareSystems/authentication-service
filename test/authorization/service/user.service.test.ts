@@ -21,6 +21,7 @@ import RoleCacheService from '../../../src/authorization/service/rolecache.servi
 import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 import { Status } from '../../../src/schema/graphql.schema';
+import SearchService from '../../../src/authorization/service/search.service';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -71,6 +72,7 @@ describe('test UserService', () => {
   >();
   const connectionMock = Substitute.for<Connection>();
   const roleCacheService = Substitute.for<RoleCacheService>();
+  const searchService = Substitute.for<SearchService>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -117,6 +119,7 @@ describe('test UserService', () => {
         { provide: 'RedisCacheService', useValue: redisCacheService },
         { provide: 'PermissionCacheService', useValue: permissionCacheService },
         { provide: 'RoleCacheService', useValue: roleCacheService },
+        { provide: 'SearchService', useValue: searchService },
         {
           provide: Connection,
           useValue: connectionMock,
@@ -127,7 +130,7 @@ describe('test UserService', () => {
   });
 
   it('should get all users', async () => {
-    userRepository.find().returns(Promise.resolve(users));
+    userRepository.find({ where: [] }).returns(Promise.resolve(users));
     const resp = await userService.getAllUsers();
     expect(resp).toEqual(users);
   });

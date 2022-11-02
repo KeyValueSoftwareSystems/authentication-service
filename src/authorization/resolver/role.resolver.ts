@@ -3,6 +3,7 @@ import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   NewRoleInput,
   Permission,
+  RoleInputFilter,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
@@ -17,8 +18,8 @@ export class RoleResolver {
 
   @Permissions(PermissionsType.ViewRoles)
   @Query()
-  getRoles(): Promise<Role[]> {
-    return this.roleService.getAllRoles();
+  getRoles(@Args('input') input: RoleInputFilter): Promise<Role[]> {
+    return this.roleService.getAllRoles(input);
   }
 
   @Permissions(PermissionsType.ViewRoles)

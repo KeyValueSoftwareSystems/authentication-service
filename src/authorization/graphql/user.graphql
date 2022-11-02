@@ -21,7 +21,6 @@ enum OperationType {
   AND
 }
 
-
 input UpdateUserInput {
   firstName: String
   middleName: String
@@ -56,8 +55,35 @@ permissions: [String]!,
 operation: OperationType
 }
 
+input UserInputFilter {
+  search: UserSearchInput
+}
+
+input UserSearchInput {
+  and: UserSearchParameter
+  or: UserSearchParameter
+}
+
+input UserSearchParameter {
+  email: StringSearchCondition
+  firstName: StringSearchCondition
+  middleName: StringSearchCondition
+  lastName: StringSearchCondition
+}
+
+input StringSearchCondition {
+  contains: String
+  equals: String
+  #----Can Include-----#
+  # notContains: String
+  # notEquals: String
+  # greaterThan: String
+  # lessThan: String
+  # beginsWith: String
+}
+
 type Query {
-  getUsers: [User]!
+  getUsers(input: UserInputFilter): [User]!
   getUser(id: ID!): User
   getUserGroups(id: ID!): [UserGroupResponse]
   getUserPermissions(id: ID!): [UserPermissions]

@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   NewRoleInput,
+  RoleInputFilter,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import { Connection, FindOperator, Repository } from 'typeorm';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
 import Permission from '../entity/permission.entity';
@@ -16,6 +17,8 @@ import {
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import RoleCacheService from './rolecache.service';
 import GroupRole from '../entity/groupRole.entity';
+import SearchService from './search.service';
+import { SearchEntity } from '../../constants/search.entity.enum';
 
 @Injectable()
 export class RoleService {
@@ -30,10 +33,22 @@ export class RoleService {
     private permissionRepository: Repository<Permission>,
     private roleCacheService: RoleCacheService,
     private connection: Connection,
+    private searchService: SearchService,
   ) {}
 
-  async getAllRoles(): Promise<Role[]> {
-    return await this.rolesRepository.find();
+  async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
+    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    if (input) {
+      if (input.search) {
+        searchTerm = this.searchService.generateSearchTermForEntity(
+          SearchEntity.ROLE,
+          input.search,
+        );
+      }
+    }
+    return await this.rolesRepository.find({
+      where: searchTerm,
+    });
   }
 
   async getRoleById(id: string): Promise<Role> {

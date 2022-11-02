@@ -14,6 +14,7 @@ import UserGroup from '../authorization/entity/userGroup.entity';
 import UserPermission from '../authorization/entity/userPermission.entity';
 import GroupCacheService from '../authorization/service/groupcache.service';
 import PermissionCacheService from '../authorization/service/permissioncache.service';
+import SearchService from '../authorization/service/search.service';
 import UserService from '../authorization/service/user.service';
 import UserCacheService from '../authorization/service/usercache.service';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
@@ -42,6 +43,7 @@ import TwilioOTPService from './service/twilio.otp.service';
 const providers = [
   UserAuthResolver,
   UserService,
+  SearchService,
   GoogleAuthService,
   AuthenticationHelper,
   ConfigService,
