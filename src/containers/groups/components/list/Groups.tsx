@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { useMutation, useQuery } from "@apollo/client";
 import { GridColumns, GridRowId, GridRowParams } from "@mui/x-data-grid";
@@ -10,10 +10,14 @@ import { GET_GROUPS } from "../../services/queries";
 import TableList from "../../../../components/table";
 import { groupListAtom } from "../../../../states/groupStates";
 import TableChipElement from "../../../../components/table-chip-element";
+import { UserPermissionsAtom } from "../../../../states/permissionsStates";
 import AvatarList from "../../../../components/avatar-list/AvatarList";
 
 const GroupList: React.FC = () => {
   const navigate = useNavigate();
+
+  const [isAddVerified, setAddVerified] = React.useState(false);
+  const [userPermissions] = useRecoilState(UserPermissionsAtom);
 
   useMutation(DELETE_GROUP, {
     refetchQueries: [{ query: GET_GROUPS }],
@@ -79,6 +83,14 @@ const GroupList: React.FC = () => {
     navigate(`edit/${id}`);
   };
 
+  useEffect(() => {
+    userPermissions.map((item: any) => {
+      if (item?.name.includes("create-groups")) {
+        setAddVerified(true);
+      }
+    });
+  }, []);
+
   return (
     <>
       <TableList
@@ -92,6 +104,9 @@ const GroupList: React.FC = () => {
         onAdd={onAddGroup}
         onEdit={onEditGroup}
         handleRowClick={onGroupClick}
+        editPermission="edit-groups"
+        deletePermission="delete-groups"
+        isAddVerified={!isAddVerified}
       />
     </>
   );

@@ -41,16 +41,13 @@ const GroupDetails: React.FC = () => {
     },
   });
 
-  const onBackNavigation = () =>{
+  const onBackNavigation = () => {
     navigate("/home/groups");
-  }
+  };
 
   return (
     <div id="group-details">
-      <div
-        id="back-page"
-        onClick={onBackNavigation}
-      >
+      <div id="back-page" onClick={onBackNavigation}>
         <ArrowBackIcon id="arrowicon" />
         Groups
       </div>

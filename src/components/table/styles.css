@@ -34,6 +34,11 @@
   color: #eb272785 !important;
 }
 
+.disabled-styles:hover {
+  cursor: not-allowed;
+  color: #67686cbf !important;
+}
+
 .MuiDataGrid-root .MuiDataGrid-cell {
   border: none !important;
   min-height: 50px !important;

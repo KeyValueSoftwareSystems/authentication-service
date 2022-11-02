@@ -8,10 +8,14 @@ import { LOGIN } from "./services/mutations";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
 import LoginPassword from "./loginPassword";
+import { UserPermissionsAtom } from "../../states/permissionsStates";
 import { currentUserAtom } from "../../states/loginStates";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+
+  const [userPermissions, setUserPermissions] =
+    useRecoilState(UserPermissionsAtom);
 
   const [currentUserDetails, setCurrentUserDetails] =
     useRecoilState(currentUserAtom);
@@ -24,6 +28,7 @@ const Login: React.FC = () => {
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
+      setUserPermissions(user?.permissions);
       setCurrentUserDetails(user);
       navigate("/home/users");
     }

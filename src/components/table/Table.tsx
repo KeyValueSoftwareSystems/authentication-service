@@ -1,13 +1,14 @@
 import { DataGrid, GridActionsCellItem, GridColumns } from "@mui/x-data-grid";
-import { FC } from "react";
+import React, { FC } from "react";
 import { Tooltip } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import { TableProps } from "./types";
 import TableToolBar from "../table-toolbar/TableToolBar";
 import "./styles.css";
+import { VERIFY_USER_PERMISSION } from "./services/queries";
 
 const TableList: FC<TableProps> = ({
   rows,
@@ -19,8 +20,37 @@ const TableList: FC<TableProps> = ({
   searchLabel,
   deleteMutation,
   refetchQuery,
+  editPermission,
+  deletePermission,
+  isAddVerified,
   handleRowClick,
 }) => {
+  const [isEditVerified, setEditVerified] = React.useState(true);
+  const [isDeleteVerified, setDeleteVerified] = React.useState(true);
+  useQuery(VERIFY_USER_PERMISSION, {
+    variables: {
+      params: {
+        permissions: [editPermission],
+        operation: "AND",
+      },
+    },
+    onCompleted: (data) => {
+      setEditVerified(data?.verifyUserPermission);
+    },
+    fetchPolicy: "network-only",
+  });
+  useQuery(VERIFY_USER_PERMISSION, {
+    variables: {
+      params: {
+        permissions: [deletePermission],
+        operation: "AND",
+      },
+    },
+    onCompleted: (data) => {
+      setDeleteVerified(data?.verifyUserPermission);
+    },
+    fetchPolicy: "network-only",
+  });
   const [deleteItem] = useMutation(deleteMutation, {
     refetchQueries: [{ query: refetchQuery }],
   });
@@ -46,15 +76,15 @@ const TableList: FC<TableProps> = ({
                 />
               }
               label="Edit"
-              className="edit"
+              className={`edit  ${!isEditVerified && "disabled-styles"}`}
               onClick={() => onEdit(id)}
             />
           </Tooltip>,
           <Tooltip title="Delete" arrow placement="top">
             <GridActionsCellItem
-              icon={<DeleteOutlinedIcon className="delete" />}
+              icon={<DeleteOutlinedIcon />}
               label="Delete"
-              className="delete"
+              className={`delete  ${!isDeleteVerified && "disabled-styles"}`}
               onClick={() => {
                 deleteItem({
                   variables: {
@@ -78,6 +108,7 @@ const TableList: FC<TableProps> = ({
           text={text}
           buttonLabel={buttonLabel}
           searchLabel={searchLabel}
+          isAddVerified={isAddVerified}
           onAdd={onAdd}
         />
       </div>
