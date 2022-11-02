@@ -3,6 +3,7 @@
   box-sizing: border-box;
   border-radius: 10px;
   padding: 20px 20px 20px 16px;
+  margin-top: 20px;
   margin-bottom: 20px;
   width: 95%;
 }
@@ -13,7 +14,7 @@
 
 #add-items {
   margin-top: 30px;
-  width: 50%;
+  width: 100%;
   padding-right: 5px;
 }
 

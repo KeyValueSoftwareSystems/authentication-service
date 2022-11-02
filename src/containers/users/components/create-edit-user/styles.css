@@ -98,6 +98,7 @@
   flex-direction: row;
   color: gray;
   margin-bottom: 3px;
+  margin-top: 5px;
   font-size: medium;
   cursor: pointer;
 }
@@ -163,14 +164,29 @@
   background: #edf6ff;
   color: #01579b;
   margin: 5px 5px 5px 5px;
+  height: 25px;
   padding: 5px;
 }
 
 #permission-list {
   flex-wrap: wrap;
   display: flex;
-  margin-top: 20px;
+  margin-top: 10px;
   align-items: center;
+}
+
+#group {
+  margin-right: 5px;
+  margin-bottom: 5px;
+  height: 25px;
+  border-radius: 5px;
+  width: max-content;
+  line-height: 21px;
+}
+
+#permission-groupwise {
+  margin-top: 10px;
+  display: flex;
 }
 
 .userGroups {

@@ -8,6 +8,7 @@
 }
 
 #group-title {
+  margin-top: 20px;
   font-weight: bold;
   font-size: 24px;
 }
@@ -28,6 +29,7 @@
   font-size: 17px;
   margin: 5px 5px 5px 5px;
   padding: 5;
+  height:35px;
 }
 
 #item-list-details {

@@ -1,10 +1,11 @@
 import { FC } from "react";
+import { Entity } from "../../types/generic";
 import "./styles.css";
 interface ChecklistProps {
   name: String;
-  mapList: any;
-  currentCheckedItems?: string[];
-  onChange: (event: any, item?: any) => void;
+  mapList: Entity[];
+  currentCheckedItems?: Entity[];
+  onChange: (event: React.ChangeEvent<HTMLInputElement>, item?: Entity) => void;
   selectAll?: boolean;
 }
 export const ChecklistComponent: FC<ChecklistProps> = ({
@@ -15,7 +16,7 @@ export const ChecklistComponent: FC<ChecklistProps> = ({
   selectAll,
 }) => {
   const isChecked = (id: string) => {
-    return currentCheckedItems.includes(id);
+    return currentCheckedItems.some((item) => item.id === id);
   };
 
   return (
@@ -33,7 +34,7 @@ export const ChecklistComponent: FC<ChecklistProps> = ({
         </div>
       </div>
       <div id="component">
-        {mapList?.map((item: any) => {
+        {mapList?.map((item: Entity) => {
           return (
             <div id="checkbox" key={item.id}>
               <input

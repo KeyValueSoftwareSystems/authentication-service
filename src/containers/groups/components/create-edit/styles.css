@@ -23,16 +23,18 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+  margin-right: 19px;
+  column-gap: 5px;
 }
 
-/* .access-setting{
-    display: flex;
-    align-items: center;
-    font-size: x-small;
-    padding: 5px 0px 5px 0px;
-    color: rgba(47,47,47,.6);
-    cursor: pointer;
-} */
+.access-setting {
+  display: flex;
+  align-items: center;
+  font-size: x-small;
+  padding: 5px 0px 5px 0px;
+  color: rgba(47, 47, 47, 0.6);
+  cursor: pointer;
+}
 
 .create-group {
   font-size: 20px;
@@ -65,7 +67,7 @@
   /* width: 100%; */
   font-size: large;
   /* padding: 10px 0px 10px 15px; */
-  padding: 40px;
+  padding: 30px 0px 30px 30px;
   font-weight: 500;
 }
 
@@ -107,11 +109,4 @@
   padding-left: 5;
   display: flex;
   flex-wrap: wrap;
-}
-
-.permission-chip {
-  font-size: 16px !important;
-  margin-right: 16px;
-  margin-bottom: 8px;
-  background: aliceblue !important;
 }

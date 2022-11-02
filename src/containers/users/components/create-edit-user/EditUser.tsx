@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import {
   UPDATE_USER,
@@ -8,21 +8,16 @@ import {
   UPDATE_USER_PERMISSIONS,
 } from "../../services/mutations";
 import { GET_USER_GROUPS } from "../../services/queries";
-import { EditUserformSchema } from "../../userSchema";
 import UserForm from "./UserForm";
-import { GET_GROUP_PERMISSIONS } from "../../../groups/services/queries";
 import { getUniquePermissions } from "../../../../utils/permissions";
 import { GroupPermissionsDetails } from "../../../../types/permission";
 import "./styles.css";
+import { Group } from "../../../../types/user";
+import { FieldValues } from "react-hook-form";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-
-  const [userPermissions, setUserPermissions] = useState<
-    GroupPermissionsDetails[]
-  >([]);
-  const [selectedGroupIds, setUserGroupIds] = useState<string[]>([]);
-
+  const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
@@ -34,31 +29,14 @@ const EditUser: React.FC = () => {
   useQuery(GET_USER_GROUPS, {
     variables: { id },
     onCompleted: (data) => {
-      const groupIds = data?.getUserGroups.map((group: any) => group.id);
-      setUserGroupIds(groupIds);
+      const groupList = data?.getUserGroups.map((group: Group) => group);
+      setUserGroups(groupList);
     },
   });
 
-  const [getData] = useLazyQuery(GET_GROUP_PERMISSIONS);
-
-  useEffect(() => {
-    selectedGroupIds.forEach((group) => {
-      getData({
-        variables: { id: group },
-        fetchPolicy: "no-cache",
-        onCompleted: (data) => {
-          setUserPermissions([
-            ...userPermissions,
-            { groupId: group, permissions: data?.getGroupPermissions },
-          ]);
-        },
-      });
-    });
-  }, [selectedGroupIds]);
-
   const onUpdateUser = (
-    inputs: any,
-    userGroupIds: string[],
+    inputs: FieldValues,
+    userGroups: Group[],
     userPermissions: GroupPermissionsDetails[]
   ) => {
     updateUser({
@@ -76,7 +54,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          groups: userGroupIds,
+          groups: userGroups.map((group) => group.id),
         },
       },
     });
@@ -96,13 +74,7 @@ const EditUser: React.FC = () => {
   };
 
   return (
-    <UserForm
-      isEdit
-      updateUser={onUpdateUser}
-      userformSchema={EditUserformSchema}
-      currentGroupIDs={selectedGroupIds}
-      currentUserPermissions={userPermissions}
-    />
+    <UserForm isEdit updateUser={onUpdateUser} currentGroups={userGroups} />
   );
 };
 
