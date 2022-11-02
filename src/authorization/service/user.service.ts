@@ -1,40 +1,29 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Connection,
-  Equal,
-  FindOperator,
-  ILike,
-  Like,
-  Not,
-  Repository,
-} from 'typeorm';
+import { Connection, FindOperator, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
   OperationType,
   Status,
-  StringSearchCondition,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
   UserInputFilter,
-  UserSearchInput,
 } from '../../schema/graphql.schema';
 import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
-import GroupPermission from '../entity/groupPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
+import { SearchEntity } from '../../constants/search.entity.enum';
 
 @Injectable()
 export default class UserService {
@@ -49,12 +38,9 @@ export default class UserService {
     private userPermissionRepository: Repository<UserPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
-    @InjectRepository(GroupPermission)
-    private groupPermissionRepository: Repository<GroupPermission>,
     private userCacheService: UserCacheService,
     private groupCacheService: GroupCacheService,
     private permissionCacheService: PermissionCacheService,
-    private cacheManager: RedisCacheService,
     private connection: Connection,
     private searchService: SearchService,
     private roleCacheService: RoleCacheService,
@@ -64,88 +50,15 @@ export default class UserService {
     let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
     if (input) {
       if (input.search) {
-        searchTerm = this.generateSearchTermForUsers(input.search);
+        searchTerm = this.searchService.generateSearchTermForEntity(
+          SearchEntity.USER,
+          input.search,
+        );
       }
     }
     return this.usersRepository.find({
       where: searchTerm,
     });
-  }
-
-  generateSearchTermForUsers(
-    input: UserSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
-    const searchWhereCondition = [];
-    const andConditions: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
-    if (input.and) {
-      if (input.and.email) {
-        andConditions[
-          `email`
-        ] = this.searchService.generateWhereClauseForStringSearch(
-          input.and.email,
-        );
-      }
-      if (input.and.firstName) {
-        andConditions[
-          `firstName`
-        ] = this.searchService.generateWhereClauseForStringSearch(
-          input.and.firstName,
-        );
-      }
-      if (input.and.middleName) {
-        andConditions[
-          `middleName`
-        ] = this.searchService.generateWhereClauseForStringSearch(
-          input.and.middleName,
-        );
-      }
-      if (input.and.lastName) {
-        andConditions[
-          `lastName`
-        ] = this.searchService.generateWhereClauseForStringSearch(
-          input.and.lastName,
-        );
-      }
-    }
-    if (Object.keys(andConditions).length) {
-      searchWhereCondition.push(andConditions);
-    }
-
-    if (input.or) {
-      if (input.or.email) {
-        searchWhereCondition.push({
-          email: this.searchService.generateWhereClauseForStringSearch(
-            input.or.email,
-          ),
-        });
-      }
-      if (input.or.firstName) {
-        searchWhereCondition.push({
-          firstName: this.searchService.generateWhereClauseForStringSearch(
-            input.or.firstName,
-          ),
-        });
-      }
-      if (input.or.middleName) {
-        searchWhereCondition.push({
-          middleName: this.searchService.generateWhereClauseForStringSearch(
-            input.or.middleName,
-          ),
-        });
-      }
-      if (input.or.lastName) {
-        searchWhereCondition.push({
-          lastName: this.searchService.generateWhereClauseForStringSearch(
-            input.or.lastName,
-          ),
-        });
-      }
-    }
-    return searchWhereCondition;
   }
 
   async getUserById(id: string): Promise<User> {
