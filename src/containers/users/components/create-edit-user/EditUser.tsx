@@ -14,7 +14,6 @@ import { FieldValues } from "react-hook-form";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
