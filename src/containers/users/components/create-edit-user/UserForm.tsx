@@ -2,10 +2,15 @@ import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm, FormProvider, FieldValues } from "react-hook-form";
-import { Box, Button, Divider, Grid, Tab } from "@mui/material";
-import TabContext from "@mui/lab/TabContext";
-import TabList from "@mui/lab/TabList";
-import TabPanel from "@mui/lab/TabPanel";
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
@@ -15,7 +20,7 @@ import {
 import { useQuery } from "@apollo/client";
 import FormInputText from "../../../../components/inputText";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
-import { GET_USER } from "../../services/queries";
+import { GET_USER, GET_USER_PERMISSIONS } from "../../services/queries";
 import { Group, Permission, User } from "../../../../types/user";
 import "./styles.css";
 import apolloClient from "../../../../services/apolloClient";
@@ -37,6 +42,32 @@ interface UserProps {
     userGroups: Group[],
     userPermissions: Permission[]
   ) => void;
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography component={"span"}>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
 }
 
 const UserForm = (props: UserProps) => {
@@ -93,6 +124,7 @@ const UserForm = (props: UserProps) => {
       },
     });
     if (response) {
+    if(!  groupPermissions.some((permission)=>permission.id===group.id))
       setGroupPermissions((previousState) => [
         ...previousState,
         {
@@ -117,7 +149,14 @@ const UserForm = (props: UserProps) => {
     onCompleted: (data) => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser.groups);
-      setSelectedPermissions(data?.getUser.permissions);
+    },
+  });
+
+  useQuery(GET_USER_PERMISSIONS, {
+    skip: !id,
+    variables: { id: id },
+    onCompleted: (data) => {
+      setSelectedPermissions(data?.getUserPermissions);
     },
   });
 
@@ -174,9 +213,9 @@ const UserForm = (props: UserProps) => {
     navigate("/home/users");
   };
 
-  const [value, setValue] = useState<string>("groups");
+  const [value, setValue] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -256,16 +295,14 @@ const UserForm = (props: UserProps) => {
         </form>
       </FormProvider>
 
-      <div id="groups-permissions">
-        <Box sx={{ width: "100%", typography: "body1" }}>
-          <TabContext value={value}>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <TabList onChange={handleTabChange}>
-                <Tab label="Groups" value="groups" />
-                <Tab label="Permissions" value="permissions" />
-              </TabList>
-            </Box>
-            <TabPanel value="groups" id="groups-permissions">
+      <div>
+        <Box>
+          <Tabs value={value} onChange={handleTabChange}>
+            <Tab label="Groups" />
+            <Tab label="Permissions" />
+          </Tabs>
+          <TabPanel value={value} index={0}>
+            <div id="groups-permissions">
               <div id="user-groups">
                 <ChecklistComponent
                   name="Select Groups"
@@ -284,14 +321,14 @@ const UserForm = (props: UserProps) => {
                   <PermissionTabs permissions={groupPermissions} />
                 </Grid>
               </div>
-            </TabPanel>
-            <TabPanel value="permissions">
-              <FilterChips
-                selectedPermissions={selectedPermissions}
-                handleClick={handleClick}
-              />
-            </TabPanel>
-          </TabContext>
+            </div>
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <FilterChips
+              selectedPermissions={selectedPermissions}
+              handleClick={handleClick}
+            />
+          </TabPanel>
         </Box>
       </div>
     </div>
