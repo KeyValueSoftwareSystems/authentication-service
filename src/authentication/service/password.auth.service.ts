@@ -11,7 +11,10 @@ import {
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
-import { PasswordAlreadySetException, UserNotFoundException } from '../../authorization/exception/user.exception';
+import {
+  PasswordAlreadySetException,
+  UserNotFoundException,
+} from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
 import {
   InvalidCredentialsException,
@@ -62,15 +65,15 @@ export default class PasswordAuthService implements Authenticatable {
   async inviteTokenSignup(
     userDetails: UserInviteTokenSignupInput,
   ): Promise<InviteTokenResponse> {
-    const verifyObj = await this.userService.verifyDuplicateUser(
+    const verifyUser = await this.userService.verifyDuplicateUser(
       userDetails.email,
       userDetails.phone,
     );
-    if (verifyObj.existingUserDetails) {
-        throw new UserExistsException(
-          verifyObj.existingUserDetails,
-          verifyObj.duplicate,
-        );
+    if (verifyUser.existingUserDetails) {
+      throw new UserExistsException(
+        verifyUser.existingUserDetails,
+        verifyUser.duplicate,
+      );
     }
     const userFromInput = new User();
     userFromInput.email = userDetails.email;
@@ -80,18 +83,27 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.lastName = userDetails.lastName;
     userFromInput.status = Status.INVITED;
     const savedUser = await this.userService.createUser(userFromInput);
-    const token = this.authenticationHelper.generateInvitationToken(
+    const invitationToken = this.authenticationHelper.generateInvitationToken(
       { id: savedUser.id },
       '7d',
     );
-    await this.userService.updateField(savedUser.id, 'inviteToken', token);
-    return { inviteToken: token };
+    await this.userService.updateField(
+      savedUser.id,
+      'inviteToken',
+      invitationToken.token,
+    );
+    return {
+      inviteToken: invitationToken.token,
+      tokenExpiryTime: invitationToken.tokenExpiryTime,
+    };
   }
 
-  async setPasswordForInvite(
+  async setPasswordForInvitedUser(
     passwordDetails: UserPasswordForInviteInput,
   ): Promise<UserSignupResponse> {
-    const verificationResponse: any = this.authenticationHelper.validateInvitationToken(passwordDetails.inviteToken);
+    const verificationResponse: any = this.authenticationHelper.validateInvitationToken(
+      passwordDetails.inviteToken,
+    );
     const user = await this.userService.getUserById(verificationResponse.id);
     if (user.password) {
       throw new PasswordAlreadySetException(user.id);
@@ -102,7 +114,7 @@ export default class PasswordAuthService implements Authenticatable {
     );
     user.password = hashedPassword;
     user.status = Status.ACTIVE;
-    const updatedUser = this.userService.updateUser(user.id, user)
+    const updatedUser = this.userService.updateUser(user.id, user);
     return updatedUser;
   }
 

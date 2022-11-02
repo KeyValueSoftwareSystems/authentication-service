@@ -61,9 +61,17 @@ export class AuthenticationHelper {
   }
 
   generateInvitationToken = (payload: any, time?: string) => {
-    return jwt.sign(payload, process.env.JWT_SECRET || '', {
-      expiresIn: time ? time : process.env.JWT_TOKEN_EXPTIME,
-    });
+    const tokenExpiryTime = time
+      ? time
+      : this.configService.get('JWT_TOKEN_EXPTIME');
+    const token = jwt.sign(
+      payload,
+      this.configService.get('JWT_SECRET') || '',
+      {
+        expiresIn: tokenExpiryTime,
+      },
+    );
+    return { token, tokenExpiryTime };
   };
 
   validateInvitationToken(inviteToken: string) {

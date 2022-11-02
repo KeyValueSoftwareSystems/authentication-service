@@ -1,7 +1,7 @@
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import { Status } from '../../../src/schema/graphql.schema';
+import { InviteTokenResponse, Status } from '../../../src/schema/graphql.schema';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
@@ -57,6 +57,40 @@ describe('test TokenService', () => {
     expect(resp).toHaveProperty('refreshToken');
   });
 
+  it('should refresh invite token', async () => {
+    const users: User[] = [
+      {
+        id: 'ee809c91-a9bf-4589-b9db-7a116dda3158',
+        email: 'user@test.com',
+        phone: '9112345678910',
+        password: 's3cr3t',
+        firstName: 'Test1',
+        lastName: 'Test2',
+        origin: 'simple',
+        status: Status.ACTIVE,
+      },
+    ];
+    const refreshInviteToken = authenticationHelper.generateInvitationToken(
+      { id: "ee809c91-a9bf-4589-b9db-7a116dda3158" },
+      '7d',
+    );
+    userService
+      .getUserById(users[0].id)
+      .returns(Promise.resolve(users[0]));
+
+    users[0].inviteToken = refreshInviteToken.token;
+    const inviteTokenRespnse: InviteTokenResponse = {
+      inviteToken:
+        refreshInviteToken.token,
+      tokenExpiryTime: '7d',
+    };
+    userService
+      .updateField(users[0].id, 'inviteToken', Arg.any())
+      .returns(Promise.resolve(users[0]));
+    const resp = await tokenService.refreshInviteToken(users[0].id);
+    expect(resp).toEqual(inviteTokenRespnse);
+  });
+
   it('Get new jwt token', async () => {
     const users: User[] = [
       {
@@ -96,5 +130,26 @@ describe('test TokenService', () => {
       .updateField(users[0].id, 'refreshToken', Arg.any())
       .returns(Promise.resolve(users[0]));
     await tokenService.resetToken(users[0].id);
+  });
+
+  it('should revoke invite token', async () => {
+    const users: User[] = [
+      {
+        id: 'ee809c91-a9bf-4589-b9db-7a116dda3158',
+        email: 'user@test.com',
+        phone: '9112345678910',
+        password: 's3cr3t',
+        firstName: 'Test1',
+        lastName: 'Test2',
+        origin: 'simple',
+        status: Status.ACTIVE,
+      },
+    ];
+    users[0].inviteToken = ""
+    userService
+      .updateField(users[0].id, 'inviteToken', Arg.any())
+      .returns(Promise.resolve(users[0]));
+    const resp = await tokenService.revokeInviteToken(users[0].id);
+    expect(resp).toEqual(true);
   });
 });

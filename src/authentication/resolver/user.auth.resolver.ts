@@ -66,7 +66,7 @@ export default class UserAuthResolver {
     @Args('input', new ValidationPipe(UserPasswordForInviteInputSchema))
     request: UserPasswordForInviteInput,
   ): Promise<UserSignupResponse> {
-    return this.passwordAuthService.setPasswordForInvite(request);
+    return this.passwordAuthService.setPasswordForInvitedUser(request);
   }
 
   @Mutation('refreshInviteToken')
@@ -76,9 +76,11 @@ export default class UserAuthResolver {
     return this.tokenService.refreshInviteToken(id);
   }
 
-  @Mutation('revokeToken')
-  async revokeToken(@Args('id', ParseUUIDPipe) id: string) {
-    return this.tokenService.revokeToken(id);
+  @Mutation('revokeInviteToken')
+  async revokeInviteToken(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<boolean> {
+    return this.tokenService.revokeInviteToken(id);
   }
 
   @Mutation('otpLogin')

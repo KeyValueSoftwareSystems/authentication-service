@@ -149,7 +149,7 @@ export interface IMutation {
     inviteTokenSignup(input?: UserInviteTokenSignupInput): InviteTokenResponse | Promise<InviteTokenResponse>;
     refreshInviteToken(id: string): InviteTokenResponse | Promise<InviteTokenResponse>;
     setPasswordForInvite(input?: UserPasswordForInviteInput): UserSignupResponse | Promise<UserSignupResponse>;
-    revokeToken(id: string): string | Promise<string>;
+    revokeInviteToken(id: string): string | Promise<string>;
     otpLogin(input: UserOTPLoginInput): TokenResponse | Promise<TokenResponse>;
     otpSignup(input: UserOTPSignupInput): UserSignupResponse | Promise<UserSignupResponse>;
     changePassword(input: UserPasswordInput): User | Promise<User>;
@@ -195,6 +195,7 @@ export interface UserSignupResponse {
 
 export interface InviteTokenResponse {
     inviteToken: string;
+    tokenExpiryTime?: string;
 }
 
 export interface Entity {
