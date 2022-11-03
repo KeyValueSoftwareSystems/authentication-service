@@ -23,6 +23,7 @@ import {
 } from '../exception/userauth.exception';
 import { Authenticatable } from '../interfaces/authenticatable';
 import { TokenService } from './token.service';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export default class PasswordAuthService implements Authenticatable {
@@ -30,6 +31,7 @@ export default class PasswordAuthService implements Authenticatable {
     private userService: UserService,
     private tokenService: TokenService,
     private authenticationHelper: AuthenticationHelper,
+    private connection: Connection,
   ) {}
 
   async userSignup(
@@ -82,19 +84,22 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
     userFromInput.status = Status.INVITED;
-    const savedUser = await this.userService.createUser(userFromInput);
-    const invitationToken = this.authenticationHelper.generateInvitationToken(
-      { id: savedUser.id },
-      '7d',
-    );
-    await this.userService.updateField(
-      savedUser.id,
-      'inviteToken',
-      invitationToken.token,
-    );
+    let invitationToken: { token: any; tokenExpiryTime?: any };
+    await this.connection.manager.transaction(async () => {
+      const savedUser = await this.userService.createUser(userFromInput);
+      invitationToken = this.authenticationHelper.generateInvitationToken(
+        { id: savedUser.id },
+        '7d',
+      );
+      await this.userService.updateField(
+        savedUser.id,
+        'inviteToken',
+        invitationToken.token,
+      );
+    });
     return {
-      inviteToken: invitationToken.token,
-      tokenExpiryTime: invitationToken.tokenExpiryTime,
+      inviteToken: invitationToken!.token,
+      tokenExpiryTime: invitationToken!.tokenExpiryTime,
     };
   }
 

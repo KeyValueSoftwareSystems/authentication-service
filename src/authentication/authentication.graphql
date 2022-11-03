@@ -4,7 +4,7 @@ type Mutation {
     inviteTokenSignup(input: UserInviteTokenSignupInput): InviteTokenResponse
     refreshInviteToken(id: ID!):InviteTokenResponse
     setPasswordForInvite(input: UserPasswordForInviteInput): UserSignupResponse
-    revokeInviteToken(id: ID!): String
+    revokeInviteToken(id: ID!): Boolean
     otpLogin(input: UserOTPLoginInput!): TokenResponse
     otpSignup(input: UserOTPSignupInput!): UserSignupResponse
     changePassword(input: UserPasswordInput!): User
@@ -82,7 +82,7 @@ input UserInviteTokenSignupInput {
 
 type InviteTokenResponse {
   inviteToken: String!
-  tokenExpiryTime: String
+  tokenExpiryTime: String!
 }
 
 input UserPasswordForInviteInput {

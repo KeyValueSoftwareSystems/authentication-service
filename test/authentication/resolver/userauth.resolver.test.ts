@@ -176,6 +176,7 @@ describe('Userauth Module', () => {
       const usersResponse: InviteTokenResponse = {
         inviteToken:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zIiwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMTV9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo',
+        tokenExpiryTime: '7d',
       };
 
       const obj = Object.create(null);
@@ -186,7 +187,7 @@ describe('Userauth Module', () => {
         .post(gql)
         .send({
           query: `mutation { inviteTokenSignup(input: { email: "user@test.com"
-          phone: "9112345678910" firstName: "Test" lastName: "User" }) { inviteToken }}`,
+          phone: "9112345678910" firstName: "Test" lastName: "User" }) { inviteToken tokenExpiryTime}}`,
         })
         .expect(200)
         .expect((res) => {
@@ -292,7 +293,7 @@ describe('Userauth Module', () => {
         })
         .expect(200)
         .expect((res) => {
-          expect(res.body.data.revokeInviteToken).toEqual('true');
+          expect(res.body.data.revokeInviteToken).toEqual(true);
         });
     });
 

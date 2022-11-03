@@ -1,6 +1,7 @@
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
+import { Connection } from 'typeorm';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import {
   InvalidCredentialsException,
@@ -37,6 +38,7 @@ describe('test PasswordAuthService', () => {
   const userService = Substitute.for<UserService>();
   const configService = Substitute.for<ConfigService>();
   const tokenService = Substitute.for<TokenService>();
+  const connectionMock = Substitute.for<Connection>();
   configService.get('ENV').returns('local');
   configService.get('JWT_SECRET').returns('s3cr3t1234567890');
   configService.get('JWT_TOKEN_EXPTIME').returns(3600);
@@ -48,6 +50,10 @@ describe('test PasswordAuthService', () => {
         { provide: 'UserService', useValue: userService },
         { provide: 'ConfigService', useValue: configService },
         { provide: 'TokenService', useValue: tokenService },
+        {
+          provide: Connection,
+          useValue: connectionMock,
+        },
         PasswordAuthService,
         AuthenticationHelper,
       ],
