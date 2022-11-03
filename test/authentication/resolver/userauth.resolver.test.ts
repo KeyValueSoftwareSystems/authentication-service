@@ -261,6 +261,7 @@ describe('Userauth Module', () => {
     });
 
     it('should refresh the invite token', () => {
+      const token = authenticationHelper.generateAccessToken(users[0]);
       const inviteTokenRespnse: InviteTokenResponse = {
         inviteToken:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zIiwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMTV9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo',
@@ -272,6 +273,7 @@ describe('Userauth Module', () => {
 
       return request(app.getHttpServer())
         .post(gql)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           query: `mutation { refreshInviteToken(id: "20ee5419-8597-4ee7-a497-b5a13daa37c8") { inviteToken, tokenExpiryTime }}`,
         })
@@ -282,12 +284,14 @@ describe('Userauth Module', () => {
     });
 
     it('should revoke the invite token', () => {
+      const token = authenticationHelper.generateAccessToken(users[0]);
       tokenService
         .revokeInviteToken('20ee5419-8597-4ee7-a497-b5a13daa37c8')
         .returns(Promise.resolve(true));
 
       return request(app.getHttpServer())
         .post(gql)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           query: `mutation { revokeInviteToken(id: "20ee5419-8597-4ee7-a497-b5a13daa37c8")}`,
         })

@@ -28,7 +28,8 @@ import ValidationPipe from '../../validation/validation.pipe';
 import PasswordAuthService from '../service/password.auth.service';
 import OTPAuthService from '../service/otp.auth.service';
 import { TokenService } from '../service/token.service';
-
+import { Permissions } from '../../authorization/permissions.decorator';
+import { PermissionsType } from '../../authorization/constants/authorization.constants';
 @Resolver('Userauth')
 export default class UserAuthResolver {
   constructor(
@@ -69,6 +70,7 @@ export default class UserAuthResolver {
     return this.passwordAuthService.setPasswordForInvitedUser(request);
   }
 
+  @Permissions(PermissionsType.EditUser)
   @Mutation('refreshInviteToken')
   async refreshInviteToken(
     @Args('id', ParseUUIDPipe) id: string,
@@ -76,6 +78,7 @@ export default class UserAuthResolver {
     return this.tokenService.refreshInviteToken(id);
   }
 
+  @Permissions(PermissionsType.EditUser)
   @Mutation('revokeInviteToken')
   async revokeInviteToken(
     @Args('id', ParseUUIDPipe) id: string,
