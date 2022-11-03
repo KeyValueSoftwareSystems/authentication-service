@@ -1,23 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import {
   UPDATE_USER,
   UPDATE_USER_GROUPS,
   UPDATE_USER_PERMISSIONS,
 } from "../../services/mutations";
-import { GET_USER_GROUPS } from "../../services/queries";
 import UserForm from "./UserForm";
-import { getUniquePermissions } from "../../../../utils/permissions";
-import { GroupPermissionsDetails } from "../../../../types/permission";
 import "./styles.css";
-import { Group } from "../../../../types/user";
+import { Group, Permission } from "../../../../types/user";
 import { FieldValues } from "react-hook-form";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
-  const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
   const [updateUserGroups, { error: groupUpdateError }] =
     useMutation(UPDATE_USER_GROUPS);
@@ -26,18 +22,10 @@ const EditUser: React.FC = () => {
   );
   const navigate = useNavigate();
 
-  useQuery(GET_USER_GROUPS, {
-    variables: { id },
-    onCompleted: (data) => {
-      const groupList = data?.getUserGroups.map((group: Group) => group);
-      setUserGroups(groupList);
-    },
-  });
-
   const onUpdateUser = (
     inputs: FieldValues,
     userGroups: Group[],
-    userPermissions: GroupPermissionsDetails[]
+    selectedPermissions: Permission[]
   ) => {
     updateUser({
       variables: {
@@ -63,7 +51,7 @@ const EditUser: React.FC = () => {
       variables: {
         id: id,
         input: {
-          permissions: getUniquePermissions(userPermissions),
+          permissions: selectedPermissions.map((permission) => permission.id),
         },
       },
       onCompleted: () => {
@@ -73,9 +61,7 @@ const EditUser: React.FC = () => {
     });
   };
 
-  return (
-    <UserForm isEdit updateUser={onUpdateUser} currentGroups={userGroups} />
-  );
+  return <UserForm isEdit updateUser={onUpdateUser} />;
 };
 
 export default EditUser;

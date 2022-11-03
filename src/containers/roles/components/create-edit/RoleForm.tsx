@@ -1,10 +1,12 @@
 import { FC, useState } from "react";
 import { Button, Divider } from "@mui/material";
+import { yupResolver } from "@hookform/resolvers/yup";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
 
+import { RoleFormSchema } from "../../roleSchema";
 import "./styles.css";
 import FormInputText from "../../../../components/inputText";
 import { Role } from "../../../../types/role";
@@ -34,6 +36,7 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
   };
 
   const methods = useForm({
+    resolver: yupResolver(RoleFormSchema),
     defaultValues: initialValues,
   });
   const { handleSubmit } = methods;

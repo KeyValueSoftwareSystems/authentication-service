@@ -13,8 +13,14 @@
 }
 
 #add-items {
-  margin-top: 30px;
+  margin-top: 10px;
   width: 100%;
+  padding-right: 5px;
+}
+
+#user-groups {
+  margin-top: 10px;
+  width: 50%;
   padding-right: 5px;
 }
 

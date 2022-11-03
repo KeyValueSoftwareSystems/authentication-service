@@ -19,12 +19,13 @@ import {
 
 import "./styles.css";
 import GroupForm from "./GroupForm";
-import { GET_GROUP_ROLES } from "../../services/queries";
-import { getUniquePermissions } from "../../../../utils/permissions";
+import { GET_GROUP_PERMISSIONS, GET_GROUP_ROLES } from "../../services/queries";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { Role } from "../../../../types/role";
 import apolloClient from "../../../../services/apolloClient";
 import PermissionTabs from "../../../../components/tabs/PermissionTabs";
+import FilterChips from "../../../../components/filter-chips/FilterChips";
+import { Permission } from "../../../../types/user";
 import { Entity, EntityPermissionsDetails } from "../../../../types/generic";
 
 interface TabPanelProps {
@@ -65,6 +66,9 @@ const CreateOrEditGroup = () => {
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [status, setStatus] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
+    []
+  );
 
   const [updateGroup, { data: updatedGroupData }] = useMutation(UPDATE_GROUP);
   const [createGroup, { data: createdGroupData }] = useMutation(CREATE_GROUP);
@@ -91,16 +95,36 @@ const CreateOrEditGroup = () => {
     },
   });
 
+  useQuery(GET_GROUP_PERMISSIONS, {
+    skip: !id,
+    variables: { id },
+    onCompleted: (data) => {
+      const permissionList = data?.getGroupPermissions;
+      setSelectedPermissions(permissionList);
+    },
+  });
+
+  const handleClick = (permission: Permission) => {
+    if (
+      selectedPermissions.some(
+        (selected_permission) => selected_permission.id === permission.id
+      )
+    ) {
+      setSelectedPermissions(
+        selectedPermissions.filter(
+          (selected_permission) => selected_permission.id !== permission.id
+        )
+      );
+    } else setSelectedPermissions([...selectedPermissions, permission]);
+  };
+
   const removeItem = (item: string) => {
-    const itemIndex = roles.findIndex((e: Role) => e.id === item);
-    setRoles([...roles.slice(0, itemIndex), ...roles.slice(itemIndex + 1)]);
-    const permissionIndex = permissions.findIndex(
-      (e: EntityPermissionsDetails) => e.id === item
+    setRoles(roles.filter((role: Role) => role.id !== item));
+    setPermissions(
+      permissions.filter(
+        (permission: EntityPermissionsDetails) => permission.id !== item
+      )
     );
-    setPermissions([
-      ...permissions.slice(0, permissionIndex),
-      ...permissions.slice(permissionIndex + 1),
-    ]);
   };
 
   const onChange = (
@@ -154,7 +178,9 @@ const CreateOrEditGroup = () => {
       updateGroupPermissions({
         variables: {
           id: createdGroupData?.createGroup?.id,
-          input: { permissions: getUniquePermissions(permissions) },
+          input: {
+            permissions: selectedPermissions.map((permission) => permission.id),
+          },
         },
       });
     }
@@ -191,7 +217,9 @@ const CreateOrEditGroup = () => {
     updateGroupPermissions({
       variables: {
         id: id,
-        input: { permissions: getUniquePermissions(permissions) },
+        input: {
+          permissions: selectedPermissions.map((permission) => permission.id),
+        },
       },
     });
   };
@@ -231,15 +259,18 @@ const CreateOrEditGroup = () => {
       setStatus(false);
     }
   };
-
   return (
     <div className="access-settings">
       <GroupForm createGroup={onCreateGroup} editGroup={onEditGroup} />
       <div>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", display: "flex" }}>
           <Tabs value={value} onChange={handleChange}>
             <Tab
-              label="Roles & Permissions"
+              label="Roles"
+              sx={{ textTransform: "none", fontSize: "18px" }}
+            />
+            <Tab
+              label="Permissions"
               sx={{ textTransform: "none", fontSize: "18px" }}
             />
           </Tabs>
@@ -268,6 +299,12 @@ const CreateOrEditGroup = () => {
               <PermissionTabs permissions={permissions} />
             </Grid>
           </Grid>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <FilterChips
+            selectedPermissions={selectedPermissions}
+            handleClick={handleClick}
+          />
         </TabPanel>
       </div>
     </div>
