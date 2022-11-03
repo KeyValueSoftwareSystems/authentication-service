@@ -12,6 +12,7 @@ type InlineEditProps = {
   onSave: (value: string | undefined, id: string | undefined) => void;
   onDeletePermission: (id: string | undefined) => void;
   isAdd: boolean;
+  onCancelAdd: () => void;
 };
 
 const InlineEdit: React.FC<InlineEditProps> = ({
@@ -20,6 +21,7 @@ const InlineEdit: React.FC<InlineEditProps> = ({
   onSave,
   onDeletePermission,
   isAdd,
+  onCancelAdd,
 }) => {
   const inputElement = useRef<any>(null);
   const [editingValue, setEditingValue] = useState<string | undefined>(value);
@@ -35,12 +37,14 @@ const InlineEdit: React.FC<InlineEditProps> = ({
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" || event.key === "Escape") {
       event.currentTarget.blur();
+      onCancelAdd();
     }
   };
 
   const onBlur = () => {
     setIsDisabled(true);
     setEditingValue(value);
+    onCancelAdd();
   };
 
   const onSavePermissionEdit = (e: React.MouseEvent) => {

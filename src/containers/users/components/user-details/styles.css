@@ -6,9 +6,13 @@
   align-items: center;
   background: aliceblue;
   border-radius: 20px;
+  overflow: auto;
 }
 
 .user-details {
+  display: flex;
+  max-height: 90%;
+  flex-direction: column;
   padding-bottom: 20px;
   width: 90%;
   box-shadow: rgb(100 100 111 / 20%) 0px 7px 29px 0px;
@@ -16,24 +20,34 @@
   border-radius: 20px;
 }
 
-.tabs {
-  background: #fff;
-  border-bottom-right-radius: 20px !important;
-  border-bottom-left-radius: 20px;
+.user-details-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 500;
+  align-items: center;
+  padding-left: 15px;
+  border-bottom: 1px solid #dcdcdc;
+  margin-bottom: 4px;
 }
 
-.back-arrow {
+.user-details-title {
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  margin-right: 7px;
-  margin-top: 2px;
+  width: 90%;
+  justify-content: center;
 }
 
 .name {
+  word-break: break-all;
   font-size: 20px;
   font-weight: bold;
   width: fit-content;
+  text-transform: capitalize;
+}
+
+.name-status {
+  display: flex;
+  column-gap: 10px;
 }
 
 .link {
@@ -42,32 +56,32 @@
   width: fit-content;
 }
 
-.grid {
-  justify-content: space-between;
-}
-
-.grid-item1 {
+.personal-details {
   display: flex;
   flex-direction: column;
   align-items: center;
+  row-gap: 10px;
 }
 
-.grid-item2 {
+.groups-permissions {
   display: flex;
   flex-direction: column;
+  padding-left: 4px;
+  row-gap: 10px;
 }
 
-.box1 {
+.details {
   display: flex;
   width: 90%;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
-.box2 {
+.details-cntr {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  row-gap: 5px;
 }
 
 .contact {
@@ -75,7 +89,7 @@
   flex-direction: column;
   align-items: flex-start;
   width: 90%;
-  margin-top: 10px;
+  row-gap: 5px;
 }
 
 .user-groups {
@@ -85,7 +99,7 @@
   font-size: 18px !important;
   align-items: flex-start;
   margin-left: 10px;
-  margin-bottom: 4px;
+  margin-top: 10px;
 }
 
 .user-permissions {
@@ -95,14 +109,11 @@
   font-size: 18px !important;
   align-items: flex-start;
   margin-left: 10px;
-  margin-top: 6px;
-  margin-bottom: 4px;
 }
 
 .items {
   margin: 6px 0px 6px 2px;
   display: flex;
-
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
