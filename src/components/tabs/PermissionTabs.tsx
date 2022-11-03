@@ -67,7 +67,6 @@ const TabsList = styled(TabsListUnstyled)(`
   `);
 
 const PermissionTabs: React.FC<StyledTabsProps> = ({ permissions }) => {
-  console.log(permissions)
   const [currentTab, setCurrentTab] = React.useState<any>(0);
 
   const handleChange = (
