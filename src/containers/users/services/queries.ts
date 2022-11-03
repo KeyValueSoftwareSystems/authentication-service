@@ -9,6 +9,14 @@ export const GET_USER = gql`
       firstName
       middleName
       lastName
+      groups {
+        id
+        name
+      }
+      permissions {
+        id
+        name
+      }
     }
   }
 `;

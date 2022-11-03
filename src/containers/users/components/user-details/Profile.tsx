@@ -4,11 +4,7 @@ import { useQuery } from "@apollo/client";
 
 import { styled, Box, Paper, Grid, Divider, Link, Chip } from "@mui/material";
 
-import {
-  GET_USER,
-  GET_USER_GROUPS,
-  GET_USER_PERMISSIONS,
-} from "../../services/queries";
+import { GET_USER } from "../../services/queries";
 import { User, Group, Permission } from "../../../../types/user";
 import { useParams } from "react-router-dom";
 import "./styles.css";
@@ -29,34 +25,25 @@ const Profile = () => {
     variables: { id: id },
     onCompleted: (data) => {
       setUser(data?.getUser);
-    },
-  });
-
-  useQuery(GET_USER_GROUPS, {
-    variables: { id: id },
-    onCompleted: (data) => {
-      setUserGroups(data?.getUserGroups);
-    },
-  });
-
-  useQuery(GET_USER_PERMISSIONS, {
-    variables: { id: id },
-    onCompleted: (data) => {
-      setUserPermissions(data?.getUserPermissions);
+      setUserGroups(data?.getUser?.groups);
+      setUserPermissions(data?.getUser?.permissions);
     },
   });
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2} className="grid">
+      <Grid container spacing={1}>
         <Grid item sm={12} md={4}>
-          <Item elevation={0} className="grid-item1">
-            <div className="box1">
-              <div className="box2">
-                <div className="name">
-                  {`${user?.firstName}
+          <Item elevation={0} className="personal-details">
+            <div className="details">
+              <div className="details-cntr">
+                <div className="name-status">
+                  <div className="name">
+                    {`${user?.firstName}
                    ${user?.middleName || ""} 
                   ${user?.lastName || ""}`}
+                  </div>
+                  <Chip label={"Active"} sx={{ background: "#D3F4BE" }} />
                 </div>
                 <Link underline="none" className="link">
                   {user?.email}
@@ -67,15 +54,6 @@ const Profile = () => {
             <div className="contact">
               <div style={{ fontWeight: 600 }}>Contact No:</div>
               <div>{user?.phone}</div>
-            </div>
-            <Divider flexItem />
-            <div className="contact">
-              <div style={{ fontWeight: 600 }}>Status:</div>
-              {/* To integrate with status api */}
-              <Chip
-                label={"Active"}
-                sx={{ fontSize: "20px", background: "#D3F4BE" }}
-              />
             </div>
             <Divider
               flexItem
@@ -90,8 +68,8 @@ const Profile = () => {
           light
           className="divider-vertical"
         />
-        <Grid item sm={10} md={7}>
-          <Item className="grid-item2" elevation={0}>
+        <Grid item sm={12} md={7}>
+          <Item className="groups-permissions" elevation={0}>
             <div className="user-groups">
               <div>Groups</div>
               <div className="items">
