@@ -68,7 +68,9 @@ const AddUser: React.FC = () => {
 
       onCompleted: () => {
         if (!createUserError && !groupUpdateError && !permissionUpdateError)
-          navigate("/home/users");
+          navigate("/home/users", {
+            state: { message: "User has been successfully created" },
+          });
       },
     });
   };

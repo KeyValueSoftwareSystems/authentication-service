@@ -57,12 +57,18 @@ const CreateOrEditRole = () => {
             permissions: rolePermissions.map((permission) => permission.id),
           },
         },
-        onCompleted: () => navigate("/home/roles"),
+        onCompleted: () =>
+          navigate("/home/roles", {
+            state: { message: "Role has been successfully created" },
+          }),
       });
   }, [createdRoleData]);
 
   useEffect(() => {
-    if (updatedRoleData && updatedRolePermissionsData) navigate("/home/roles");
+    if (updatedRoleData && updatedRolePermissionsData)
+      navigate("/home/roles", {
+        state: { message: "Role has been successfully updated" },
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatedRoleData, updatedRolePermissionsData]);
 
