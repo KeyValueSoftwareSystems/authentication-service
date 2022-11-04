@@ -1,7 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
-import { TokenResponse } from '../../schema/graphql.schema';
+import {
+  InviteTokenResponse,
+  TokenResponse,
+} from '../../schema/graphql.schema';
 import { AuthenticationHelper } from '../authentication.helper';
 
 @Injectable()
@@ -9,6 +13,7 @@ export class TokenService {
   constructor(
     private userService: UserService,
     private authenticationHelper: AuthenticationHelper,
+    private configService: ConfigService,
   ) {}
 
   async refresh(refreshToken: string): Promise<TokenResponse> {
@@ -29,6 +34,23 @@ export class TokenService {
     await this.userService.updateField(id, 'refreshToken', '');
   }
 
+  async refreshInviteToken(id: string): Promise<InviteTokenResponse> {
+    const userDetails = await this.userService.getUserById(id);
+    const refreshInviteToken = this.authenticationHelper.generateInvitationToken(
+      { id: userDetails.id },
+      this.configService.get('INVITATION_TOKEN_EXPTIME'),
+    );
+    await this.userService.updateField(
+      userDetails.id,
+      'inviteToken',
+      refreshInviteToken.token,
+    );
+    return {
+      inviteToken: refreshInviteToken.token,
+      tokenExpiryTime: refreshInviteToken.tokenExpiryTime,
+    };
+  }
+
   async getNewToken(userRecord: User): Promise<TokenResponse> {
     const token = this.authenticationHelper.generateTokenForUser(userRecord);
     await this.userService.updateField(
@@ -38,5 +60,10 @@ export class TokenService {
     );
     const tokenResponse: TokenResponse = { ...token, user: userRecord };
     return tokenResponse;
+  }
+
+  async revokeInviteToken(id: string): Promise<boolean> {
+    await this.userService.updateField(id, 'inviteToken', null);
+    return true;
   }
 }

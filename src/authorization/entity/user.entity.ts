@@ -42,6 +42,9 @@ class User extends BaseEntity {
 
   @Column({ type: 'enum', enum: Status, default: Status.INACTIVE })
   public status!: Status;
+
+  @Column({ nullable: true })
+  public inviteToken?: string;
 }
 
 export default User;

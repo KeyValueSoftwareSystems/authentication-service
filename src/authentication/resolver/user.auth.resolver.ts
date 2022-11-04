@@ -1,10 +1,13 @@
-import { UseGuards, UsePipes } from '@nestjs/common';
+import { ParseUUIDPipe, UseGuards, UsePipes } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import {
   GenerateOtpInput,
+  InviteTokenResponse,
   RefreshTokenInput,
   TokenResponse,
+  UserInviteTokenSignupInput,
   UserOTPLoginInput,
+  UserPasswordForInviteInput,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
   UserSignupResponse,
@@ -13,8 +16,10 @@ import User from '../../authorization/entity/user.entity';
 import { AuthGuard } from '../authentication.guard';
 import {
   GenerateOtpInputSchema,
+  UserInviteTokenSignupInputSchema,
   UserOTPLoginInputSchema,
   UserOTPSignupInputSchema,
+  UserPasswordForInviteInputSchema,
   UserPasswordInputSchema,
   UserPasswordLoginInputSchema,
   UserPasswordSignupInputSchema,
@@ -23,7 +28,8 @@ import ValidationPipe from '../../validation/validation.pipe';
 import PasswordAuthService from '../service/password.auth.service';
 import OTPAuthService from '../service/otp.auth.service';
 import { TokenService } from '../service/token.service';
-
+import { Permissions } from '../../authorization/permissions.decorator';
+import { PermissionsType } from '../../authorization/constants/authorization.constants';
 @Resolver('Userauth')
 export default class UserAuthResolver {
   constructor(
@@ -46,6 +52,38 @@ export default class UserAuthResolver {
     request: UserPasswordSignupInput,
   ): Promise<UserSignupResponse> {
     return this.passwordAuthService.userSignup(request);
+  }
+
+  @Mutation('inviteTokenSignup')
+  async inviteTokenSignup(
+    @Args('input', new ValidationPipe(UserInviteTokenSignupInputSchema))
+    request: UserInviteTokenSignupInput,
+  ): Promise<InviteTokenResponse> {
+    return this.passwordAuthService.inviteTokenSignup(request);
+  }
+
+  @Mutation('setPasswordForInvite')
+  async setPasswordForInvite(
+    @Args('input', new ValidationPipe(UserPasswordForInviteInputSchema))
+    request: UserPasswordForInviteInput,
+  ): Promise<UserSignupResponse> {
+    return this.passwordAuthService.setPasswordForInvitedUser(request);
+  }
+
+  @Permissions(PermissionsType.EditUser)
+  @Mutation('refreshInviteToken')
+  async refreshInviteToken(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<InviteTokenResponse> {
+    return this.tokenService.refreshInviteToken(id);
+  }
+
+  @Permissions(PermissionsType.EditUser)
+  @Mutation('revokeInviteToken')
+  async revokeInviteToken(
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<boolean> {
+    return this.tokenService.revokeInviteToken(id);
   }
 
   @Mutation('otpLogin')

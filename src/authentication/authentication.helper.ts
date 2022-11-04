@@ -59,4 +59,24 @@ export class AuthenticationHelper {
   generatePasswordHash(plainTextPassword: string, salt = 10) {
     return bcrypt.hashSync(plainTextPassword, salt);
   }
+
+  generateInvitationToken = (payload: any, time?: string) => {
+    const tokenExpiryTime = time
+      ? time
+      : this.configService.get('JWT_TOKEN_EXPTIME');
+    const token = jwt.sign(
+      payload,
+      this.configService.get('JWT_SECRET') || '',
+      {
+        expiresIn: tokenExpiryTime,
+      },
+    );
+    return { token, tokenExpiryTime };
+  };
+
+  validateInvitationToken(inviteToken: string) {
+    const secret = this.configService.get('JWT_SECRET') || '';
+    const verificationResponse: any = jwt.verify(inviteToken, secret);
+    return verificationResponse;
+  }
 }
