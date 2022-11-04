@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
 import {
@@ -12,6 +13,7 @@ export class TokenService {
   constructor(
     private userService: UserService,
     private authenticationHelper: AuthenticationHelper,
+    private configService: ConfigService,
   ) {}
 
   async refresh(refreshToken: string): Promise<TokenResponse> {
@@ -36,7 +38,7 @@ export class TokenService {
     const userDetails = await this.userService.getUserById(id);
     const refreshInviteToken = this.authenticationHelper.generateInvitationToken(
       { id: userDetails.id },
-      '7d',
+      this.configService.get('INVITATION_TOKEN_EXPTIME'),
     );
     await this.userService.updateField(
       userDetails.id,

@@ -24,6 +24,7 @@ import {
 import { Authenticatable } from '../interfaces/authenticatable';
 import { TokenService } from './token.service';
 import { Connection } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export default class PasswordAuthService implements Authenticatable {
@@ -32,6 +33,7 @@ export default class PasswordAuthService implements Authenticatable {
     private tokenService: TokenService,
     private authenticationHelper: AuthenticationHelper,
     private connection: Connection,
+    private configService: ConfigService,
   ) {}
 
   async userSignup(
@@ -89,7 +91,7 @@ export default class PasswordAuthService implements Authenticatable {
       const savedUser = await this.userService.createUser(userFromInput);
       invitationToken = this.authenticationHelper.generateInvitationToken(
         { id: savedUser.id },
-        '7d',
+        this.configService.get('INVITATION_TOKEN_EXPTIME'),
       );
       await this.userService.updateField(
         savedUser.id,

@@ -18,6 +18,7 @@ describe('test TokenService', () => {
   configService.get('ENV').returns('local');
   configService.get('JWT_SECRET').returns('s3cr3t1234567890');
   configService.get('JWT_TOKEN_EXPTIME').returns(3600);
+  configService.get('INVITATION_TOKEN_EXPTIME').returns('7d');
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ConfigModule],
