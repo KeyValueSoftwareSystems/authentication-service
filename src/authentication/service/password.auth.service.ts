@@ -86,9 +86,10 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.middleName = userDetails.middleName;
     userFromInput.lastName = userDetails.lastName;
     userFromInput.status = Status.INVITED;
+    let savedUser: User;
     let invitationToken: { token: any; tokenExpiryTime?: any };
     await this.connection.manager.transaction(async () => {
-      const savedUser = await this.userService.createUser(userFromInput);
+      savedUser = await this.userService.createUser(userFromInput);
       invitationToken = this.authenticationHelper.generateInvitationToken(
         { id: savedUser.id },
         this.configService.get('INVITATION_TOKEN_EXPTIME'),
@@ -99,9 +100,11 @@ export default class PasswordAuthService implements Authenticatable {
         invitationToken.token,
       );
     });
+    savedUser!.inviteToken = invitationToken!.token;
     return {
       inviteToken: invitationToken!.token,
       tokenExpiryTime: invitationToken!.tokenExpiryTime,
+      user: savedUser!,
     };
   }
 

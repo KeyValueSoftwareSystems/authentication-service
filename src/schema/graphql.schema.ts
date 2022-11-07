@@ -243,6 +243,7 @@ export interface UserSignupResponse {
 export interface InviteTokenResponse {
     inviteToken: string;
     tokenExpiryTime: string;
+    user: User;
 }
 
 export interface Entity {
@@ -318,6 +319,7 @@ export interface User {
     status: Status;
     groups?: Group[];
     permissions?: Permission[];
+    inviteToken?: string;
 }
 
 export interface UserGroupResponse {

@@ -84,6 +84,7 @@ describe('test TokenService', () => {
     const inviteTokenRespnse: InviteTokenResponse = {
       inviteToken: refreshInviteToken.token,
       tokenExpiryTime: '7d',
+      user: users[0],
     };
     userService
       .updateField(users[0].id, 'inviteToken', Arg.any())
