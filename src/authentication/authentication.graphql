@@ -83,6 +83,7 @@ input UserInviteTokenSignupInput {
 type InviteTokenResponse {
   inviteToken: String!
   tokenExpiryTime: String!
+  user: User!
 }
 
 input UserPasswordForInviteInput {

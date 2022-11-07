@@ -45,9 +45,11 @@ export class TokenService {
       'inviteToken',
       refreshInviteToken.token,
     );
+    userDetails.inviteToken = refreshInviteToken.token;
     return {
       inviteToken: refreshInviteToken.token,
       tokenExpiryTime: refreshInviteToken.tokenExpiryTime,
+      user: userDetails,
     };
   }
 

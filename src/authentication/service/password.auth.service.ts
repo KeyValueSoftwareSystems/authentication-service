@@ -87,7 +87,7 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.lastName = userDetails.lastName;
     userFromInput.status = Status.INVITED;
     let invitationToken: { token: any; tokenExpiryTime?: any };
-    await this.connection.manager.transaction(async () => {
+    return await this.connection.manager.transaction(async () => {
       const savedUser = await this.userService.createUser(userFromInput);
       invitationToken = this.authenticationHelper.generateInvitationToken(
         { id: savedUser.id },
@@ -98,11 +98,13 @@ export default class PasswordAuthService implements Authenticatable {
         'inviteToken',
         invitationToken.token,
       );
+      const user = await this.userService.getUserById(savedUser.id);
+      return {
+        inviteToken: invitationToken!.token,
+        tokenExpiryTime: invitationToken!.tokenExpiryTime,
+        user: user!,
+      };
     });
-    return {
-      inviteToken: invitationToken!.token,
-      tokenExpiryTime: invitationToken!.tokenExpiryTime,
-    };
   }
 
   async setPasswordForInvitedUser(
