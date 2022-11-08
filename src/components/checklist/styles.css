@@ -1,4 +1,7 @@
 #checkbox {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
   border: 1px solid rgba(0, 0, 0, 0.23);
   box-sizing: border-box;
   border-radius: 10px;
@@ -29,6 +32,7 @@
   color: #040404;
 }
 .checklistLabel {
+  text-transform: capitalize;
   margin-left: 10px;
 }
 

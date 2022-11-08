@@ -1,5 +1,5 @@
+import { useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { useMutation } from "@apollo/client";
 import {
   Outlet,
   Navigate,
@@ -11,6 +11,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { useSetRecoilState } from "recoil";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import {
@@ -28,6 +29,8 @@ import { LOGO_URL } from "../../config";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
 import { LOGOUT } from "../auth/services/mutations";
+import { GET_USERS } from "../users/services/queries";
+import { allUsersAtom } from "../../states/userStates";
 import { currentUserAtom } from "../../states/loginStates";
 import { stringAvatar, stringToColor } from "../../utils/table";
 import Toast from "../../components/toast";
@@ -45,6 +48,13 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { state: toastMessage } = useLocation();
 
+  const setUsers = useSetRecoilState(allUsersAtom);
+
+  useQuery(GET_USERS, {
+    onCompleted: (data) => {
+      setUsers(data?.getUsers);
+    },
+  });
   const [currentUserDetails] = useRecoilState(currentUserAtom);
 
   const [logout] = useMutation(LOGOUT, {

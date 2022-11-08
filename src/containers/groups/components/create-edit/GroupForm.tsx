@@ -1,36 +1,25 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Divider } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
 
 import "./styles.css";
 import { GroupFormSchema } from "../../groupSchema";
-import { GET_GROUP } from "../../services/queries";
-import { Group } from "../../../../types/group";
 import FormInputText from "../../../../components/inputText";
 
 interface GroupFormProps {
+  name: string;
   createGroup: (inputs: FieldValues) => void;
   editGroup: (inputs: FieldValues) => void;
 }
 
-const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
+const GroupForm: FC<GroupFormProps> = ({ name, createGroup, editGroup }) => {
   const navigate = useNavigate();
 
   const { id } = useParams();
-  const [group, setGroup] = useState<Group>();
-
-  const { loading } = useQuery(GET_GROUP, {
-    skip: !id,
-    variables: { id: id },
-    onCompleted: (data) => {
-      setGroup(data?.getGroup);
-    },
-  });
 
   const methods = useForm({
     resolver: yupResolver(GroupFormSchema),
@@ -73,18 +62,14 @@ const GroupForm: FC<GroupFormProps> = ({ createGroup, editGroup }) => {
             </div>
           </div>
           <Divider />
-          {!loading && (
-            <>
-              <FormInputText
-                name="name"
-                label="Group Name"
-                type="text"
-                className="group-name"
-                defaultText={group?.name}
-              />
-              {/* <Divider sx={{ marginTop: 2 }} /> */}
-            </>
-          )}
+          <FormInputText
+            name="name"
+            label="Group Name"
+            type="text"
+            className="group-name"
+            defaultText={name}
+          />
+          {/* <Divider sx={{ marginTop: 2 }} /> */}
         </form>
       </FormProvider>
     </div>

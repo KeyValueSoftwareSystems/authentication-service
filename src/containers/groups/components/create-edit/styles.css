@@ -7,7 +7,7 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
   align-items: center;
 }
 
@@ -72,11 +72,6 @@
 }
 
 .add-members {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  row-gap: 15px;
 }
 
 .roles {
@@ -109,4 +104,26 @@
   padding-left: 5;
   display: flex;
   flex-wrap: wrap;
+}
+
+.user-cards {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 16px;
+  row-gap: 16px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 20px;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 30px;
 }

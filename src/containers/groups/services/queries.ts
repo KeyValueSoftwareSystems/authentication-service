@@ -22,6 +22,18 @@ export const GET_GROUP = gql`
     getGroup(id: $id) {
       id
       name
+      users {
+        id
+        email
+        phone
+        firstName
+        middleName
+        lastName
+      }
+      roles {
+        id
+        name
+      }
     }
   }
 `;
