@@ -319,7 +319,14 @@ const CreateOrEditGroup = () => {
         />
       )}
       <div>
-        <Box sx={{ borderBottom: 1, borderColor: "divider", display: "flex" }}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            display: "flex",
+            width: "98.7%",
+          }}
+        >
           <Tabs value={value} onChange={handleChange}>
             <Tab
               label="Roles"

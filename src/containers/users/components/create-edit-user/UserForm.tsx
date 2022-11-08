@@ -154,6 +154,7 @@ const UserForm = (props: UserProps) => {
     onCompleted: (data) => {
       setSelectedPermissions(data?.getUserPermissions);
     },
+    fetchPolicy: "network-only",
   });
 
   const methods = useForm({
@@ -290,10 +291,14 @@ const UserForm = (props: UserProps) => {
 
       <div>
         <Box>
-          <Tabs value={value} onChange={handleTabChange}>
-            <Tab label="Groups" />
-            <Tab label="Permissions" />
-          </Tabs>
+          <Box
+            sx={{ borderBottom: 1, borderColor: "divider", display: "flex" }}
+          >
+            <Tabs value={value} onChange={handleTabChange}>
+              <Tab label="Groups" />
+              <Tab label="Permissions" />
+            </Tabs>
+          </Box>
           <TabPanel value={value} index={0}>
             <div id="groups-permissions">
               <div id="user-groups">

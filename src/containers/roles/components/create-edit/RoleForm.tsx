@@ -55,8 +55,8 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
         <form onSubmit={handleSubmit(onSubmitForm)} className="form">
           <div className="horizontal-bar">
             <div className="page-header">
-              <div className="access-setting" onClick={onBackNavigation}>
-                <ArrowBackIcon sx={{ height: 15 }} />
+              <div id="back-page" onClick={onBackNavigation}>
+                <ArrowBackIcon id="arrowicon" />
                 Roles Listing
               </div>
               <div className="create-role">
@@ -64,19 +64,15 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
               </div>
             </div>
             <div className="submit-section">
-              <Button
-                variant="text"
-                className="button"
-                onClick={onBackNavigation}
-              >
+              <Button variant="text" onClick={onBackNavigation}>
                 Cancel
               </Button>
-              <Button variant="outlined" className="button" type="submit">
+              <Button variant="outlined" type="submit">
                 {id ? "Update" : "Create"}
               </Button>
             </div>
           </div>
-          <Divider />
+          <Divider sx={{ marginTop: "2px", marginBottom: "10px" }} />
           {!loading && (
             <>
               <FormInputText
@@ -86,7 +82,7 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
                 className="role-name"
                 defaultText={role?.name}
               />
-              <Divider sx={{ marginTop: 2 }} />
+              <Divider sx={{ marginTop: "46px" }} />
             </>
           )}
         </form>

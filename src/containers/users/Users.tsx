@@ -64,7 +64,7 @@ const Users: React.FC = () => {
     },
     {
       field: "groups",
-      headerName: "Member Of",
+      headerName: "Groups",
       headerClassName: "user-list-header",
       flex: 0.5,
       renderCell: (params) => (
