@@ -28,6 +28,10 @@ const Roles: React.FC = () => {
     },
     fetchPolicy: "network-only",
   });
+
+  const setItemList = (data: any) => {
+    setRoleList(data.getRoles);
+  };
   const columns: GridColumns = [
     {
       field: "name",
@@ -79,6 +83,7 @@ const Roles: React.FC = () => {
         text="All Roles"
         buttonLabel="Add Role"
         searchLabel="Search Role"
+        setItemList={setItemList}
         entity="Role"
         deleteMutation={DELETE_ROLE}
         refetchQuery={GET_ROLES}

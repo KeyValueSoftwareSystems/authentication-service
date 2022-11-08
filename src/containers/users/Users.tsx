@@ -49,6 +49,10 @@ const Users: React.FC = () => {
     });
   }, []);
 
+  const setItemList = (data: any) => {
+    setUserList(data.getUsers);
+  };
+
   const columns: GridColumns = [
     {
       field: "firstName",
@@ -103,6 +107,7 @@ const Users: React.FC = () => {
         rows={userList}
         columns={columns}
         text="All Users"
+        setItemList={setItemList}
         onAdd={onAdd}
         onEdit={onEdit}
         entity="User"

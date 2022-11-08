@@ -33,6 +33,7 @@ const TableList: FC<TableProps> = ({
   rows,
   columns,
   text,
+  setItemList,
   onAdd,
   onEdit,
   buttonLabel,
@@ -183,6 +184,8 @@ const TableList: FC<TableProps> = ({
           text={text}
           buttonLabel={buttonLabel}
           searchLabel={searchLabel}
+          setItemList={setItemList}
+          searchQuery={refetchQuery}
           isAddVerified={isAddVerified}
           onAdd={onAdd}
         />
