@@ -43,7 +43,16 @@ const Profile = () => {
                    ${user?.middleName || ""} 
                   ${user?.lastName || ""}`}
                   </div>
-                  <Chip label={"Active"} sx={{ background: "#D3F4BE" }} />
+                  <Chip
+                    label={user?.status}
+                    id={
+                      user?.status === "ACTIVE"
+                        ? "active-user"
+                        : user?.status === "INACTIVE"
+                        ? "inactive-user"
+                        : "invited-user"
+                    }
+                  />
                 </div>
                 <Link underline="none" className="link">
                   {user?.email}

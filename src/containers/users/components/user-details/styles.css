@@ -132,6 +132,21 @@
   display: none;
 }
 
+#active-user {
+  background-color: #d3f4be;
+  color: #008000d1;
+}
+
+#inactive-user {
+  background-color: #80000040;
+  color: #8000008c;
+}
+
+#invited-user {
+  background-color: #efcc2433;
+  color: #d9a034;
+}
+
 @media (max-width: 900px) {
   .divider-vertical {
     display: none;
