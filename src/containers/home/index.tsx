@@ -88,7 +88,7 @@ const HomePage = () => {
           <div className="userdetails">
             <Avatar
               {...stringAvatar(
-                `${currentUserDetails.firstName} ${currentUserDetails.lastName}`
+                `${currentUserDetails.firstName} ${currentUserDetails.lastName}`?.toUpperCase()
               )}
             />
             <Tooltip title="Account Details">
@@ -111,12 +111,12 @@ const HomePage = () => {
               <MenuItem>
                 <Avatar
                   {...stringAvatar(
-                    `${currentUserDetails.firstName} ${currentUserDetails.lastName}`
+                    `${currentUserDetails.firstName} ${currentUserDetails.lastName}`?.toUpperCase()
                   )}
                   sx={{
                     marginLeft: "0px !important",
                     bgcolor: stringToColor(
-                      `${currentUserDetails.firstName} ${currentUserDetails.lastName}`
+                      `${currentUserDetails.firstName} ${currentUserDetails.lastName}`?.toUpperCase()
                     ),
                   }}
                 />
