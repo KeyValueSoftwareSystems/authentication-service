@@ -92,6 +92,7 @@ const Users: React.FC = () => {
         text="All Users"
         onAdd={onAdd}
         onEdit={onEdit}
+        entity="User"
         buttonLabel="Add User"
         searchLabel="Search User"
         deleteMutation={DELETE_USER}

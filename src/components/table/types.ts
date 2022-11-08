@@ -12,6 +12,7 @@ export interface TableProps {
   buttonLabel: string;
   text: string;
   searchLabel: string;
+  entity: string;
   deleteMutation: DocumentNode;
   refetchQuery: DocumentNode;
   editPermission?: string;

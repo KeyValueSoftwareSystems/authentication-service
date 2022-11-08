@@ -99,6 +99,7 @@ const GroupList: React.FC = () => {
         text="All Groups"
         buttonLabel="Add Group"
         searchLabel="Search Group"
+        entity="Group"
         deleteMutation={DELETE_GROUP}
         refetchQuery={GET_GROUPS}
         onAdd={onAddGroup}
