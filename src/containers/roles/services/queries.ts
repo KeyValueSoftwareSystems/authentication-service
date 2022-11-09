@@ -18,6 +18,10 @@ export const GET_ROLE = gql`
     getRole(id: $id) {
       id
       name
+      permissions {
+        id
+        name
+      }
     }
   }
 `;

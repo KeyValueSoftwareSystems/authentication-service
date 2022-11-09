@@ -13,11 +13,12 @@ import { Role } from "../../../../types/role";
 import { GET_ROLE } from "../../services/queries";
 
 interface RoleFormProps {
+  name: string;
   createRole: (inputs: FieldValues) => void;
   editRole: (inputs: FieldValues) => void;
 }
 
-const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
+const RoleForm: FC<RoleFormProps> = ({ name, createRole, editRole }) => {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -32,7 +33,7 @@ const RoleForm: FC<RoleFormProps> = ({ createRole, editRole }) => {
   });
 
   const initialValues = {
-    name: id ? role?.name : "",
+    name: name,
   };
 
   const methods = useForm({

@@ -64,10 +64,11 @@ const CreateOrEditGroup = () => {
   const [value, setValue] = useState(0);
   const [group, setGroup] = useState<Group>();
   const [roles, setRoles] = useState<Role[]>([]);
+  const [entityPermissions, setEntityPermissions] = useState<
+    EntityPermissionsDetails[]
+  >([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [permissions, setPermissions] = useState<EntityPermissionsDetails[]>(
-    []
-  );
+
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const allUsers = useRecoilValue(allUsersAtom);
   const [status, setStatus] = useState<boolean>(false);
@@ -136,9 +137,9 @@ const CreateOrEditGroup = () => {
   }) => {
     if (roleId) {
       setRoles(roles.filter((role: Role) => role.id !== roleId));
-      setPermissions(
-        permissions.filter(
-          (permission: EntityPermissionsDetails) => permission.id !== roleId
+      setEntityPermissions(
+        entityPermissions.filter(
+          (entityObj: EntityPermissionsDetails) => entityObj.id !== roleId
         )
       );
     }
@@ -170,7 +171,7 @@ const CreateOrEditGroup = () => {
     } else {
       if (value === "all") {
         setRoles([]);
-        setPermissions([]);
+        setEntityPermissions([]);
         return;
       }
       removeItem({ roleId: item?.id as string });
@@ -282,8 +283,12 @@ const CreateOrEditGroup = () => {
   };
 
   useEffect(() => {
-    if (permissions.length === 0 || allRoles?.length === roles?.length)
+    if (
+      (entityPermissions.length === 0 && !status) ||
+      allRoles?.length === roles?.length
+    ) {
       roles.forEach((role) => handlePermissions(role));
+    }
   }, [roles]);
 
   const handlePermissions = async (role: Role) => {
@@ -296,14 +301,15 @@ const CreateOrEditGroup = () => {
         },
       });
       if (response?.data?.getRolePermissions) {
-        setPermissions((previousState) => [
-          ...previousState,
-          {
-            id: role.id,
-            name: role.name,
-            permissions: response?.data?.getRolePermissions,
-          },
-        ]);
+        if (!entityPermissions.some((entityObj) => entityObj.id === role.id))
+          setEntityPermissions((previousState) => [
+            ...previousState,
+            {
+              id: role.id,
+              name: role.name,
+              permissions: response?.data?.getRolePermissions,
+            },
+          ]);
       }
     } finally {
       setStatus(false);
@@ -362,7 +368,7 @@ const CreateOrEditGroup = () => {
               <div className="header">
                 Permissions summary of selected roles
               </div>
-              <PermissionTabs permissions={permissions} />
+              <PermissionTabs permissions={entityPermissions} />
             </Grid>
           </Grid>
         </TabPanel>
