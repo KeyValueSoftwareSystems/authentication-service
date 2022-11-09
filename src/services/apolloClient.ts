@@ -4,19 +4,11 @@ import {
   createHttpLink,
   from,
 } from "@apollo/client";
-import { onError } from "@apollo/client/link/error";
 import { setContext } from "@apollo/client/link/context";
 
 const link = createHttpLink({
   uri: "http://localhost:4000/auth/api/graphql",
   // credentials: "include",
-});
-
-// to manage when graphQLErrors occurs.
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message }) => alert(message));
-  }
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -32,7 +24,7 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const client = new ApolloClient({
-  link: from([errorLink, authLink.concat(link)]),
+  link: from([authLink.concat(link)]),
   cache: new InMemoryCache(),
 });
 

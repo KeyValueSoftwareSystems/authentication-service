@@ -14,17 +14,35 @@ import { FieldValues } from "react-hook-form";
 import { currentUserAtom } from "../../../../states/loginStates";
 import { useRecoilState } from "recoil";
 import { UserPermissionsAtom } from "../../../../states/permissionsStates";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
 
 const EditUser: React.FC = () => {
   const { id } = useParams();
 
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [userPermissions, setUserPermissions] =
     useRecoilState(UserPermissionsAtom);
   const [currentUserDetails] = useRecoilState(currentUserAtom);
 
-  const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER);
-  const [updateUserGroups, { error: groupUpdateError }] =
-    useMutation(UPDATE_USER_GROUPS);
+  const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER, {
+    onError: () => {
+      setApiSuccess(false);
+      setToastMessage("The request could not be processed");
+    },
+  });
+  const [updateUserGroups, { error: groupUpdateError }] = useMutation(
+    UPDATE_USER_GROUPS,
+    {
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
+      },
+    }
+  );
   const [updateUserPermissions, { error: permissionUpdateError }] = useMutation(
     UPDATE_USER_PERMISSIONS,
     {
@@ -32,6 +50,10 @@ const EditUser: React.FC = () => {
         if (currentUserDetails.id === id) {
           setUserPermissions(data.updateUserPermissions);
         }
+      },
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
       },
     }
   );
@@ -70,10 +92,11 @@ const EditUser: React.FC = () => {
         },
       },
       onCompleted: () => {
-        if (!userUpdateError && !groupUpdateError && !permissionUpdateError)
-          navigate("/home/users", {
-            state: { message: "User has been successfully updated" },
-          });
+        if (!userUpdateError && !groupUpdateError && !permissionUpdateError) {
+          navigate("/home/users");
+          setApiSuccess(true);
+          setToastMessage("User has been successfully updated");
+        }
       },
     });
   };

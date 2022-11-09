@@ -146,6 +146,7 @@ const UserForm = (props: UserProps) => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser.groups);
     },
+    fetchPolicy: "network-only",
   });
 
   useQuery(GET_USER_PERMISSIONS, {

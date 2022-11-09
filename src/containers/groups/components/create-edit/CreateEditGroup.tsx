@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues } from "react-hook-form";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Box, Tab, Tabs, Typography, Grid, Divider } from "@mui/material";
 
 import {
@@ -30,6 +30,10 @@ import { Permission, User } from "../../../../types/user";
 import { Group } from "../../../../types/group";
 import { allUsersAtom } from "../../../../states/userStates";
 import UserCard from "./Usercard";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -61,6 +65,8 @@ const CreateOrEditGroup = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [value, setValue] = useState(0);
   const [group, setGroup] = useState<Group>();
   const [roles, setRoles] = useState<Role[]>([]);
@@ -77,12 +83,34 @@ const CreateOrEditGroup = () => {
     []
   );
 
-  const [updateGroup, { data: updatedGroupData }] = useMutation(UPDATE_GROUP);
-  const [createGroup, { data: createdGroupData }] = useMutation(CREATE_GROUP);
-  const [updateGroupRoles, { data: updatedGroupRolesData }] =
-    useMutation(UPDATE_GROUP_ROLES);
+  const [updateGroup, { data: updatedGroupData }] = useMutation(UPDATE_GROUP, {
+    onError: () => {
+      setApiSuccess(false);
+      setToastMessage("The request could not be processed");
+    },
+  });
+  const [createGroup, { data: createdGroupData }] = useMutation(CREATE_GROUP, {
+    onError: () => {
+      setApiSuccess(false);
+      setToastMessage("The request could not be processed");
+    },
+  });
+  const [updateGroupRoles, { data: updatedGroupRolesData }] = useMutation(
+    UPDATE_GROUP_ROLES,
+    {
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
+      },
+    }
+  );
   const [updateGroupPermissions, { data: updatedGroupPermissionsData }] =
-    useMutation(UPDATE_GROUP_PERMISSIONS);
+    useMutation(UPDATE_GROUP_PERMISSIONS, {
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
+      },
+    });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -239,16 +267,15 @@ const CreateOrEditGroup = () => {
   }, [createdGroupData]);
 
   useEffect(() => {
-    if ((createdGroupData && updatedGroupData) || updatedGroupData)
+    if ((createdGroupData && updatedGroupData) || updatedGroupData) {
       if (updatedGroupRolesData && updatedGroupPermissionsData) {
-        navigate("/home/groups", {
-          state: {
-            message: createdGroupData
-              ? "Group has been successfully created"
-              : "Group has been successfully updated",
-          },
-        });
+        navigate("/home/groups");
+        setApiSuccess(true);
+        createdGroupData
+          ? setToastMessage("Group has been successfully created")
+          : setToastMessage("Group has been successfully updated");
       }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     createdGroupData,

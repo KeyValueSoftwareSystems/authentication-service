@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 
 import {
   CREATE_USER,
@@ -12,21 +13,47 @@ import UserForm from "./UserForm";
 import { GroupPermissionsDetails } from "../../../../types/permission";
 import { FieldValues } from "react-hook-form";
 import { Group, Permission } from "../../../../types/user";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
 
 const AddUser: React.FC = () => {
   const navigate = useNavigate();
 
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [userPermissions, setUserPermissions] = useState<
     GroupPermissionsDetails[]
   >([]);
   const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
-  const [createUser, { error: createUserError, data }] =
-    useMutation(CREATE_USER);
-  const [updateUserGroups, { error: groupUpdateError }] =
-    useMutation(UPDATE_USER_GROUPS);
+  const [createUser, { error: createUserError, data }] = useMutation(
+    CREATE_USER,
+    {
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
+      },
+    }
+  );
+  const [updateUserGroups, { error: groupUpdateError }] = useMutation(
+    UPDATE_USER_GROUPS,
+    {
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
+      },
+    }
+  );
   const [updateUserPermissions, { error: permissionUpdateError }] = useMutation(
-    UPDATE_USER_PERMISSIONS
+    UPDATE_USER_PERMISSIONS,
+    {
+      onError: () => {
+        setApiSuccess(false);
+        setToastMessage("The request could not be processed");
+      },
+    }
   );
 
   useEffect(() => {
@@ -67,10 +94,11 @@ const AddUser: React.FC = () => {
       },
 
       onCompleted: () => {
-        if (!createUserError && !groupUpdateError && !permissionUpdateError)
-          navigate("/home/users", {
-            state: { message: "User has been successfully created" },
-          });
+        if (!createUserError && !groupUpdateError && !permissionUpdateError) {
+          navigate("/home/users");
+          setApiSuccess(true);
+          setToastMessage("User has been successfully created");
+        }
       },
     });
   };

@@ -34,9 +34,10 @@ import { allUsersAtom } from "../../states/userStates";
 import { currentUserAtom } from "../../states/loginStates";
 import { stringAvatar, stringToColor } from "../../utils/table";
 import Toast from "../../components/toast";
+import { toastMessageAtom } from "../../states/apiRequestState";
 
 const HomePage = () => {
-  const [message, setMessage] = useState<string>();
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -46,7 +47,6 @@ const HomePage = () => {
     setAnchorEl(null);
   };
   const navigate = useNavigate();
-  const { state: toastMessage } = useLocation();
 
   const setUsers = useSetRecoilState(allUsersAtom);
 
@@ -68,14 +68,8 @@ const HomePage = () => {
     logout();
   };
 
-  useEffect(() => {
-    if (toastMessage?.message) {
-      setMessage(toastMessage.message);
-    }
-  }, [toastMessage]);
-
   const onCloseToast = () => {
-    setMessage("");
+    setToastMessage("");
   };
 
   return (
@@ -197,8 +191,8 @@ const HomePage = () => {
             )}
           </div>
           <Toast
-            message={message}
-            isOpen={Boolean(message)}
+            message={toastMessage}
+            isOpen={Boolean(toastMessage)}
             handleClose={onCloseToast}
           />
         </div>
