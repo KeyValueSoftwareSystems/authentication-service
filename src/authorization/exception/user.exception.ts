@@ -11,3 +11,8 @@ export class PasswordAlreadySetException extends NotAcceptableException {
     super(`Password for ${userId} already set`);
   }
 }
+export class InviteTokenAlreadyRevokedException extends NotAcceptableException {
+  constructor(userId: string) {
+    super(`Invite token for ${userId} is already revoked`);
+  }
+}
