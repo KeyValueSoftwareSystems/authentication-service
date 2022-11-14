@@ -20,15 +20,20 @@ import {
 } from "../../../../states/apiRequestState";
 
 const EditUser: React.FC = () => {
-  const { id } = useParams();
-
-  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
-  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
+  const { id } = useParams(); // eslint-disable-next-line
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom); // eslint-disable-next-line
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom); // eslint-disable-next-line
   const [userPermissions, setUserPermissions] =
     useRecoilState(UserPermissionsAtom);
-  const [currentUserDetails] = useRecoilState(currentUserAtom);
+  const [currentUserDetails, setCurrentUserDetails] =
+    useRecoilState(currentUserAtom);
 
   const [updateUser, { error: userUpdateError }] = useMutation(UPDATE_USER, {
+    onCompleted: (data) => {
+      if (currentUserDetails.id === id) {
+        setCurrentUserDetails(data.updateUser);
+      }
+    },
     onError: () => {
       setApiSuccess(false);
       setToastMessage("The request could not be processed");

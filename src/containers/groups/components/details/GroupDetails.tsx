@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { ApolloError, useQuery } from "@apollo/client";
 import { Chip } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,11 +12,17 @@ import {
   GET_GROUP_ROLES,
 } from "../../services/queries";
 import "./styles.css";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
 
 const GroupDetails: React.FC = () => {
   const { id } = useParams();
   const [group, setGroup] = useRecoilState(groupDetailsAtom);
   const [roles, setRoles] = useRecoilState(GroupRolesAtom);
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [permissions, setPermissions] = useRecoilState(GroupPermissionsAtom);
   const navigate = useNavigate();
 
@@ -25,6 +31,10 @@ const GroupDetails: React.FC = () => {
     onCompleted: (data) => {
       setGroup(data?.getGroup);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
   useQuery(GET_GROUP_ROLES, {
@@ -32,12 +42,20 @@ const GroupDetails: React.FC = () => {
     onCompleted: (data) => {
       setRoles(data?.getGroupRoles);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
   useQuery(GET_GROUP_PERMISSIONS, {
     variables: { id },
     onCompleted: (data) => {
       setPermissions(data?.getGroupPermissions);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 

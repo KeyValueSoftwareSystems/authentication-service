@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRecoilState } from "recoil";
-import { useMutation, useQuery } from "@apollo/client";
-import { GridColumns, GridRowId, GridRowParams } from "@mui/x-data-grid";
+import { ApolloError, useQuery } from "@apollo/client";
+import { GridColumns, GridRowId } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 
 import "./roles.css";
@@ -11,20 +11,27 @@ import { RolesListAtom } from "../../../../states/roleStates";
 import TableList from "../../../../components/table";
 import { UserPermissionsAtom } from "../../../../states/permissionsStates";
 import TableChipElement from "../../../../components/table-chip-element";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
 
 const Roles: React.FC = () => {
   const navigate = useNavigate();
 
   const [isAddVerified, setAddVerified] = React.useState(false);
-  const [userPermissions] = useRecoilState(UserPermissionsAtom);
+  const [userPermissions] = useRecoilState(UserPermissionsAtom); // eslint-disable-next-line
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom); // eslint-disable-next-line
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
 
-  useMutation(DELETE_ROLE, {
-    refetchQueries: [{ query: GET_ROLES }],
-  });
   const [roleList, setRoleList] = useRecoilState(RolesListAtom);
   useQuery(GET_ROLES, {
     onCompleted: (data) => {
       setRoleList(data?.getRoles);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
     fetchPolicy: "network-only",
   });
@@ -68,11 +75,12 @@ const Roles: React.FC = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line
     userPermissions.map((item: any) => {
       if (item?.name.includes("create-roles")) {
         setAddVerified(true);
       }
-    });
+    }); // eslint-disable-next-line
   }, []);
 
   return (

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import {
   Outlet,
@@ -34,9 +34,10 @@ import { allUsersAtom } from "../../states/userStates";
 import { currentUserAtom } from "../../states/loginStates";
 import { stringAvatar, stringToColor } from "../../utils/table";
 import Toast from "../../components/toast";
-import { toastMessageAtom } from "../../states/apiRequestState";
+import { apiRequestAtom, toastMessageAtom } from "../../states/apiRequestState";
 
 const HomePage = () => {
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
   const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -54,6 +55,10 @@ const HomePage = () => {
     onCompleted: (data) => {
       setUsers(data?.getUsers);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
   const [currentUserDetails] = useRecoilState(currentUserAtom);
 
@@ -61,6 +66,10 @@ const HomePage = () => {
     onCompleted: () => {
       CustomerAuth.clearTokens();
       navigate("/login");
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 

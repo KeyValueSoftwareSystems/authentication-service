@@ -4,13 +4,18 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
-import { useQuery } from "@apollo/client";
+import { ApolloError, useQuery } from "@apollo/client";
 
 import { RoleFormSchema } from "../../roleSchema";
 import "./styles.css";
 import FormInputText from "../../../../components/inputText";
 import { Role } from "../../../../types/role";
 import { GET_ROLE } from "../../services/queries";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
+import { useRecoilState } from "recoil";
 
 interface RoleFormProps {
   name: string;
@@ -23,12 +28,18 @@ const RoleForm: FC<RoleFormProps> = ({ name, createRole, editRole }) => {
 
   const { id } = useParams();
   const [role, setRole] = useState<Role>();
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
 
   const { loading } = useQuery(GET_ROLE, {
     skip: !id,
     variables: { id: id },
     onCompleted: (data) => {
       setRole(data?.getRole);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 

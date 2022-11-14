@@ -32,7 +32,7 @@ const SearchBar: FC<SearchBarProps> = ({
   };
 
   useEffect(() => {
-    searchItemQuery();
+    if (searchValue.length !== 0) searchItemQuery(); // eslint-disable-next-line
   }, [searchValue]);
 
   return (

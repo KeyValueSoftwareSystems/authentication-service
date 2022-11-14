@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import { useRecoilState } from "recoil";
 import { Button } from "@mui/material";
 
@@ -13,8 +13,11 @@ import { GET_PERMISSIONS } from "./services/queries";
 import InlineEdit from "../../components/inline-edit";
 import { Permission } from "../../types/permission";
 import "./styles.css";
+import { apiRequestAtom, toastMessageAtom } from "../../states/apiRequestState";
 
 const PermissionList: React.FC = () => {
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   const [showAddPermission, setShowAddPermission] = useState(false);
   const [permissionList, setPermissionList] =
     useRecoilState(permissionsListAtom);
@@ -23,11 +26,25 @@ const PermissionList: React.FC = () => {
     onCompleted: (data) => {
       setPermissionList(data?.getPermissions);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
-  const [deletePermission] = useMutation(DELETE_PERMISSION);
+  const [deletePermission] = useMutation(DELETE_PERMISSION, {
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
+  });
 
-  const [updatePermission] = useMutation(UPDATE_PERMISSION);
+  const [updatePermission] = useMutation(UPDATE_PERMISSION, {
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
+  });
 
   const [createNewPermission] = useMutation(CREATE_PERMISSION, {
     update(cache, { data }) {
@@ -42,6 +59,10 @@ const PermissionList: React.FC = () => {
         query: GET_PERMISSIONS,
         data: { getPermissions: newPermissionList },
       });
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 

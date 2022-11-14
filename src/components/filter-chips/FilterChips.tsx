@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { ApolloError, useQuery } from "@apollo/client";
 import { Chip } from "@mui/material";
 import DoneIcon from "@mui/icons-material/Done";
 import { useState } from "react";
@@ -6,6 +6,8 @@ import { useState } from "react";
 import "./styles.css";
 import { GET_PERMISSIONS } from "../../containers/permissions/services/queries";
 import { Permission } from "../../types/user";
+import { apiRequestAtom, toastMessageAtom } from "../../states/apiRequestState";
+import { useRecoilState } from "recoil";
 
 interface FilterChipsProps {
   selectedPermissions: Permission[];
@@ -15,9 +17,15 @@ interface FilterChipsProps {
 const FilterChips: React.FC<FilterChipsProps> = (props: FilterChipsProps) => {
   const { handleClick, selectedPermissions } = props;
   const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   useQuery(GET_PERMISSIONS, {
     onCompleted: (data) => {
       setAllPermissions(data?.getPermissions);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useQuery } from "@apollo/client";
+import { ApolloError, useQuery } from "@apollo/client";
 
 import { styled, Box, Paper, Grid, Divider, Link, Chip } from "@mui/material";
 
@@ -8,6 +8,11 @@ import { GET_USER } from "../../services/queries";
 import { User, Group, Permission } from "../../../../types/user";
 import { useParams } from "react-router-dom";
 import "./styles.css";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
+import { useRecoilState } from "recoil";
 
 const Item = styled(Paper)(() => ({
   backgroundColor: "#fff",
@@ -20,6 +25,8 @@ const Profile = () => {
   const [user, setUser] = useState<User>();
   const [userGroups, setUserGroups] = useState<Group[]>();
   const [userPermissions, setUserPermissions] = useState<Permission[]>();
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
 
   useQuery(GET_USER, {
     variables: { id: id },
@@ -27,6 +34,10 @@ const Profile = () => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser?.groups);
       setUserPermissions(data?.getUser?.permissions);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 

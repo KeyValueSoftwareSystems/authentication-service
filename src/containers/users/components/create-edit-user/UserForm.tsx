@@ -17,7 +17,7 @@ import {
   GET_GROUPS,
   GET_GROUP_PERMISSIONS,
 } from "../../../groups/services/queries";
-import { useQuery } from "@apollo/client";
+import { ApolloError, useQuery } from "@apollo/client";
 import FormInputText from "../../../../components/inputText";
 import { ChecklistComponent } from "../../../../components/checklist/CheckList";
 import { GET_USER, GET_USER_PERMISSIONS } from "../../services/queries";
@@ -29,6 +29,11 @@ import { Entity } from "../../../../types/generic";
 import { EntityPermissionsDetails } from "../../../../types/permission";
 import { AddUserformSchema, EditUserformSchema } from "../../userSchema";
 import FilterChips from "../../../../components/filter-chips/FilterChips";
+import {
+  apiRequestAtom,
+  toastMessageAtom,
+} from "../../../../states/apiRequestState";
+import { useRecoilState } from "recoil";
 
 interface UserProps {
   isEdit?: boolean;
@@ -86,6 +91,8 @@ const UserForm = (props: UserProps) => {
   const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
     []
   );
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
 
   const handleClick = (permission: Permission) => {
     if (
@@ -137,6 +144,10 @@ const UserForm = (props: UserProps) => {
       const groups = data?.getGroups.map((group: Group) => group);
       setAllGroups([...groups]);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
   const { loading } = useQuery(GET_USER, {
@@ -146,6 +157,10 @@ const UserForm = (props: UserProps) => {
       setUser(data?.getUser);
       setUserGroups(data?.getUser.groups);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
     fetchPolicy: "network-only",
   });
 
@@ -154,6 +169,10 @@ const UserForm = (props: UserProps) => {
     variables: { id: id },
     onCompleted: (data) => {
       setSelectedPermissions(data?.getUserPermissions);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
     fetchPolicy: "network-only",
   });

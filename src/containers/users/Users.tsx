@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useRecoilState } from "recoil";
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import { Avatar, Chip } from "@mui/material";
 import { GridColumns } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
@@ -17,20 +17,23 @@ import TableChipElement from "../../components/table-chip-element";
 import { stringAvatar } from "../../utils/table";
 import "./components/create-edit-user/styles.css";
 import { UserPermissionsAtom } from "../../states/permissionsStates";
+import { apiRequestAtom, toastMessageAtom } from "../../states/apiRequestState";
 
 const Users: React.FC = () => {
   const [isAddVerified, setAddVerified] = React.useState(false);
   const [userPermissions] = useRecoilState(UserPermissionsAtom);
   const [userList, setUserList] = useRecoilState(userListAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
   const navigate = useNavigate();
-
-  useMutation(DELETE_USER, {
-    refetchQueries: [{ query: GET_USERS }],
-  });
 
   useQuery(GET_USERS, {
     onCompleted: (data) => {
       setUserList(data?.getUsers);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
     fetchPolicy: "network-only",
   });

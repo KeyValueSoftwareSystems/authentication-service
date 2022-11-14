@@ -16,12 +16,14 @@ import {
 } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 
 import { TableProps } from "./types";
 import TableToolBar from "../table-toolbar/TableToolBar";
 import "./styles.css";
 import { VERIFY_USER_PERMISSION } from "./services/queries";
+import { useRecoilState } from "recoil";
+import { apiRequestAtom, toastMessageAtom } from "../../states/apiRequestState";
 
 const StyledDialog = styled(Dialog)`
   .MuiBackdrop-root {
@@ -48,6 +50,8 @@ const TableList: FC<TableProps> = ({
 }) => {
   const [isEditVerified, setEditVerified] = React.useState(true);
   const [isDeleteVerified, setDeleteVerified] = React.useState(true);
+  const [apiSuccess, setApiSuccess] = useRecoilState(apiRequestAtom);
+  const [toastMessage, setToastMessage] = useRecoilState(toastMessageAtom);
   useQuery(VERIFY_USER_PERMISSION, {
     variables: {
       params: {
@@ -57,6 +61,10 @@ const TableList: FC<TableProps> = ({
     },
     onCompleted: (data) => {
       setEditVerified(data?.verifyUserPermission);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
     fetchPolicy: "network-only",
   });
@@ -70,10 +78,18 @@ const TableList: FC<TableProps> = ({
     onCompleted: (data) => {
       setDeleteVerified(data?.verifyUserPermission);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
     fetchPolicy: "network-only",
   });
   const [deleteItem] = useMutation(deleteMutation, {
     refetchQueries: [{ query: refetchQuery }],
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
   const [open, setOpen] = useState(false);
@@ -126,50 +142,48 @@ const TableList: FC<TableProps> = ({
             />
           </Tooltip>,
           <Tooltip title="Delete" arrow placement="top">
-            <>
-              <GridActionsCellItem
-                icon={<DeleteOutlinedIcon className="delete" />}
-                label="Delete"
-                className={`delete  ${!isDeleteVerified && "disabled-styles"}`}
-                onClick={() => openConfirmPopup(params.id, params.row.name)}
-              />
-              <StyledDialog
-                PaperProps={{
-                  style: {
-                    boxShadow: "none",
-                    width: "400px",
-                    alignItems: "center",
-                  },
-                }}
-                open={open}
-                onClose={handleClose}
-              >
-                <DialogTitle>
-                  <>Delete {entity}</>
-                </DialogTitle>
-                <DialogContentText>
-                  <>
-                    {" "}
-                    Are you sure you want to delete the {entity?.toLowerCase()}{" "}
-                    {entityName}
-                  </>
-                </DialogContentText>
-                <DialogActions>
-                  <Button onClick={handleClose}>No</Button>
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      height: "30px",
-                    }}
-                    onClick={onConfirmDelete}
-                    autoFocus
-                  >
-                    Yes
-                  </Button>
-                </DialogActions>
-              </StyledDialog>
-            </>
+            <GridActionsCellItem
+              icon={<DeleteOutlinedIcon className="delete" />}
+              label="Delete"
+              className={`delete  ${!isDeleteVerified && "disabled-styles"}`}
+              onClick={() => openConfirmPopup(params.id, params.row.name)}
+            />
           </Tooltip>,
+          <StyledDialog
+            PaperProps={{
+              style: {
+                boxShadow: "none",
+                minWidth: "400px",
+                alignItems: "center",
+              },
+            }}
+            open={open}
+            onClose={handleClose}
+          >
+            <DialogTitle>
+              <>Delete {entity}</>
+            </DialogTitle>
+            <DialogContentText sx={{ width: "84%" }}>
+              <>
+                {" "}
+                Are you sure you want to delete the {entity?.toLowerCase()}{" "}
+                {entityName}?
+              </>
+            </DialogContentText>
+            <DialogActions>
+              <Button onClick={handleClose}>No</Button>
+              <Button
+                variant="outlined"
+                sx={{
+                  height: "30px",
+                }}
+                onClick={onConfirmDelete}
+                autoFocus
+              >
+                Yes
+              </Button>
+            </DialogActions>
+          </StyledDialog>,
         ];
       },
     },

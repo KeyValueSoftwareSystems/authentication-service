@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { FieldValues } from "react-hook-form";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -120,6 +120,10 @@ const CreateOrEditGroup = () => {
     onCompleted: (data) => {
       setAllRoles(data?.getRoles);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
   const { loading } = useQuery(GET_GROUP, {
@@ -131,6 +135,10 @@ const CreateOrEditGroup = () => {
       setRoles([...roles, ...data?.getGroup?.roles]);
       setUsers([...users, ...data?.getGroup?.users]);
     },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
+    },
   });
 
   useQuery(GET_GROUP_PERMISSIONS, {
@@ -139,6 +147,10 @@ const CreateOrEditGroup = () => {
     onCompleted: (data) => {
       const permissionList = data?.getGroupPermissions;
       setSelectedPermissions(permissionList);
+    },
+    onError: (error: ApolloError) => {
+      setToastMessage(error.message);
+      setApiSuccess(false);
     },
   });
 
