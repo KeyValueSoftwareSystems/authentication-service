@@ -1,0 +1,99 @@
+enum Status {
+  INVITED
+  INACTIVE
+  ACTIVE
+}
+
+type User {
+  id: ID!
+  email: String
+  phone: String
+  firstName: String!
+  middleName: String
+  lastName: String!
+  status: Status!
+  groups: [Group]
+  permissions: [Permission]
+  inviteToken: String
+}
+
+enum OperationType {
+  OR
+  AND
+}
+
+input UpdateUserInput {
+  firstName: String
+  middleName: String
+  lastName: String
+}
+
+input UpdateUserPermissionInput {
+  permissions: [ID!]!
+}
+
+input UpdateUserGroupInput {
+  groups: [ID!]!
+}
+
+type UserGroupResponse {
+  id: ID!,
+  name: String!
+}
+
+type UserPermissions {
+  id: ID!,
+  name: String!
+}
+
+enum OperationType {
+  AND
+  OR
+}
+
+input UserPermissionsVerification {
+permissions: [String]!,
+operation: OperationType
+}
+
+input UserInputFilter {
+  search: UserSearchInput
+}
+
+input UserSearchInput {
+  and: UserSearchParameter
+  or: UserSearchParameter
+}
+
+input UserSearchParameter {
+  email: StringSearchCondition
+  firstName: StringSearchCondition
+  middleName: StringSearchCondition
+  lastName: StringSearchCondition
+}
+
+input StringSearchCondition {
+  contains: String
+  equals: String
+  #----Can Include-----#
+  # notContains: String
+  # notEquals: String
+  # greaterThan: String
+  # lessThan: String
+  # beginsWith: String
+}
+
+type Query {
+  getUsers(input: UserInputFilter): [User]!
+  getUser(id: ID!): User
+  getUserGroups(id: ID!): [UserGroupResponse]
+  getUserPermissions(id: ID!): [UserPermissions]
+  verifyUserPermission(params: UserPermissionsVerification!): Boolean
+}
+
+type Mutation {
+  updateUser(id: ID!, input: UpdateUserInput!): User
+  deleteUser(id: ID!): User
+  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput!): [UserPermissions]
+  updateUserGroups(id: ID!, input: UpdateUserGroupInput!): [UserGroupResponse]
+}

@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  auth:
+    container_name: auth-service
+    build:
+      context: .
+    volumes:
+      - .:/app
+    ports:
+      - '4000:4000'
+    command: [sh, -c, "npm run run-migrations && npm run start:dev"]
+    env_file:
+      - .env
+    networks:
+      - authnet
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres:12
+    expose:
+      - '5432'
+    ports:
+      - '5432:5432'
+    volumes:
+      - /data/postgres:/var/lib/postgresql/data
+    env_file:
+      - docker.env
+    networks:
+      - authnet
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - '8080:80'
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    env_file:
+      - docker.env
+    networks:
+      - authnet
+
+  redis:
+    container_name: cache
+    image: 'redis'
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    env_file:
+      - docker.env
+    networks:
+      - authnet
+
+networks:
+  authnet:
+    driver: bridge
