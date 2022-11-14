@@ -1,0 +1,129 @@
+.container {
+  padding: 5px 0px 5px 0px;
+  box-shadow: aliceblue;
+}
+
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  align-items: center;
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  width: inherit;
+}
+
+.button-section {
+  width: inherit;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 19px;
+  column-gap: 5px;
+}
+
+.access-setting {
+  display: flex;
+  align-items: center;
+  font-size: x-small;
+  padding: 5px 0px 5px 0px;
+  color: rgba(47, 47, 47, 0.6);
+  cursor: pointer;
+}
+
+.create-group {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 5px 0px 10px 0px;
+}
+
+.group-name {
+  margin-top: 20px !important;
+  width: 50% !important;
+}
+
+.description {
+  margin-top: 20px !important;
+  width: 50% !important;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.buttonCreateGroup {
+  margin-left: 10px !important;
+  /* text-transform: none !important; */
+}
+
+.access-settings {
+  /* width: 100%; */
+  font-size: large;
+  /* padding: 10px 0px 10px 15px; */
+  padding: 30px 8px 30px 30px;
+  font-weight: 500;
+}
+
+.add-members {
+}
+
+.roles {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 5px;
+}
+
+.role {
+  padding: 10px 5px 5px 0px;
+}
+
+.role-name {
+  font-weight: 600;
+}
+
+.role-description {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.6);
+}
+
+.header {
+  padding-left: 4px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.chips {
+  padding-left: 5;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.user-cards {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 16px;
+  row-gap: 16px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 20px;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 30px;
+}
