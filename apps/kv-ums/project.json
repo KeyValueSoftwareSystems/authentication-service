@@ -1,0 +1,81 @@
+{
+  "name": "kv-ums",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/kv-ums/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "outputPath": "dist/apps/kv-ums",
+        "index": "apps/kv-ums/src/index.html",
+        "baseHref": "/",
+        "main": "apps/kv-ums/src/main.tsx",
+        "polyfills": "apps/kv-ums/src/polyfills.ts",
+        "tsConfig": "apps/kv-ums/tsconfig.app.json",
+        "assets": ["apps/kv-ums/src/favicon.ico", "apps/kv-ums/src/assets"],
+        "styles": ["apps/kv-ums/src/styles.css"],
+        "scripts": [],
+        "webpackConfig": "@nrwl/react/plugins/webpack"
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/kv-ums/src/environments/environment.ts",
+              "with": "apps/kv-ums/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/webpack:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "kv-ums:build",
+        "hmr": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "kv-ums:build:development"
+        },
+        "production": {
+          "buildTarget": "kv-ums:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/kv-ums/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/kv-ums/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
