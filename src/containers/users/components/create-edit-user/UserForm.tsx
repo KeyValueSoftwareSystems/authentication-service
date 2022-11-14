@@ -277,13 +277,6 @@ const UserForm = (props: UserProps) => {
                   type="text"
                   className="fields"
                 />
-                <FormInputText
-                  name="password"
-                  label="Password*"
-                  type="password"
-                  className="fields"
-                  autoComplete="new-password"
-                />
               </div>
             )}
           </div>

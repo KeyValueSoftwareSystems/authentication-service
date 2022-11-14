@@ -5,6 +5,14 @@ const LoginSchema = yup.object({
   password: yup.string().required("Password can not be empty"),
 });
 
+const ConfirmPasswordSchema = yup.object({
+  password: yup.string().required("Password can not be empty"),
+  confirmPassword: yup
+    .string()
+    .required("Please retype your password.")
+    .oneOf([yup.ref("password")], "Your passwords do not match."),
+});
+
 const ForgotPasswordSchema = yup.object({
   email: yup
     .string()
@@ -23,4 +31,9 @@ const ResetPasswordSchema = yup.object({
     .oneOf([yup.ref("password"), null], "Passwords must match"),
 });
 
-export { LoginSchema, ForgotPasswordSchema, ResetPasswordSchema };
+export {
+  LoginSchema,
+  ConfirmPasswordSchema,
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
+};

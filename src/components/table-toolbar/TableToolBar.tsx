@@ -1,12 +1,9 @@
 import { Button } from "@mui/material";
-import React, { FC, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import React, { FC } from "react";
 
 import { TableToolBarProps } from "./types";
 import "./styles.css";
 import SearchBar from "../search-bar/SearchBar";
-import { UserPermissionsAtom } from "../../states/permissionsStates";
 
 const TableToolBar: FC<TableToolBarProps> = ({
   text,
@@ -17,8 +14,6 @@ const TableToolBar: FC<TableToolBarProps> = ({
   isAddVerified,
   onAdd,
 }) => {
-  const navigate = useNavigate();
-
   return (
     <div className="table-toolbar">
       <legend className="legend-title">{text}</legend>

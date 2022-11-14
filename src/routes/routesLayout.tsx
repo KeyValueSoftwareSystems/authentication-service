@@ -28,6 +28,7 @@ const RoutesLayout: React.FC = () => {
           element={<Navigate replace to={RoutePaths.login} />}
         />
         <Route path={RoutePaths.login} element={<Login />} />
+        <Route path={RoutePaths.confirmpassword} element={<Login />} />
         <Route path="/home/*" element={<HomePage />}>
           <Route path={RoutePaths.users} element={<Users />} />
           <Route path="users/:id" element={<UserDetails />}></Route>

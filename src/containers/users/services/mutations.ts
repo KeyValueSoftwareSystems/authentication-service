@@ -9,14 +9,18 @@ export const DELETE_USER = gql`
 `;
 
 export const CREATE_USER = gql`
-  mutation passwordSignup($input: UserPasswordSignupInput!) {
-    passwordSignup(input: $input) {
-      id
-      email
-      phone
-      firstName
-      middleName
-      lastName
+  mutation inviteTokenSignup($input: UserInviteTokenSignupInput) {
+    inviteTokenSignup(input: $input) {
+      inviteToken
+      tokenExpiryTime
+      user {
+        id
+        email
+        phone
+        firstName
+        middleName
+        lastName
+      }
     }
   }
 `;

@@ -18,6 +18,7 @@ export const GET_USER = gql`
         id
         name
       }
+      inviteToken
     }
   }
 `;
@@ -46,6 +47,7 @@ export const GET_USERS = gql`
         id
         name
       }
+      inviteToken
     }
   }
 `;

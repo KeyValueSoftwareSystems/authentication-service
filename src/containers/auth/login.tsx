@@ -1,18 +1,22 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { useRecoilState } from "recoil";
+import { FieldValues } from "react-hook-form";
 
 import { LOGIN_URL } from "../../config";
-import { LOGIN } from "./services/mutations";
+import { LOGIN, SET_PASSWORD } from "./services/mutations";
 import CustomerAuth from "../../services/auth";
 import "./styles.css";
 import LoginPassword from "./loginPassword";
 import { UserPermissionsAtom } from "../../states/permissionsStates";
 import { currentUserAtom } from "../../states/loginStates";
+import PasswordConfirmation from "./PasswordConfirmation";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const inviteToken: string | null = searchParams.get("token");
 
   const [userPermissions, setUserPermissions] =
     useRecoilState(UserPermissionsAtom);
@@ -21,6 +25,9 @@ const Login: React.FC = () => {
     useRecoilState(currentUserAtom);
 
   const [userLogin, { data }] = useMutation(LOGIN);
+  const [setPassword, { data: passwordCreatedData }] =
+    useMutation(SET_PASSWORD);
+
   useEffect(() => {
     if (data) {
       const { accessToken, refreshToken, user } = data.passwordLogin;
@@ -34,7 +41,11 @@ const Login: React.FC = () => {
     }
   }, [data]);
 
-  const onSubmitForm = (data: any) => {
+  useEffect(() => {
+    if (passwordCreatedData) navigate("/");
+  }, [passwordCreatedData]);
+
+  const onLogin = (data: FieldValues) => {
     userLogin({
       variables: {
         input: data,
@@ -42,14 +53,27 @@ const Login: React.FC = () => {
     });
   };
 
+  const onConfirmPassword = (data: FieldValues) => {
+    setPassword({
+      variables: {
+        input: { inviteToken, password: data?.password },
+      },
+      fetchPolicy: "no-cache",
+    });
+  };
+
+  const getInputFields = () => {
+    if (inviteToken)
+      return <PasswordConfirmation onSubmitForm={onConfirmPassword} />;
+    else return <LoginPassword onSubmitForm={onLogin} />;
+  };
+
   return (
     <div className="login-page">
       <div className="left">
         <img src={LOGIN_URL} alt="login image" id="login-image" />
       </div>
-      <div className="input-container">
-        <LoginPassword onSubmitForm={onSubmitForm} />
-      </div>
+      <div className="input-container">{getInputFields()}</div>
     </div>
   );
 };

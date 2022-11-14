@@ -78,7 +78,7 @@ const AddUser: React.FC = () => {
   const updateUserInfo = () => {
     updateUserGroups({
       variables: {
-        id: data?.passwordSignup.id,
+        id: data?.inviteTokenSignup.user.id,
         input: {
           groups: userGroups.map((group) => group.id),
         },
@@ -87,7 +87,7 @@ const AddUser: React.FC = () => {
 
     updateUserPermissions({
       variables: {
-        id: data?.passwordSignup.id,
+        id: data?.inviteTokenSignup.user.id,
         input: {
           permissions: permissions,
         },

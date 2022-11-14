@@ -12,6 +12,7 @@
 .user-details {
   display: flex;
   max-height: 90%;
+  overflow-y: auto;
   flex-direction: column;
   padding-bottom: 20px;
   width: 90%;
