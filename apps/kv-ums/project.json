@@ -13,10 +13,10 @@
         "outputPath": "dist/apps/kv-ums",
         "index": "apps/kv-ums/src/index.html",
         "baseHref": "/",
-        "main": "apps/kv-ums/src/main.tsx",
+        "main": "apps/kv-ums/src/index.tsx",
         "polyfills": "apps/kv-ums/src/polyfills.ts",
         "tsConfig": "apps/kv-ums/tsconfig.app.json",
-        "assets": ["apps/kv-ums/src/favicon.ico", "apps/kv-ums/src/assets"],
+        "assets": ["apps/kv-ums/src/public", "apps/kv-ums/src/assets"],
         "styles": ["apps/kv-ums/src/styles.css"],
         "scripts": [],
         "webpackConfig": "@nrwl/react/plugins/webpack"
