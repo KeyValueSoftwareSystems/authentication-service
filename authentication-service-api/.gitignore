@@ -1,6 +1,0 @@
-docker.env
-.env
-node_modules
-dist
-.vscode
-coverage
