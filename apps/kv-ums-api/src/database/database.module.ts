@@ -16,8 +16,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities: [
-          __dirname + '/../**/*.entity.ts',
-          __dirname + '/../**/*.entity.js',
+          __dirname + '/../../src/**/*.entity.ts',
+          __dirname + '/../../src/**/*.entity.js',
         ],
         namingStrategy: new SnakeNamingStrategy(),
         synchronize: false,

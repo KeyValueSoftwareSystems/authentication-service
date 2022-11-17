@@ -18,7 +18,7 @@ const rdbmsConfig: ConnectionOptions = {
   type: 'postgres',
   username: process.env.POSTGRES_USER,
   namingStrategy: new SnakeNamingStrategy(),
-  migrations: ['dist/migrations/*.js'],
+  migrations: [__dirname + '/../../../../dist/out-tsc/apps/kv-ums-api/src/migrations/**/*.js'],
   cli: {
     migrationsDir: 'src/migrations',
   },

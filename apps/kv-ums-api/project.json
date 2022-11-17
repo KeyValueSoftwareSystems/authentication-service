@@ -5,39 +5,21 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/webpack:webpack",
+      "builder": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/kv-ums-api",
-        "main": "apps/kv-ums-api/src/main.ts",
-        "tsConfig": "apps/kv-ums-api/tsconfig.app.json",
-        "assets": ["apps/kv-ums-api/src/assets"]
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "apps/kv-ums-api/src/environments/environment.ts",
-              "with": "apps/kv-ums-api/src/environments/environment.prod.ts"
-            }
-          ]
-        }
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/nest build --path tsconfig.app.json",
+        "cwd": "apps/kv-ums-api"
       }
     },
     "serve": {
-      "executor": "@nrwl/js:node",
+      "builder": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "buildTarget": "kv-ums-api:build"
-      },
-      "configurations": {
-        "production": {
-          "buildTarget": "kv-ums-api:build:production"
-        }
+        "command": "node main",
+        "cwd": "dist/out-tsc/apps/kv-ums-api/src"
       }
     },
     "lint": {
@@ -53,6 +35,42 @@
       "options": {
         "jestConfig": "apps/kv-ums-api/jest.config.ts",
         "passWithNoTests": true
+      }
+    },
+    "typeorm": {
+      "builder": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm",
+        "cwd": "apps/kv-ums-api"
+      }
+    },
+    "create-migration": {
+      "builder": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm migration:create --config src/config/migration.config.ts -n",
+        "cwd": "apps/kv-ums-api"
+      }
+    },
+    "run-migrations": {
+      "builder": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm migration:run --config src/config/migration.config.ts",
+        "cwd": "apps/kv-ums-api"
+      }
+    },
+    "generate-migration": {
+      "builder": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm migration:generate --config src/config/migration.config.ts -n",
+        "cwd": "apps/kv-ums-api"
       }
     }
   },
