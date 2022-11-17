@@ -24,7 +24,7 @@ export class RecaptchaService {
     }
     const verificationUrl = `${recaptchaVerifyURL}?secret=${recaptchaSecretKey}&response=${captcha}`;
     const response = await this.httpService.get(verificationUrl).toPromise();
-    const body = response.data;
+    const body = response?.data;
     if (!body.score) {
       throw new BadRequestException(
         'Score missing from response, Ensure the request is going to a V3 app',
@@ -45,7 +45,7 @@ export class RecaptchaService {
     const verificationUrl = `${recaptchaVerifyURL}?secret=${recaptchaSecretKey}&response=${captcha}&remoteip=${ipAddress}`;
 
     const response = await this.httpService.get(verificationUrl).toPromise();
-    const body = response.data;
+    const body = response?.data;
     if (body.success !== undefined && !body.success) {
       throw new UnauthorizedException();
     }
