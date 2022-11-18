@@ -49,7 +49,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "kv-ums:build",
-        "hmr": true
+        "hmr": true,
+        "port": 4200
       },
       "configurations": {
         "development": {

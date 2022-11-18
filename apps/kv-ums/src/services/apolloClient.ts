@@ -11,7 +11,7 @@ import { ErrorMessagesArray } from "./constants";
 import { RoutePaths } from "./../routes/routePaths";
 
 const link = createHttpLink({
-  uri: process.env.REACT_APP_API_URL,
+  uri: process.env.NX_APP_API_URL,
   // credentials: "include",
 });
 

@@ -150,7 +150,7 @@ const CheckAccess = (props: any) => {
 
   const onCopyInviteLink = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    const inviteLink = `${process.env.REACT_APP_BASE_URL}/#/confirmpassword?token=${props.row.inviteToken}`;
+    const inviteLink = `${process.env.NX_APP_BASE_URL}/#/confirmpassword?token=${props.row.inviteToken}`;
     navigator.clipboard.writeText(inviteLink);
   };
 
