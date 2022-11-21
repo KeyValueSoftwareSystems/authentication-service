@@ -1,4 +1,4 @@
-FROM node:14.17.0-alpine3.10
+FROM nikolaik/python-nodejs:python3.8-nodejs14-alpine
 
 WORKDIR /app
 
@@ -6,8 +6,10 @@ COPY . .
 
 RUN npm install glob rimraf
 
+RUN npm install -g nx
+
 RUN npm install
 
-RUN npm run build
+RUN nx run kv-ums-api:build
 
-CMD ["npm", "run", "start:prod"]
+CMD ["nx", "run", "kv-ums-api:serve"]

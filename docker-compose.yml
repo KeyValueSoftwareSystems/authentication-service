@@ -1,0 +1,91 @@
+version: '3.8'
+services:
+  kvums:
+    build:
+      context: .
+      dockerfile: ./apps/kv-ums/Dockerfile
+    ports:
+      - '8000:80'
+    env_file:
+      - .env
+    networks:
+      - kv-ums
+    depends_on:
+      - kvumsapi
+
+  kvumsapi:
+    build:
+      context: .
+      dockerfile: ./apps/kv-ums-api/Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - '4000:4000'
+    command: [sh, -c, "nx run kv-ums-api:serve"]
+    env_file:
+      - .env
+    networks:
+      - kv-ums
+    depends_on:
+      - postgres
+      - redis
+      - kvumsapi-migrations
+
+  kvumsapi-migrations:
+    build:
+      context: .
+      dockerfile: ./apps/kv-ums-api/Dockerfile
+    volumes:
+      - .:/app
+    command: [sh, -c, "nx run kv-ums-api:run-migrations"]
+    env_file:
+      - .env
+    networks:
+      - kv-ums
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:12
+    ports:
+      - '5432:5432'
+    volumes:
+      - kv-ums-data-postgres:/var/lib/postgresql/data
+    env_file:
+      - docker.env
+    networks:
+      - kv-ums
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    image: dpage/pgadmin4
+    ports:
+      - '8080:80'
+    volumes:
+      - kv-ums-data-pgadmin:/root/.pgadmin
+    env_file:
+      - docker.env
+    networks:
+      - kv-ums
+
+  redis:
+    image: 'redis'
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    env_file:
+      - docker.env
+    networks:
+      - kv-ums
+
+networks:
+  kv-ums:
+    driver: bridge
+volumes:
+  kv-ums-data-postgres:
+    driver: local
+  kv-ums-data-pgadmin:
+    driver: local
