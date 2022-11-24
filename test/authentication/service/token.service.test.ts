@@ -67,7 +67,6 @@ describe('test TokenService', () => {
         id: 'ee809c91-a9bf-4589-b9db-7a116dda3158',
         email: 'user@test.com',
         phone: '9112345678910',
-        password: 's3cr3t',
         firstName: 'Test1',
         lastName: 'Test2',
         origin: 'simple',

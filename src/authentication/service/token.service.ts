@@ -1,5 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  PasswordAlreadySetException,
+  InviteTokenAlreadyRevokedException,
+} from '../../authorization/exception/user.exception';
 import User from '../../authorization/entity/user.entity';
 import UserService from '../../authorization/service/user.service';
 import {
@@ -36,6 +40,9 @@ export class TokenService {
 
   async refreshInviteToken(id: string): Promise<InviteTokenResponse> {
     const userDetails = await this.userService.getUserById(id);
+    if (userDetails.password != null) {
+      throw new PasswordAlreadySetException(userDetails.id);
+    }
     const refreshInviteToken = this.authenticationHelper.generateInvitationToken(
       { id: userDetails.id },
       this.configService.get('INVITATION_TOKEN_EXPTIME'),
@@ -65,6 +72,13 @@ export class TokenService {
   }
 
   async revokeInviteToken(id: string): Promise<boolean> {
+    const userDetails = await this.userService.getUserById(id);
+    if (userDetails.password != null) {
+      throw new PasswordAlreadySetException(userDetails.id);
+    }
+    if (userDetails.inviteToken == null) {
+      throw new InviteTokenAlreadyRevokedException(userDetails.id);
+    }
     await this.userService.updateField(id, 'inviteToken', null);
     return true;
   }

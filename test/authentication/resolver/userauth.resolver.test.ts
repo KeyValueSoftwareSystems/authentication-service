@@ -166,10 +166,10 @@ describe('Userauth Module', () => {
     it('should signup a user without password for invite', () => {
       const userInput: UserInviteTokenSignupInput[] = [
         {
-          email: users[0].email,
-          phone: users[0].phone,
-          firstName: users[0].firstName,
-          lastName: users[0].lastName,
+          email: 'test@gmail.com',
+          phone: '9947849200',
+          firstName: 'Test',
+          lastName: 'Name',
         },
       ];
 
@@ -177,6 +177,14 @@ describe('Userauth Module', () => {
         inviteToken:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zIiwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMTV9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo',
         tokenExpiryTime: '7d',
+        user: {
+          id: 'ebe8a78e-099d-4db8-b2d0-e0b558ac5acb',
+          firstName: 'Test',
+          lastName: 'Name',
+          inviteToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zIiwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMTV9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo',
+          status: Status.INVITED,
+        },
       };
 
       const obj = Object.create(null);
@@ -186,8 +194,8 @@ describe('Userauth Module', () => {
       return request(app.getHttpServer())
         .post(gql)
         .send({
-          query: `mutation { inviteTokenSignup(input: { email: "user@test.com"
-          phone: "9112345678910" firstName: "Test" lastName: "User" }) { inviteToken tokenExpiryTime}}`,
+          query: `mutation { inviteTokenSignup(input: { email: "test@gmail.com"
+          phone: "9947849200" firstName: "Test" lastName: "Name" }) { inviteToken tokenExpiryTime user{id firstName lastName inviteToken status}}}`,
         })
         .expect(200)
         .expect((res) => {
@@ -262,24 +270,44 @@ describe('Userauth Module', () => {
 
     it('should refresh the invite token', () => {
       const token = authenticationHelper.generateAccessToken(users[0]);
-      const inviteTokenRespnse: InviteTokenResponse = {
+      const inviteTokenResponse: InviteTokenResponse = {
         inviteToken:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zIiwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMTV9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo',
         tokenExpiryTime: '7d',
+        user: {
+          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+          firstName: 'Test',
+          lastName: 'User',
+          inviteToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inh5ekBrZXl2YWx1ZS5zeXN0ZW1zIiwiaWF0IjoxNjIxNTI1NTE1LCJleHAiOjE2MjE1MjkxMTV9.t8z7rBZKkog-1jirScYU6HE7KVTzatKWjZw8lVz3xLo',
+          status: Status.INVITED,
+        },
       };
       tokenService
-        .refreshInviteToken('20ee5419-8597-4ee7-a497-b5a13daa37c8')
-        .returns(Promise.resolve(inviteTokenRespnse));
+        .refreshInviteToken('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+        .returns(Promise.resolve(inviteTokenResponse));
 
       return request(app.getHttpServer())
         .post(gql)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          query: `mutation { refreshInviteToken(id: "20ee5419-8597-4ee7-a497-b5a13daa37c8") { inviteToken, tokenExpiryTime }}`,
+          query: `mutation {
+            refreshInviteToken(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {
+              inviteToken
+              tokenExpiryTime
+              user {
+                id
+                firstName
+                lastName
+                inviteToken
+                status
+              }
+            }
+          }`,
         })
         .expect(200)
         .expect((res) => {
-          expect(res.body.data.refreshInviteToken).toEqual(inviteTokenRespnse);
+          expect(res.body.data.refreshInviteToken).toEqual(inviteTokenResponse);
         });
     });
 
