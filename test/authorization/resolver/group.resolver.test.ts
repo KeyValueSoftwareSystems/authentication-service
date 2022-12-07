@@ -17,6 +17,7 @@ import UserService from '../../../src/authorization/service/user.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import Role from 'src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
+import Permission from 'src/authorization/entity/permission.entity';
 
 const gql = '/graphql';
 
@@ -79,35 +80,108 @@ describe('Group Module', () => {
   describe(gql, () => {
     describe('groups', () => {
       it('should get the groups', () => {
+        const permissions: Permission[] = [
+          {
+            id: '6fcec8dd-196e-4649-a607-7085bf4032a3',
+            name: 'Edit-Roles',
+          },
+        ];
+        const groupRoles: Role[] = [
+          {
+            id: 'f56bc83b-b163-4fa0-a685-c0fa0926614c',
+            name: 'Test Group Role',
+          },
+        ];
+        const response: GqlSchema.Group[] = [
+          {
+            id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+            name: 'Customers',
+            roles: [
+              {
+                id: 'f56bc83b-b163-4fa0-a685-c0fa0926614c',
+                name: 'Test Group Role',
+              },
+            ],
+            permissions: [
+              {
+                id: '6fcec8dd-196e-4649-a607-7085bf4032a3',
+                name: 'Edit-Roles',
+              },
+            ],
+          },
+        ];
         const token = authenticationHelper.generateAccessToken(users[0]);
-
-        groupService.getAllGroups().returns(Promise.resolve(groups));
-        return request(app.getHttpServer())
-          .post(gql)
-          .set('Authorization', `Bearer ${token}`)
-          .send({ query: '{getGroups {id name }}' })
-          .expect(200)
-          .expect((res) => {
-            expect(res.body.data.getGroups).toEqual(groups);
-          });
-      });
-
-      it('should get single group', () => {
-        const token = authenticationHelper.generateAccessToken(users[0]);
-
         groupService
-          .getGroupById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-          .returns(Promise.resolve(groups[0]));
+          .getGroupPermissions(groups[0].id)
+          .returns(Promise.resolve(permissions));
+        groupService
+          .getGroupRoles(groups[0].id)
+          .returns(Promise.resolve(groupRoles));
+        groupService.getAllGroups().returns(Promise.resolve(groups));
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getGroup(id: "ae032b1b-cc3c-4e44-9197-276ca877a7f8") {id name }}',
+              '{getGroups {id name permissions{id name} roles{ id name }}}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.getGroup).toEqual(groups[0]);
+            expect(res.body.data.getGroups).toEqual(response);
+          });
+      });
+
+      it('should get single group', () => {
+        const token = authenticationHelper.generateAccessToken(users[0]);
+        const group: Group = {
+          id: '4a3c33a9-983e-44c0-ad22-bdc5a84c2c75',
+          name: 'Customers',
+        };
+        const permissions: Permission[] = [
+          {
+            id: '48ef52c3-2ca7-4453-80fb-7c170affd6da',
+            name: 'Edit-Roles',
+          },
+        ];
+        const groupRoles: Role[] = [
+          {
+            id: '9942109f-026b-4f2f-a26f-5ceb5f911ba6',
+            name: 'Test Group Role',
+          },
+        ];
+        const response: GqlSchema.Group = {
+          id: '4a3c33a9-983e-44c0-ad22-bdc5a84c2c75',
+          name: 'Customers',
+          roles: [
+            {
+              id: '9942109f-026b-4f2f-a26f-5ceb5f911ba6',
+              name: 'Test Group Role',
+            },
+          ],
+          permissions: [
+            {
+              id: '48ef52c3-2ca7-4453-80fb-7c170affd6da',
+              name: 'Edit-Roles',
+            },
+          ],
+        };
+        groupService.getGroupById(group.id).returns(Promise.resolve(group));
+        groupService
+          .getGroupPermissions(group.id)
+          .returns(Promise.resolve(permissions));
+        groupService
+          .getGroupRoles(group.id)
+          .returns(Promise.resolve(groupRoles));
+        return request(app.getHttpServer())
+          .post(gql)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            query:
+              '{getGroup(id: "4a3c33a9-983e-44c0-ad22-bdc5a84c2c75") {id name permissions{ id name } roles{ id name }}}',
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.data.getGroup).toEqual(response);
           });
       });
 

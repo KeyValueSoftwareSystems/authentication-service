@@ -299,4 +299,35 @@ describe('test Group Service', () => {
     );
     expect(resp).toEqual(roles);
   });
+
+  it('should get group permissions', async () => {
+    const group: Group = {
+      id: '09f7f119-c14b-4c37-ac1f-aae57d7bdbe5',
+      name: 'Test1',
+    };
+
+    const permissions: Permission[] = [
+      {
+        id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+        name: 'Customers',
+      },
+    ];
+    permissionRepository
+      .createQueryBuilder('permission')
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .leftJoinAndSelect(
+        GroupPermission,
+        'groupPermission',
+        'permission.id = groupPermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .where('groupPermission.groupId = :groupId', {
+        groupId: group.id,
+      })
+      .returns(permissionQueryBuilder);
+    const resp = await groupService.getGroupPermissions(group.id);
+    expect(resp).toEqual(permissions);
+  });
 });

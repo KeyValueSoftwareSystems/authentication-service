@@ -13,10 +13,8 @@ import { TokenService } from '../../../src/authentication/service/token.service'
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import {
-  InviteTokenResponse,
   Status,
   TokenResponse,
-  UserInviteTokenSignupInput,
   UserPasswordLoginInput,
   UserPasswordSignupInput,
 } from '../../../src/schema/graphql.schema';
@@ -141,16 +139,6 @@ describe('test PasswordAuthService', () => {
     const hashedPassword = authenticationHelper.generatePasswordHash(
       's3cr3t' as string,
     );
-
-    const userFromInput = {
-      email: 'test@gmail.com',
-      phone: '9947849200',
-      firstName: users[0].firstName,
-      middleName: undefined,
-      lastName: users[0].lastName,
-      status: Status.ACTIVE,
-      password: hashedPassword,
-    };
     const userResponse: User[] = [
       {
         id: 'f1bc54fe-9231-472b-8d3c-595c5cb464a7',
