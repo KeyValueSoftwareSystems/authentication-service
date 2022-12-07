@@ -204,9 +204,10 @@ export default class UserService {
 
     await this.connection.manager.transaction(async (entityManager) => {
       const usersRepo = entityManager.getRepository(User);
+      const userGroupRepo = entityManager.getRepository(UserGroup);
       await usersRepo.update(id, { status: Status.INACTIVE });
       await usersRepo.softDelete(id);
-      await this.userGroupRepository
+      await userGroupRepo
         .createQueryBuilder()
         .softDelete()
         .where({ userId: id })

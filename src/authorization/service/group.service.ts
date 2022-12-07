@@ -114,9 +114,11 @@ export class GroupService {
       throw new GroupDeleteNotAllowedException(id);
     }
 
-    await this.connection.manager.transaction(async () => {
-      await this.groupsRepository.softDelete(id);
-      await this.groupRoleRepository
+    await this.connection.manager.transaction(async (entityManager) => {
+      const groupRepo = entityManager.getRepository(Group);
+      const groupRoleRepo = entityManager.getRepository(GroupRole);
+      await groupRepo.softDelete(id);
+      await groupRoleRepo
         .createQueryBuilder()
         .softDelete()
         .where({ groupId: id })
