@@ -96,4 +96,11 @@ export class GroupResolver {
       return this.groupService.getGroupRoles(group.id);
     }
   }
+
+  @ResolveField('permissions')
+  async getAllPermissionOfGroup(group: Group) {
+    if (group.id) {
+      return this.groupService.getGroupPermissions(group.id);
+    }
+  }
 }
