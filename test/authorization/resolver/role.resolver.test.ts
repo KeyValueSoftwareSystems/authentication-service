@@ -79,16 +79,31 @@ describe('Role Module', () => {
   describe(gql, () => {
     describe('roles', () => {
       it('should get the roles', () => {
+        const response: GqlSchema.Role[] = [
+          {
+            id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+            name: 'Customers',
+            permissions: [
+              {
+                id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+                name: 'Customers',
+              },
+            ],
+          },
+        ];
         const token = authenticationHelper.generateAccessToken(users[0]);
 
         roleService.getAllRoles().returns(Promise.resolve(roles));
+        roleService
+          .getRolePermissions(roles[0].id)
+          .returns(Promise.resolve(permissions));
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
-          .send({ query: '{getRoles {id name }}' })
+          .send({ query: '{getRoles {id name permissions { id name }}}' })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.getRoles).toEqual(roles);
+            expect(res.body.data.getRoles).toEqual(response);
           });
       });
 
