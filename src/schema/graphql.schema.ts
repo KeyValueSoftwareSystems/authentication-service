@@ -281,6 +281,7 @@ export interface Group {
     name: string;
     users?: User[];
     roles?: Role[];
+    permissions?: Permission[];
 }
 
 export interface GroupPermission {
