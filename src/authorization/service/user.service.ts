@@ -206,6 +206,11 @@ export default class UserService {
       const usersRepo = entityManager.getRepository(User);
       await usersRepo.update(id, { status: Status.INACTIVE });
       await usersRepo.softDelete(id);
+      await this.userGroupRepository
+        .createQueryBuilder()
+        .softDelete()
+        .where({ userId: id })
+        .execute();
     });
 
     await this.userCacheService.invalidateUserPermissionsCache(id);

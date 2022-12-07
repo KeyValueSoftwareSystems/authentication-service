@@ -113,7 +113,16 @@ export class GroupService {
     if (usage) {
       throw new GroupDeleteNotAllowedException(id);
     }
-    await this.groupsRepository.softDelete(id);
+
+    await this.connection.manager.transaction(async () => {
+      await this.groupsRepository.softDelete(id);
+      await this.groupRoleRepository
+        .createQueryBuilder()
+        .softDelete()
+        .where({ groupId: id })
+        .execute();
+    });
+
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return existingGroup;
   }
