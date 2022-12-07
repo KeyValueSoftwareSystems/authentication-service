@@ -249,6 +249,7 @@ export interface InviteTokenResponse {
 export interface Entity {
     id: string;
     name: string;
+    permissions?: EntityPermission[];
 }
 
 export interface EntityPermission {
