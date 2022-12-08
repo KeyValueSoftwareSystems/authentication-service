@@ -1,6 +1,7 @@
 type Entity {
   id: ID!
   name: String!
+  permissions: [EntityPermission]
 }
 
 input NewEntityInput {

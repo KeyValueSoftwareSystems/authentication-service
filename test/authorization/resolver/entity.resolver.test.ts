@@ -32,6 +32,21 @@ const users: User[] = [
   },
 ];
 
+const permissions = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+  },
+];
+
+const allEntities: Entity[] = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    permissions: permissions,
+  },
+];
+
 const entities: Entity[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
@@ -39,12 +54,6 @@ const entities: Entity[] = [
   },
 ];
 
-const permissions = [
-  {
-    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-    name: 'Customers',
-  },
-];
 const entityService = Substitute.for<EntityService>();
 const userService = Substitute.for<UserService>();
 describe('Entity Module', () => {
@@ -81,13 +90,16 @@ describe('Entity Module', () => {
     describe('entities', () => {
       it('should get the entities', () => {
         entityService.getAllEntities().returns(Promise.resolve(entities));
+        entityService
+          .getEntityPermissions('2b33268a-7ff5-4cac-a87a-6bfc4430d34c')
+          .returns(Promise.resolve(permissions));
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
-          .send({ query: '{getEntities {id name }}' })
+          .send({ query: '{getEntities {id name permissions { id name} }}' })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.getEntities).toEqual(entities);
+            expect(res.body.data.getEntities).toEqual(allEntities);
           });
       });
 
