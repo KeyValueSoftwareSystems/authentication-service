@@ -68,7 +68,7 @@ export class EntityResolver {
   }
 
   @ResolveField('permissions')
-  async getRolesOfGroup(entity: Entity) {
+  async getPermissionsOfEntity(entity: Entity) {
     if (entity.id) {
       return this.entityService.getEntityPermissions(entity.id);
     }
