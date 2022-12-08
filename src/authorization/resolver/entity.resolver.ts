@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   Entity,
   NewEntityInput,
@@ -65,5 +65,12 @@ export class EntityResolver {
   @Permissions(PermissionsType.DeleteEntities)
   async deleteEntity(@Args('id', ParseUUIDPipe) id: string): Promise<Entity> {
     return this.entityService.deleteEntity(id);
+  }
+
+  @ResolveField('permissions')
+  async getPermissionsOfEntity(entity: Entity) {
+    if (entity.id) {
+      return this.entityService.getEntityPermissions(entity.id);
+    }
   }
 }
