@@ -113,18 +113,7 @@ export class GroupService {
     if (usage) {
       throw new GroupDeleteNotAllowedException(id);
     }
-
-    await this.connection.manager.transaction(async (entityManager) => {
-      const groupRepo = entityManager.getRepository(Group);
-      const groupRoleRepo = entityManager.getRepository(GroupRole);
-      await groupRepo.softDelete(id);
-      await groupRoleRepo
-        .createQueryBuilder()
-        .softDelete()
-        .where({ groupId: id })
-        .execute();
-    });
-
+    await this.groupsRepository.softDelete(id);
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return existingGroup;
   }
@@ -282,9 +271,11 @@ export class GroupService {
   }
 
   private async checkGroupUsage(id: string) {
-    const userCount = await this.userGroupRepository.count({
-      where: { groupId: id },
-    });
+    const userCount = await this.userRepository
+      .createQueryBuilder()
+      .innerJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId=User.id')
+      .where('userGroup.groupId = :id', { id: id })
+      .getCount();
     return userCount != 0;
   }
 }

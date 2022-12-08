@@ -266,11 +266,16 @@ describe('test Group Service', () => {
     groupRepository
       .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .resolves(Arg.any());
-    userGroupRepository
-      .count({
-        where: { groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
+    userRepository.createQueryBuilder().returns(userQueryBuilder);
+    userQueryBuilder
+      .innerJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId=User.id')
+      .returns(userQueryBuilder);
+    userQueryBuilder
+      .where('userGroup.groupId = :id', {
+        id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       })
-      .resolves(0);
+      .returns(userQueryBuilder);
+    userQueryBuilder.getCount().resolves(0);
     const resp = await groupService.deleteGroup(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
