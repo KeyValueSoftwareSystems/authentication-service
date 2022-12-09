@@ -58,6 +58,7 @@ operation: OperationType
 
 input UserInputFilter {
   search: UserSearchInput
+  filter: FilterInput
 }
 
 input UserSearchInput {

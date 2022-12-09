@@ -18,6 +18,11 @@ export enum OperationType {
     OR = "OR"
 }
 
+export enum FilterConditions {
+    EQUALS = "EQUALS",
+    IN = "IN"
+}
+
 export interface UserPasswordSignupInput {
     email?: string;
     phone?: string;
@@ -171,6 +176,7 @@ export interface UserPermissionsVerification {
 
 export interface UserInputFilter {
     search?: UserSearchInput;
+    filter?: FilterInput;
 }
 
 export interface UserSearchInput {
@@ -188,6 +194,16 @@ export interface UserSearchParameter {
 export interface StringSearchCondition {
     contains?: string;
     equals?: string;
+}
+
+export interface FilterInput {
+    operands: FilterField[];
+}
+
+export interface FilterField {
+    condition: FilterConditions;
+    field: string;
+    value: string[];
 }
 
 export interface IMutation {

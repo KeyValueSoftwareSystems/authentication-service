@@ -24,6 +24,7 @@ import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
+import { FilterBuilder } from '../../common/filter.builder';
 
 @Injectable()
 export default class UserService {
@@ -48,6 +49,9 @@ export default class UserService {
 
   getAllUsers(input?: UserInputFilter): Promise<User[]> {
     let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    let filters: { [key: string]: FindOperator<string | undefined> }[] = [];
+
+    const qb = this.usersRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
         searchTerm = this.searchService.generateSearchTermForEntity(
@@ -55,10 +59,18 @@ export default class UserService {
           input.search,
         );
       }
+      if (input.filter) {
+        filters = new FilterBuilder<User>(qb).build(input.filter);
+      }
     }
-    return this.usersRepository.find({
-      where: searchTerm,
-    });
+    return qb
+      // .andWhere(searchTerm)
+      .getMany();
+
+    // return this.usersRepository.find({
+    //   relations:
+    //   where: { searchTerm, ...(filters ? filters : []) },
+    // });
   }
 
   async getUserById(id: string): Promise<User> {

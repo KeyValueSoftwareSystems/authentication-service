@@ -1,0 +1,16 @@
+
+input FilterInput {
+    operands: [FilterField]!
+
+}
+
+input FilterField {
+    condition: FilterConditions!
+    field: String!
+    value: [String]!
+}
+
+enum FilterConditions {
+    EQUALS
+    IN
+}
