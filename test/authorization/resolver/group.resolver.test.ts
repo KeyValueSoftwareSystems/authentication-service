@@ -118,7 +118,7 @@ describe('Group Module', () => {
                 name: 'Edit-Roles',
               },
             ],
-            allpermissions: [
+            allPermissions: [
               {
                 id: '48ef52c3-2ca7-4453-80fb-7c170affd6da',
                 name: 'Edit-Roles',
@@ -146,7 +146,7 @@ describe('Group Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getGroups {id name permissions{id name} roles{ id name } allpermissions{ id name }}}',
+              '{getGroups {id name permissions{id name} roles{ id name } allPermissions{ id name }}}',
           })
           .expect(200)
           .expect((res) => {
@@ -197,7 +197,7 @@ describe('Group Module', () => {
               name: 'Edit-Roles',
             },
           ],
-          allpermissions: [
+          allPermissions: [
             {
               id: '48ef52c3-2ca7-4453-80fb-7c170affd6da',
               name: 'Edit-Roles',
@@ -223,7 +223,7 @@ describe('Group Module', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getGroup(id: "4a3c33a9-983e-44c0-ad22-bdc5a84c2c75") {id name permissions{ id name } roles{ id name } allpermissions{ id name }}}',
+              '{getGroup(id: "4a3c33a9-983e-44c0-ad22-bdc5a84c2c75") {id name permissions{ id name } roles{ id name } allPermissions{ id name }}}',
           })
           .expect(200)
           .expect((res) => {

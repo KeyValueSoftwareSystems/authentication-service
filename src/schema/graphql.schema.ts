@@ -283,7 +283,7 @@ export interface Group {
     users?: User[];
     roles?: Role[];
     permissions?: Permission[];
-    allpermissions?: Permission[];
+    allPermissions?: Permission[];
 }
 
 export interface GroupPermission {

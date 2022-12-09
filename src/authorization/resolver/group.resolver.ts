@@ -104,7 +104,7 @@ export class GroupResolver {
     }
   }
 
-  @ResolveField('allpermissions')
+  @ResolveField('allPermissions')
   async getAllGroupPermissions(group: Group) {
     if (group.id) {
       return this.groupService.getAllGroupPermissions(group.id);
