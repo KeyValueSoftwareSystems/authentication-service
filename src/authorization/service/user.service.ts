@@ -24,6 +24,7 @@ import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
+import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
 
 @Injectable()
 export default class UserService {
@@ -279,6 +280,14 @@ export default class UserService {
     const requiredPermissionsWithUser = permissionsRequired
       .map((x) => x.id)
       .filter((x) => allPermissionsOfUser.has(x));
+    const permissions = permissionsRequired
+      .map(({ id, name }) => {
+        if (!requiredPermissionsWithUser.includes(id)) return name;
+      })
+      .filter((x) => x != undefined);
+    if (permissions.length) {
+      throw new UserNotAuthorized(permissions);
+    }
     switch (operation) {
       case OperationType.AND:
         return (

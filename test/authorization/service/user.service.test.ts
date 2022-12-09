@@ -22,6 +22,7 @@ import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 import { Status } from '../../../src/schema/graphql.schema';
 import SearchService from '../../../src/authorization/service/search.service';
+import { UserNotAuthorized } from '../../../src/authentication/exception/userauth.exception';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -403,7 +404,7 @@ describe('test UserService', () => {
     expect(resp).toEqual(true);
   });
 
-  it('should verify and return false if user doesnot have required permissions', async () => {
+  it('should verify and throw error if user doesnot have required permissions', async () => {
     const userGroups: UserGroup[] = [
       {
         userId: 'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
@@ -479,11 +480,11 @@ describe('test UserService', () => {
     roleCacheService
       .getRolePermissionsFromRoleId('fcd858c6-26c5-462b-8c53-4b544830dca8')
       .resolves(groupRolePermissions.map((x) => x.permissionId));
-    const resp = await userService.verifyUserPermissions(
+    const resp =  userService.verifyUserPermissions(
       'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
       ['CreateUser'],
     );
-    expect(resp).toEqual(false);
+    expect(resp).rejects.toThrowError(new UserNotAuthorized(['CreateUser']));
   });
 
   it('should return all permissions of a user', async () => {
