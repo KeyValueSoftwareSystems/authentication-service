@@ -67,6 +67,7 @@ describe('test UserService', () => {
   const permissionCacheService = Substitute.for<PermissionCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
+  const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
@@ -131,6 +132,8 @@ describe('test UserService', () => {
 
   it('should get all users', async () => {
     userRepository.find({ where: [] }).returns(Promise.resolve(users));
+    userRepository.createQueryBuilder().returns(userQueryBuilder);
+    userQueryBuilder.getMany().resolves(users);
     const resp = await userService.getAllUsers();
     expect(resp).toEqual(users);
   });
