@@ -63,9 +63,11 @@ export default class UserService {
         filters = new FilterBuilder<User>(qb).build(input.filter);
       }
     }
-    return qb
-      // .andWhere(searchTerm)
-      .getMany();
+    return (
+      qb
+        // .andWhere(searchTerm)
+        .getMany()
+    );
 
     // return this.usersRepository.find({
     //   relations:

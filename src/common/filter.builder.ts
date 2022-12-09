@@ -1,9 +1,9 @@
-import UserGroup from 'src/authorization/entity/userGroup.entity';
+import UserGroup from '../authorization/entity/userGroup.entity';
 import {
   FilterConditions,
   FilterField,
   FilterInput,
-} from 'src/schema/graphql.schema';
+} from '../schema/graphql.schema';
 import { FindOperator, In, SelectQueryBuilder } from 'typeorm';
 
 export class FilterBuilder<T> {

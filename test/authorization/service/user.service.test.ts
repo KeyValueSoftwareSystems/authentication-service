@@ -131,7 +131,6 @@ describe('test UserService', () => {
   });
 
   it('should get all users', async () => {
-    userRepository.find({ where: [] }).returns(Promise.resolve(users));
     userRepository.createQueryBuilder().returns(userQueryBuilder);
     userQueryBuilder.getMany().resolves(users);
     const resp = await userService.getAllUsers();
