@@ -26,6 +26,7 @@ import UserCacheService from './usercache.service';
 import User from '../entity/user.entity';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
+import RolePermission from '../entity/rolePermission.entity';
 
 @Injectable()
 export class GroupService {
@@ -275,5 +276,33 @@ export class GroupService {
       where: { groupId: id },
     });
     return userCount != 0;
+  }
+
+  async getAllGroupPermissions(groupId: string) {
+    const groupPermissions: Permission[] = await this.getGroupPermissions(
+      groupId,
+    );
+    const groupRolePermissions: Permission[] = await this.permissionRepository
+      .createQueryBuilder('permission')
+      .innerJoin(
+        RolePermission,
+        'rolePermission',
+        'permission.id = rolePermission.permissionId',
+      )
+      .innerJoin(
+        GroupRole,
+        'groupRole',
+        'rolePermission.roleId = groupRole.roleId',
+      )
+      .where('groupRole.groupId = :groupId', { groupId: groupId })
+      .getMany();
+    const allPermissionsOfGroup = groupPermissions.concat(groupRolePermissions);
+    const permissionIds = allPermissionsOfGroup.map(
+      (permission) => permission.id,
+    );
+    const filteredPermissions = allPermissionsOfGroup.filter(
+      ({ id }, index) => !permissionIds.includes(id, index + 1),
+    );
+    return filteredPermissions;
   }
 }

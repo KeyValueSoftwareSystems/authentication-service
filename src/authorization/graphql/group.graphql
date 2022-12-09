@@ -4,6 +4,7 @@ type Group {
   users: [User]
   roles: [Role]
   permissions: [Permission]
+  allPermissions: [Permission]
 }
 
 input NewGroupInput {

@@ -23,6 +23,7 @@ import Role from '../../../src/authorization/entity/role.entity';
 import User from '../../../src/authorization/entity/user.entity';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import SearchService from '../../../src/authorization/service/search.service';
+import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -329,5 +330,59 @@ describe('test Group Service', () => {
       .returns(permissionQueryBuilder);
     const resp = await groupService.getGroupPermissions(group.id);
     expect(resp).toEqual(permissions);
+  });
+
+  it('should get all group permissions', async () => {
+    const group: Group = {
+      id: '09f7f119-c14b-4c37-ac1f-aae57d7bdbe5',
+      name: 'Test1',
+    };
+    const permissionsOfGroup: Permission[] = [
+      {
+        id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+        name: 'Customers',
+      },
+    ];
+    const rolePermissionsOfGroup: Permission[] = [
+      {
+        id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+        name: 'Customers',
+      },
+    ];
+    const resp = await groupService.getGroupPermissions(group.id);
+    expect(resp).toEqual(permissionsOfGroup);
+    permissionRepository
+      .createQueryBuilder('permission')
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .innerJoin(
+        RolePermission,
+        'rolePermission',
+        'permission.id = rolePermission.permissionId',
+      )
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .innerJoin(
+        GroupRole,
+        'groupRole',
+        'rolePermission.roleId = groupRole.roleId',
+      )
+      .returns(permissionQueryBuilder);
+    permissionQueryBuilder
+      .where('groupRole.groupId = :groupId', {
+        groupId: group.id,
+      })
+      .returns(permissionQueryBuilder);
+    const allPermissionsOfGroup = permissionsOfGroup.concat(
+      rolePermissionsOfGroup,
+    );
+    const permissionIds = allPermissionsOfGroup.map(
+      (permission) => permission.id,
+    );
+    const filteredPermissions = allPermissionsOfGroup.filter(
+      ({ id }, index) => !permissionIds.includes(id, index + 1),
+    );
+    const finalResponse = await groupService.getAllGroupPermissions(group.id);
+    expect(finalResponse).toEqual(filteredPermissions);
   });
 });
