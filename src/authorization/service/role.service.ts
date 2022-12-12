@@ -37,18 +37,17 @@ export class RoleService {
   ) {}
 
   async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
-    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    let queryBuilder = this.rolesRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
-        searchTerm = this.searchService.generateSearchTermForEntity(
+        queryBuilder = this.searchService.generateSearchTermForEntity(
+          queryBuilder,
           SearchEntity.ROLE,
           input.search,
         );
       }
     }
-    return await this.rolesRepository.find({
-      where: searchTerm,
-    });
+    return await queryBuilder.getMany();
   }
 
   async getRoleById(id: string): Promise<Role> {

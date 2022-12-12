@@ -52,18 +52,17 @@ export class GroupService {
   ) {}
 
   getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
-    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
+    let queryBuilder = this.groupsRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
-        searchTerm = this.searchService.generateSearchTermForEntity(
+        queryBuilder = this.searchService.generateSearchTermForEntity(
+          queryBuilder,
           SearchEntity.GROUP,
           input.search,
         );
       }
     }
-    return this.groupsRepository.find({
-      where: searchTerm,
-    });
+    return queryBuilder.getMany();
   }
 
   async getGroupById(id: string): Promise<Group> {

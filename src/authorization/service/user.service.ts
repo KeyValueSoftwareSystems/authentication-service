@@ -48,12 +48,12 @@ export default class UserService {
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<User[]> {
-    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
     const SortFieldMapping = new Map([['firstName', 'User.first_name']]);
     const qb = this.usersRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
-        searchTerm = this.searchService.generateSearchTermForEntity(
+        this.searchService.generateSearchTermForEntity(
+          qb,
           SearchEntity.USER,
           input.search,
         );

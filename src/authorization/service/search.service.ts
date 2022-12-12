@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Equal, FindOperator, ILike, Like } from 'typeorm';
+import { Equal, FindOperator, ILike, Like, SelectQueryBuilder } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupSearchInput,
@@ -13,48 +13,54 @@ export default class SearchService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
-  public generateSearchTermForEntity(
+  public generateSearchTermForEntity<T>(
+    qb: SelectQueryBuilder<T>,
     entity: SearchEntity,
     input: UserSearchInput | GroupSearchInput | RoleSearchInput,
-  ) {
+  ): SelectQueryBuilder<T> {
     if (entity === SearchEntity.USER) {
-      return this.generateSearchTermForUsers(input as UserSearchInput);
+      return this.generateSearchTermForUsers(qb, input as UserSearchInput);
     } else if (entity === SearchEntity.GROUP) {
-      return this.generateSearchTermForGroups(input as GroupSearchInput);
-    } else if (entity === SearchEntity.ROLE) {
-      return this.generateSearchTermForRole(input as RoleSearchInput);
+      return this.generateSearchTermForGroups(qb, input as GroupSearchInput);
+    } else {
+      return this.generateSearchTermForRole(qb, input as RoleSearchInput);
     }
-
-    return [];
   }
 
-  private generateSearchTermForUsers(
+  private generateSearchTermForUsers<T>(
+    qb: SelectQueryBuilder<T>,
     input: UserSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
+  ): SelectQueryBuilder<T> {
     const searchWhereCondition = [];
     const andConditions: {
       [key: string]: FindOperator<string | undefined>;
     } = {};
     if (input.and) {
       if (input.and.email) {
-        andConditions[`email`] = this.generateWhereClauseForStringSearch(
+        this.generateWhereClauseForStringSearch(
+          'User.email',
+          qb,
           input.and.email,
         );
       }
       if (input.and.firstName) {
-        andConditions[`firstName`] = this.generateWhereClauseForStringSearch(
+        this.generateWhereClauseForStringSearch(
+          'User.firstName',
+          qb,
           input.and.firstName,
         );
       }
       if (input.and.middleName) {
-        andConditions[`middleName`] = this.generateWhereClauseForStringSearch(
+        this.generateWhereClauseForStringSearch(
+          'User.middleName',
+          qb,
           input.and.middleName,
         );
       }
       if (input.and.lastName) {
-        andConditions[`lastName`] = this.generateWhereClauseForStringSearch(
+        this.generateWhereClauseForStringSearch(
+          'User.lastName',
+          qb,
           input.and.lastName,
         );
       }
@@ -65,102 +71,99 @@ export default class SearchService {
 
     if (input.or) {
       if (input.or.email) {
-        searchWhereCondition.push({
-          email: this.generateWhereClauseForStringSearch(input.or.email),
-        });
+        this.generateWhereClauseForStringSearch(
+          'User.email',
+          qb,
+          input.or.email,
+        );
       }
       if (input.or.firstName) {
-        searchWhereCondition.push({
-          firstName: this.generateWhereClauseForStringSearch(
-            input.or.firstName,
-          ),
-        });
+        this.generateWhereClauseForStringSearch(
+          'User.firstName',
+          qb,
+          input.or.firstName,
+        );
       }
       if (input.or.middleName) {
+        this.generateWhereClauseForStringSearch(
+          'User.middleName',
+          qb,
+          input.or.middleName,
+        );
+      }
+      if (input.or.lastName) {
+        this.generateWhereClauseForStringSearch(
+          'lastName',
+          qb,
+          input.or.lastName,
+        );
+      }
+    }
+    return qb;
+  }
+
+  private generateSearchTermForGroups<T>(
+    qb: SelectQueryBuilder<T>,
+    input: GroupSearchInput,
+  ): SelectQueryBuilder<T> {
+    const searchWhereCondition = [];
+    const andConditions: {
+      [key: string]: FindOperator<string | undefined>;
+    } = {};
+    if (input.and) {
+      if (input.and.name) {
+        this.generateWhereClauseForStringSearch('name', qb, input.and.name);
+      }
+    }
+    if (Object.keys(andConditions).length) {
+      searchWhereCondition.push(andConditions);
+    }
+
+    if (input.or) {
+      if (input.or.name) {
         searchWhereCondition.push({
-          middleName: this.generateWhereClauseForStringSearch(
-            input.or.middleName,
+          name: this.generateWhereClauseForStringSearch(
+            'name',
+            qb,
+            input.or.name,
           ),
         });
       }
-      if (input.or.lastName) {
-        searchWhereCondition.push({
-          lastName: this.generateWhereClauseForStringSearch(input.or.lastName),
-        });
-      }
     }
-    return searchWhereCondition;
+    return qb;
   }
 
-  private generateSearchTermForGroups(
-    input: GroupSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
-    const searchWhereCondition = [];
-    const andConditions: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
-    if (input.and) {
-      if (input.and.name) {
-        andConditions[`name`] = this.generateWhereClauseForStringSearch(
-          input.and.name,
-        );
-      }
-    }
-    if (Object.keys(andConditions).length) {
-      searchWhereCondition.push(andConditions);
-    }
-
-    if (input.or) {
-      if (input.or.name) {
-        searchWhereCondition.push({
-          name: this.generateWhereClauseForStringSearch(input.or.name),
-        });
-      }
-    }
-    return searchWhereCondition;
-  }
-
-  private generateSearchTermForRole(
+  private generateSearchTermForRole<T>(
+    qb: SelectQueryBuilder<T>,
     input: RoleSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
-    const searchWhereCondition = [];
-    const andConditions: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
+  ): SelectQueryBuilder<T> {
     if (input.and) {
       if (input.and.name) {
-        andConditions[`name`] = this.generateWhereClauseForStringSearch(
+        qb = this.generateWhereClauseForStringSearch(
+          `name`,
+          qb,
           input.and.name,
         );
       }
     }
-    if (Object.keys(andConditions).length) {
-      searchWhereCondition.push(andConditions);
-    }
 
     if (input.or) {
       if (input.or.name) {
-        searchWhereCondition.push({
-          name: this.generateWhereClauseForStringSearch(input.or.name),
-        });
+        qb = this.generateWhereClauseForStringSearch('name', qb, input.or.name);
       }
     }
-    return searchWhereCondition;
+    return qb;
   }
 
-  public generateWhereClauseForStringSearch(
+  public generateWhereClauseForStringSearch<T>(
+    field: string,
+    qb: SelectQueryBuilder<T>,
     input: StringSearchCondition,
-  ): FindOperator<string | undefined> {
+  ): SelectQueryBuilder<T> {
     if (input.contains) {
-      return ILike(`%${input.contains}%`);
-    } else if (input.equals) {
-      return Equal(input.equals);
+      return qb.andWhere(field + ' ' + `ILIKE('%${input.contains}%')`);
     } else {
-      return Like(`%%`);
+      return qb.andWhere(field + ' ' + `ILIKE('%${input.equals}%')`);
     }
   }
 }

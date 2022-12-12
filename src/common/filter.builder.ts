@@ -31,12 +31,10 @@ export class FilterBuilder<T> {
 
     if (userFields.includes(field.field)) {
       this.qb.andWhere(
-        fieldMapping.get(field.field) +
-          ' ' +
-          this.ConditionMapping.get(field.condition) +
-          ' :' +
-          field.field,
-        { [field.field]: field.value[0] },
+        `${fieldMapping.get(field.field)} ${this.ConditionMapping.get(
+          field.condition,
+        )} (:...${field.field})`,
+        { [field.field]: field.value },
       );
     }
   }
