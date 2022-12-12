@@ -36,6 +36,7 @@ type GroupRole {
 
 input GroupInputFilter {
   search: GroupSearchInput
+  sort: SortInput
 }
 
 input GroupSearchInput {

@@ -48,7 +48,7 @@ export default class UserService {
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<User[]> {
-    const SortFieldMapping = new Map([['firstName', 'User.first_name']]);
+    const SortFieldMapping = new Map([['firstName', 'User.firstName']]);
     const qb = this.usersRepository.createQueryBuilder();
     if (input) {
       if (input.search) {

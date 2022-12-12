@@ -23,6 +23,7 @@ type RolePermission {
 
 input RoleInputFilter {
   search: RoleSearchInput
+  sort: SortInput
 }
 
 input RoleSearchInput {

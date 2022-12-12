@@ -37,6 +37,7 @@ export class RoleService {
   ) {}
 
   async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
+    const SortFieldMapping = new Map([['name', 'Role.name']]);
     let queryBuilder = this.rolesRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
@@ -45,6 +46,10 @@ export class RoleService {
           SearchEntity.ROLE,
           input.search,
         );
+      }
+      if (input.sort) {
+        const field = SortFieldMapping.get(input.sort.field);
+        field && queryBuilder.orderBy(field, input.sort.direction);
       }
     }
     return await queryBuilder.getMany();

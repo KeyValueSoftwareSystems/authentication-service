@@ -52,6 +52,7 @@ export class GroupService {
   ) {}
 
   getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
+    const SortFieldMapping = new Map([['name', 'Group.name']]);
     let queryBuilder = this.groupsRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
@@ -60,6 +61,10 @@ export class GroupService {
           SearchEntity.GROUP,
           input.search,
         );
+      }
+      if (input.sort) {
+        const field = SortFieldMapping.get(input.sort.field);
+        field && queryBuilder.orderBy(field, input.sort.direction);
       }
     }
     return queryBuilder.getMany();

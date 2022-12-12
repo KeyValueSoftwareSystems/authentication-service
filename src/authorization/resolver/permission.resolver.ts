@@ -1,6 +1,7 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
+  Entity,
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';

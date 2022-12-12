@@ -93,7 +93,7 @@ export default class SearchService {
       }
       if (input.or.lastName) {
         this.generateWhereClauseForStringSearch(
-          'lastName',
+          'User.lastName',
           qb,
           input.or.lastName,
         );

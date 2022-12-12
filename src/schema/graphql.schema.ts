@@ -116,6 +116,7 @@ export interface UpdateGroupRoleInput {
 
 export interface GroupInputFilter {
     search?: GroupSearchInput;
+    sort?: SortInput;
 }
 
 export interface GroupSearchInput {
@@ -149,6 +150,7 @@ export interface UpdateRolePermissionInput {
 
 export interface RoleInputFilter {
     search?: RoleSearchInput;
+    sort?: SortInput;
 }
 
 export interface RoleSearchInput {
