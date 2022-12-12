@@ -49,8 +49,7 @@ export default class UserService {
 
   getAllUsers(input?: UserInputFilter): Promise<User[]> {
     let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
-    let filters: { [key: string]: FindOperator<string | undefined> }[] = [];
-
+    const SortFieldMapping = new Map([['firstName', 'User.first_name']]);
     const qb = this.usersRepository.createQueryBuilder();
     if (input) {
       if (input.search) {
@@ -60,9 +59,14 @@ export default class UserService {
         );
       }
       if (input.filter) {
-        filters = new FilterBuilder<User>(qb).build(input.filter);
+        new FilterBuilder<User>(qb).build(input.filter);
+      }
+      if (input.sort) {
+        const sortField = SortFieldMapping.get(input.sort.field);
+        sortField && qb.orderBy(sortField, input.sort.direction);
       }
     }
+
     return (
       qb
         // .andWhere(searchTerm)

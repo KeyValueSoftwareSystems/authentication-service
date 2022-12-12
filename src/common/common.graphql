@@ -14,3 +14,13 @@ enum FilterConditions {
     EQUALS
     IN
 }
+
+enum SortDirection {
+    ASC
+    DESC
+}
+
+input SortInput {
+    field: String!
+    direction: SortDirection!
+}

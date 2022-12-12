@@ -4,7 +4,7 @@ import {
   FilterField,
   FilterInput,
 } from '../schema/graphql.schema';
-import { FindOperator, In, SelectQueryBuilder } from 'typeorm';
+import { SelectQueryBuilder } from 'typeorm';
 
 export class FilterBuilder<T> {
   constructor(private qb: SelectQueryBuilder<T>) {}
@@ -13,23 +13,6 @@ export class FilterBuilder<T> {
     [FilterConditions.EQUALS, '='],
     [FilterConditions.IN, 'IN'],
   ]);
-
-  private applyField(
-    field: FilterField,
-  ): { [key: string]: FindOperator<string | undefined> } {
-    const andCondition: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
-    if (field.condition == FilterConditions.EQUALS) {
-      andCondition[field.field] = In(field.value);
-      return andCondition;
-    }
-    return andCondition;
-  }
-
-  private applyCond(input: FilterInput) {
-    return input.operands.map((x) => this.applyField(x));
-  }
 
   private applyUserGroupFilter(field: FilterField) {
     if (field.field == 'group') {
@@ -58,12 +41,8 @@ export class FilterBuilder<T> {
     }
   }
 
-  public build(
-    filter: FilterInput,
-  ): { [key: string]: FindOperator<string | undefined> }[] {
+  public build(filter: FilterInput) {
     filter.operands.map((o) => this.applyUserFieldsFilter(o));
     filter.operands.map((o) => this.applyUserGroupFilter(o));
-
-    return this.applyCond(filter);
   }
 }

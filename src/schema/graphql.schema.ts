@@ -23,6 +23,11 @@ export enum FilterConditions {
     IN = "IN"
 }
 
+export enum SortDirection {
+    ASC = "ASC",
+    DESC = "DESC"
+}
+
 export interface UserPasswordSignupInput {
     email?: string;
     phone?: string;
@@ -177,6 +182,7 @@ export interface UserPermissionsVerification {
 export interface UserInputFilter {
     search?: UserSearchInput;
     filter?: FilterInput;
+    sort?: SortInput;
 }
 
 export interface UserSearchInput {
@@ -204,6 +210,11 @@ export interface FilterField {
     condition: FilterConditions;
     field: string;
     value: string[];
+}
+
+export interface SortInput {
+    field: string;
+    direction: SortDirection;
 }
 
 export interface IMutation {
