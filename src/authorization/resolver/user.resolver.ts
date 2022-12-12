@@ -90,7 +90,7 @@ export class UserResolver {
     return this.userService.deleteUser(id);
   }
 
-  @Permissions()
+  @Permissions(PermissionsType.ViewUser)
   @Query()
   async verifyUserPermission(
     @Args('params')
