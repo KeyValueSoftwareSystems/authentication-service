@@ -272,9 +272,11 @@ export class GroupService {
   }
 
   private async checkGroupUsage(id: string) {
-    const userCount = await this.userGroupRepository.count({
-      where: { groupId: id },
-    });
+    const userCount = await this.userRepository
+      .createQueryBuilder()
+      .innerJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId=User.id')
+      .where('userGroup.groupId = :id', { id: id })
+      .getCount();
     return userCount != 0;
   }
 
