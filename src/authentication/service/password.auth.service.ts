@@ -107,8 +107,8 @@ export default class PasswordAuthService implements Authenticatable {
         status: user.status,
       };
       return {
-        inviteToken: invitationToken!.token,
-        tokenExpiryTime: invitationToken!.tokenExpiryTime,
+        inviteToken: invitationToken.token,
+        tokenExpiryTime: invitationToken.tokenExpiryTime,
         user: userResponse,
       };
     });
