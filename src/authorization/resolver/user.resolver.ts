@@ -17,12 +17,14 @@ import {
   UserPermissionsVerification,
   OperationType,
   UserInputFilter,
+  UserPaginated,
 } from '../../schema/graphql.schema';
 import UserService from '../service/user.service';
 import ValidationPipe from '../../validation/validation.pipe';
 import * as UserSchema from '../validation/user.validation.schema';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
+import { UserPage } from 'twilio/lib/rest/conversations/v1/user';
 
 @Resolver('User')
 export class UserResolver {
@@ -30,8 +32,11 @@ export class UserResolver {
 
   @Permissions(PermissionsType.ViewUser)
   @Query()
-  getUsers(@Args('input') input: UserInputFilter): Promise<User[]> {
-    return this.userService.getAllUsers(input);
+  async getUsers(
+    @Args('input') input: UserInputFilter,
+  ): Promise<UserPaginated> {
+    const [users, count] = await this.userService.getAllUsers(input);
+    return { totalCount: count, results: users };
   }
 
   @Permissions(PermissionsType.ViewUser)

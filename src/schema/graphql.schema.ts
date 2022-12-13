@@ -185,6 +185,7 @@ export interface UserInputFilter {
     search?: UserSearchInput;
     filter?: FilterInput;
     sort?: SortInput;
+    pagination?: PaginationInput;
 }
 
 export interface UserSearchInput {
@@ -217,6 +218,15 @@ export interface FilterField {
 export interface SortInput {
     field: string;
     direction: SortDirection;
+}
+
+export interface PaginationInput {
+    limit?: number;
+    offset?: number;
+}
+
+export interface Paginated {
+    totalCount?: number;
 }
 
 export interface IMutation {
@@ -299,7 +309,7 @@ export interface IQuery {
     getRoles(input?: RoleInputFilter): Role[] | Promise<Role[]>;
     getRole(id: string): Role | Promise<Role>;
     getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
-    getUsers(input?: UserInputFilter): User[] | Promise<User[]>;
+    getUsers(input?: UserInputFilter): UserPaginated | Promise<UserPaginated>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
@@ -339,6 +349,11 @@ export interface Role {
 export interface RolePermission {
     id: string;
     name: string;
+}
+
+export interface UserPaginated extends Paginated {
+    totalCount?: number;
+    results?: User[];
 }
 
 export interface User {

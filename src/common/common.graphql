@@ -24,3 +24,12 @@ input SortInput {
     field: String!
     direction: SortDirection!
 }
+
+input PaginationInput {
+    limit: Int = 10
+    offset: Int = 0
+}
+
+interface Paginated {
+    totalCount: Int
+}

@@ -47,26 +47,28 @@ export default class UserService {
     private roleCacheService: RoleCacheService,
   ) {}
 
-  getAllUsers(input?: UserInputFilter): Promise<User[]> {
+  getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {
     const SortFieldMapping = new Map([['firstName', 'User.firstName']]);
     const qb = this.usersRepository.createQueryBuilder();
-    if (input) {
-      if (input.search) {
-        this.searchService.generateSearchTermForEntity(
-          qb,
-          SearchEntity.USER,
-          input.search,
-        );
-      }
-      if (input.filter) {
-        new FilterBuilder<User>(qb).build(input.filter);
-      }
-      if (input.sort) {
-        const sortField = SortFieldMapping.get(input.sort.field);
-        sortField && qb.orderBy(sortField, input.sort.direction);
-      }
+    if (input?.search) {
+      this.searchService.generateSearchTermForEntity(
+        qb,
+        SearchEntity.USER,
+        input.search,
+      );
     }
-    return qb.getMany();
+    if (input?.filter) {
+      new FilterBuilder<User>(qb).build(input.filter);
+    }
+    if (input?.sort) {
+      const sortField = SortFieldMapping.get(input.sort.field);
+      sortField && qb.orderBy(sortField, input.sort.direction);
+    }
+    qb.limit(input?.pagination?.limit ?? 10).offset(
+      input?.pagination?.offset ?? 0,
+    );
+
+    return qb.getManyAndCount();
   }
 
   async getUserById(id: string): Promise<User> {
