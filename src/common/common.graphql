@@ -26,8 +26,8 @@ input SortInput {
 }
 
 input PaginationInput {
-    limit: Int = 10
-    offset: Int = 0
+    limit: Int
+    offset: Int
 }
 
 interface Paginated {
