@@ -36,23 +36,25 @@ export class RoleService {
     private searchService: SearchService,
   ) {}
 
-  async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
+  async getAllRoles(input?: RoleInputFilter): Promise<[Role[], number]> {
     const SortFieldMapping = new Map([['name', 'Role.name']]);
     let queryBuilder = this.rolesRepository.createQueryBuilder();
-    if (input) {
-      if (input.search) {
-        queryBuilder = this.searchService.generateSearchTermForEntity(
-          queryBuilder,
-          SearchEntity.ROLE,
-          input.search,
-        );
-      }
-      if (input.sort) {
-        const field = SortFieldMapping.get(input.sort.field);
-        field && queryBuilder.orderBy(field, input.sort.direction);
-      }
+    if (input?.search) {
+      queryBuilder = this.searchService.generateSearchTermForEntity(
+        queryBuilder,
+        SearchEntity.ROLE,
+        input.search,
+      );
     }
-    return await queryBuilder.getMany();
+    if (input?.sort) {
+      const field = SortFieldMapping.get(input.sort.field);
+      field && queryBuilder.orderBy(field, input.sort.direction);
+    }
+    queryBuilder
+      .limit(input?.pagination?.limit ?? 10)
+      .offset(input?.pagination?.offset ?? 0);
+
+    return await queryBuilder.getManyAndCount();
   }
 
   async getRoleById(id: string): Promise<Role> {

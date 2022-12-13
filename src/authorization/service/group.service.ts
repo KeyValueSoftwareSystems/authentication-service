@@ -51,23 +51,26 @@ export class GroupService {
     private searchService: SearchService,
   ) {}
 
-  getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
+  getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
     const SortFieldMapping = new Map([['name', 'Group.name']]);
     let queryBuilder = this.groupsRepository.createQueryBuilder();
-    if (input) {
-      if (input.search) {
-        queryBuilder = this.searchService.generateSearchTermForEntity(
-          queryBuilder,
-          SearchEntity.GROUP,
-          input.search,
-        );
-      }
-      if (input.sort) {
-        const field = SortFieldMapping.get(input.sort.field);
-        field && queryBuilder.orderBy(field, input.sort.direction);
-      }
+
+    if (input?.search) {
+      queryBuilder = this.searchService.generateSearchTermForEntity(
+        queryBuilder,
+        SearchEntity.GROUP,
+        input.search,
+      );
     }
-    return queryBuilder.getMany();
+    if (input?.sort) {
+      const field = SortFieldMapping.get(input.sort.field);
+      field && queryBuilder.orderBy(field, input.sort.direction);
+    }
+    queryBuilder
+      .limit(input?.pagination?.limit ?? 10)
+      .offset(input?.pagination?.offset ?? 0);
+
+    return queryBuilder.getManyAndCount();
   }
 
   async getGroupById(id: string): Promise<Group> {

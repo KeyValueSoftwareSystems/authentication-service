@@ -117,6 +117,7 @@ export interface UpdateGroupRoleInput {
 export interface GroupInputFilter {
     search?: GroupSearchInput;
     sort?: SortInput;
+    pagination?: PaginationInput;
 }
 
 export interface GroupSearchInput {
@@ -151,6 +152,7 @@ export interface UpdateRolePermissionInput {
 export interface RoleInputFilter {
     search?: RoleSearchInput;
     sort?: SortInput;
+    pagination?: PaginationInput;
 }
 
 export interface RoleSearchInput {
@@ -300,13 +302,13 @@ export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
     getEntityPermissions(id: string): EntityPermission[] | Promise<EntityPermission[]>;
-    getGroups(input?: GroupInputFilter): Group[] | Promise<Group[]>;
+    getGroups(input?: GroupInputFilter): GroupPaginated | Promise<GroupPaginated>;
     getGroup(id: string): Group | Promise<Group>;
     getGroupPermissions(id: string): GroupPermission[] | Promise<GroupPermission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
     getPermission(id: string): Permission | Promise<Permission>;
-    getRoles(input?: RoleInputFilter): Role[] | Promise<Role[]>;
+    getRoles(input?: RoleInputFilter): RolePaginated | Promise<RolePaginated>;
     getRole(id: string): Role | Promise<Role>;
     getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
     getUsers(input?: UserInputFilter): UserPaginated | Promise<UserPaginated>;
@@ -335,6 +337,11 @@ export interface GroupRole {
     name: string;
 }
 
+export interface GroupPaginated extends Paginated {
+    totalCount?: number;
+    results?: Group[];
+}
+
 export interface Permission {
     id: string;
     name: string;
@@ -349,6 +356,11 @@ export interface Role {
 export interface RolePermission {
     id: string;
     name: string;
+}
+
+export interface RolePaginated extends Paginated {
+    totalCount?: number;
+    results?: Role[];
 }
 
 export interface UserPaginated extends Paginated {

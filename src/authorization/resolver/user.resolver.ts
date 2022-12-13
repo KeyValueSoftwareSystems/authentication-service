@@ -25,6 +25,8 @@ import * as UserSchema from '../validation/user.validation.schema';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
 import { UserPage } from 'twilio/lib/rest/conversations/v1/user';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/authentication/authentication.guard';
 
 @Resolver('User')
 export class UserResolver {
@@ -95,7 +97,7 @@ export class UserResolver {
     return this.userService.deleteUser(id);
   }
 
-  @Permissions(PermissionsType.ViewUser)
+  @UseGuards(AuthGuard)
   @Query()
   async verifyUserPermission(
     @Args('params')
