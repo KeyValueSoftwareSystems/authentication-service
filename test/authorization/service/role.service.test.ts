@@ -18,6 +18,7 @@ import { RoleService } from '../../../src/authorization/service/role.service';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 import RoleCacheService from '../../../src/authorization/service/rolecache.service';
 import SearchService from '../../../src/authorization/service/search.service';
+import Group from '../../../src/authorization/entity/group.entity';
 const roles: Role[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -42,6 +43,7 @@ describe('test Role Service', () => {
   const redisCacheService = Substitute.for<RedisCacheService>();
   const searchService = Substitute.for<SearchService>();
   const connectionMock = Substitute.for<Connection>();
+  const groupRoleQueryBuilder = Substitute.for<SelectQueryBuilder<GroupRole>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
@@ -197,11 +199,16 @@ describe('test Role Service', () => {
     rolesRepository
       .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
       .resolves(Arg.any());
-    groupRoleRepository
-      .count({
-        where: { roleId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
+    groupRoleRepository.createQueryBuilder().returns(groupRoleQueryBuilder);
+    groupRoleQueryBuilder
+      .innerJoinAndSelect(Group, 'group', 'group.id = GroupRole.groupId')
+      .returns(groupRoleQueryBuilder);
+    groupRoleQueryBuilder
+      .where('GroupRole.roleId= :id', {
+        id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       })
-      .resolves(0);
+      .returns(groupRoleQueryBuilder);
+    groupRoleQueryBuilder.getCount().resolves(0);
     const resp = await roleService.deleteRole(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
