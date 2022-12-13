@@ -3,6 +3,7 @@ import { Equal, FindOperator, ILike, Like, SelectQueryBuilder } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupSearchInput,
+  OperationType,
   RoleSearchInput,
   StringSearchCondition,
   UserSearchInput,
@@ -41,6 +42,7 @@ export default class SearchService {
           'User.email',
           qb,
           input.and.email,
+          OperationType.AND,
         );
       }
       if (input.and.firstName) {
@@ -48,6 +50,7 @@ export default class SearchService {
           'User.firstName',
           qb,
           input.and.firstName,
+          OperationType.AND,
         );
       }
       if (input.and.middleName) {
@@ -55,6 +58,7 @@ export default class SearchService {
           'User.middleName',
           qb,
           input.and.middleName,
+          OperationType.AND,
         );
       }
       if (input.and.lastName) {
@@ -62,6 +66,7 @@ export default class SearchService {
           'User.lastName',
           qb,
           input.and.lastName,
+          OperationType.AND,
         );
       }
     }
@@ -75,6 +80,7 @@ export default class SearchService {
           'User.email',
           qb,
           input.or.email,
+          OperationType.OR,
         );
       }
       if (input.or.firstName) {
@@ -82,6 +88,7 @@ export default class SearchService {
           'User.firstName',
           qb,
           input.or.firstName,
+          OperationType.OR,
         );
       }
       if (input.or.middleName) {
@@ -89,6 +96,7 @@ export default class SearchService {
           'User.middleName',
           qb,
           input.or.middleName,
+          OperationType.OR,
         );
       }
       if (input.or.lastName) {
@@ -96,6 +104,7 @@ export default class SearchService {
           'User.lastName',
           qb,
           input.or.lastName,
+          OperationType.OR,
         );
       }
     }
@@ -112,7 +121,12 @@ export default class SearchService {
     } = {};
     if (input.and) {
       if (input.and.name) {
-        this.generateWhereClauseForStringSearch('name', qb, input.and.name);
+        this.generateWhereClauseForStringSearch(
+          'name',
+          qb,
+          input.and.name,
+          OperationType.AND,
+        );
       }
     }
     if (Object.keys(andConditions).length) {
@@ -126,6 +140,7 @@ export default class SearchService {
             'name',
             qb,
             input.or.name,
+            OperationType.OR,
           ),
         });
       }
@@ -143,13 +158,19 @@ export default class SearchService {
           `name`,
           qb,
           input.and.name,
+          OperationType.AND,
         );
       }
     }
 
     if (input.or) {
       if (input.or.name) {
-        qb = this.generateWhereClauseForStringSearch('name', qb, input.or.name);
+        qb = this.generateWhereClauseForStringSearch(
+          'name',
+          qb,
+          input.or.name,
+          OperationType.OR,
+        );
       }
     }
     return qb;
@@ -159,11 +180,12 @@ export default class SearchService {
     field: string,
     qb: SelectQueryBuilder<T>,
     input: StringSearchCondition,
+    operation: OperationType,
   ): SelectQueryBuilder<T> {
-    if (input.contains) {
+    if (input.contains && operation == OperationType.AND) {
       return qb.andWhere(field + ' ' + `ILIKE('%${input.contains}%')`);
     } else {
-      return qb.andWhere(field + ' ' + `ILIKE('%${input.equals}%')`);
+      return qb.orWhere(field + ' ' + `ILIKE('%${input.contains}%')`);
     }
   }
 }

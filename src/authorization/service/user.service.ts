@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, FindOperator, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -66,17 +66,7 @@ export default class UserService {
         sortField && qb.orderBy(sortField, input.sort.direction);
       }
     }
-
-    return (
-      qb
-        // .andWhere(searchTerm)
-        .getMany()
-    );
-
-    // return this.usersRepository.find({
-    //   relations:
-    //   where: { searchTerm, ...(filters ? filters : []) },
-    // });
+    return qb.getMany();
   }
 
   async getUserById(id: string): Promise<User> {
