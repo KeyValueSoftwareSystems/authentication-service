@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Equal, FindOperator, ILike, Like, SelectQueryBuilder } from 'typeorm';
+import { FindOperator, SelectQueryBuilder } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupSearchInput,

@@ -132,9 +132,9 @@ describe('test UserService', () => {
 
   it('should get all users', async () => {
     userRepository.createQueryBuilder().returns(userQueryBuilder);
-    userQueryBuilder.getMany().resolves(users);
+    userQueryBuilder.getManyAndCount().resolves([users, 1]);
     const resp = await userService.getAllUsers();
-    expect(resp).toEqual(users);
+    expect(resp).toEqual([users, 1]);
   });
 
   it('should get a user by id', async () => {

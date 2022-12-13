@@ -45,6 +45,7 @@ describe('test Role Service', () => {
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
+  const rolesQueryBuilder = Substitute.for<SelectQueryBuilder<Role>>();
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -83,9 +84,10 @@ describe('test Role Service', () => {
   });
 
   it('should get all roles', async () => {
-    rolesRepository.find({ where: [] }).returns(Promise.resolve(roles));
+    rolesRepository.createQueryBuilder().returns(rolesQueryBuilder);
+    rolesQueryBuilder.getManyAndCount().returns(Promise.resolve([roles, 1]));
     const resp = await roleService.getAllRoles();
-    expect(resp).toEqual(roles);
+    expect(resp).toEqual([roles, 1]);
   });
 
   it('should get a role by id', async () => {

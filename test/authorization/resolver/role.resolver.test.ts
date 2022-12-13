@@ -79,28 +79,34 @@ describe('Role Module', () => {
   describe(gql, () => {
     describe('roles', () => {
       it('should get the roles', () => {
-        const response: GqlSchema.Role[] = [
-          {
-            id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-            name: 'Customers',
-            permissions: [
-              {
-                id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-                name: 'Customers',
-              },
-            ],
-          },
-        ];
+        const response: GqlSchema.RolePaginated = {
+          totalCount: 1,
+          results: [
+            {
+              id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+              name: 'Customers',
+              permissions: [
+                {
+                  id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+                  name: 'Customers',
+                },
+              ],
+            },
+          ],
+        };
         const token = authenticationHelper.generateAccessToken(users[0]);
 
-        roleService.getAllRoles().returns(Promise.resolve(roles));
+        roleService.getAllRoles().returns(Promise.resolve([roles, 1]));
         roleService
           .getRolePermissions(roles[0].id)
           .returns(Promise.resolve(permissions));
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
-          .send({ query: '{getRoles {id name permissions { id name }}}' })
+          .send({
+            query:
+              '{getRoles { totalCount results { id name permissions { id name }}}}',
+          })
           .expect(200)
           .expect((res) => {
             expect(res.body.data.getRoles).toEqual(response);
@@ -296,21 +302,27 @@ describe('Role Module', () => {
           name: 'create-entries',
         },
       ];
-      const finalResponse: GqlSchema.Role[] = [
-        {
-          id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-          name: 'Customers',
-          permissions: permissions,
-        },
-      ];
+      const finalResponse: GqlSchema.RolePaginated = {
+        totalCount: 1,
+        results: [
+          {
+            id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+            name: 'Customers',
+            permissions: permissions,
+          },
+        ],
+      };
       const token = authenticationHelper.generateAccessToken(users[0]);
       return request(app.getHttpServer())
         .post(gql)
         .set('Authorization', `Bearer ${token}`)
-        .send({ query: '{getRoles {id name permissions{ id name }}}' })
+        .send({
+          query:
+            '{getRoles { totalCount results { id name permissions{ id name }}}}',
+        })
         .expect(200)
         .expect((res) => {
-          res.body.data.getRoles[0].permissions = permissions;
+          res.body.data.getRoles.results[0].permissions = permissions;
           expect(res.body.data.getRoles).toEqual(finalResponse);
         });
     });
