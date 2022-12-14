@@ -66,10 +66,11 @@ export class GroupService {
       const field = SortFieldMapping.get(input.sort.field);
       field && queryBuilder.orderBy(field, input.sort.direction);
     }
-    queryBuilder
-      .limit(input?.pagination?.limit ?? 10)
-      .offset(input?.pagination?.offset ?? 0);
-
+    if (input?.pagination) {
+      queryBuilder
+        .limit(input?.pagination?.limit ?? 10)
+        .offset(input?.pagination?.offset ?? 0);
+    }
     return queryBuilder.getManyAndCount();
   }
 

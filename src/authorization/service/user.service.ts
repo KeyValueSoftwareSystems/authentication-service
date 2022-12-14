@@ -65,9 +65,11 @@ export default class UserService {
       const sortField = SortFieldMapping.get(input.sort.field);
       sortField && qb.orderBy(sortField, input.sort.direction);
     }
-    qb.limit(input?.pagination?.limit ?? 10).offset(
-      input?.pagination?.offset ?? 0,
-    );
+    if (input?.pagination) {
+      qb.limit(input?.pagination?.limit ?? 10).offset(
+        input?.pagination?.offset ?? 0,
+      );
+    }
 
     return qb.getManyAndCount();
   }
