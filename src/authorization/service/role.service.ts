@@ -19,6 +19,7 @@ import RoleCacheService from './rolecache.service';
 import GroupRole from '../entity/groupRole.entity';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
+import Group from '../entity/group.entity';
 
 @Injectable()
 export class RoleService {
@@ -159,9 +160,11 @@ export class RoleService {
   }
 
   private async checkRoleUsage(id: string) {
-    const groupCount = await this.groupRoleRepository.count({
-      where: { roleId: id },
-    });
+    const groupCount = await this.groupRoleRepository
+      .createQueryBuilder()
+      .innerJoinAndSelect(Group, 'group', 'group.id = GroupRole.groupId')
+      .where('GroupRole.roleId= :id', { id: id })
+      .getCount();
     return groupCount != 0;
   }
 }

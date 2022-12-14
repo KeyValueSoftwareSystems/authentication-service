@@ -1,4 +1,8 @@
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import User from '../../authorization/entity/user.entity';
 
 export class UserExistsException extends BadRequestException {
@@ -31,6 +35,14 @@ export class GoogleSetupError extends BadRequestException {
   constructor() {
     super({
       error: 'Google login is not supported.',
+    });
+  }
+}
+
+export class UserNotAuthorized extends ForbiddenException {
+  constructor(permissions: any) {
+    super({
+      error: `User is forbidden owing to the absence of ${permissions} permissions`,
     });
   }
 }
