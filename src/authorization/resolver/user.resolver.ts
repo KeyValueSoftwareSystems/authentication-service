@@ -24,7 +24,7 @@ import * as UserSchema from '../validation/user.validation.schema';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/authentication/authentication.guard';
+import { AuthGuard } from '../../authentication/authentication.guard';
 
 @Resolver('User')
 export class UserResolver {
