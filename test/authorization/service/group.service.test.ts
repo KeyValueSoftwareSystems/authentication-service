@@ -35,6 +35,7 @@ const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
+    label: 'Customers',
   },
 ];
 
@@ -316,6 +317,7 @@ describe('test Group Service', () => {
       {
         id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
         name: 'Customers',
+        label: 'Customers',
       },
     ];
     permissionRepository
@@ -346,12 +348,14 @@ describe('test Group Service', () => {
       {
         id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
         name: 'Customers',
+        label: 'Customers',
       },
     ];
     const rolePermissionsOfGroup: Permission[] = [
       {
         id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
         name: 'Customers',
+        label: 'Customers',
       },
     ];
     const resp = await groupService.getGroupPermissions(group.id);
