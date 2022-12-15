@@ -16,11 +16,6 @@ input UpdateRolePermissionInput {
   permissions: [ID!]!
 }
 
-type RolePermission {
-  id: ID!,
-  name: String!
-}
-
 input RoleInputFilter {
   search: RoleSearchInput
   sort: SortInput
@@ -44,12 +39,12 @@ type RolePaginated implements Paginated {
 type Query {
   getRoles(input: RoleInputFilter): RolePaginated!
   getRole(id: ID!): Role
-  getRolePermissions(id: ID!): [RolePermission]
+  getRolePermissions(id: ID!): [Permission]
 }
 
 type Mutation {
   createRole(input: NewRoleInput!): Role
   updateRole(id: ID!, input: UpdateRoleInput!): Role
   deleteRole(id: ID!): Role
-  updateRolePermissions(id: ID!, input: UpdateRolePermissionInput!): [RolePermission]
+  updateRolePermissions(id: ID!, input: UpdateRolePermissionInput!): [Permission]
 }
