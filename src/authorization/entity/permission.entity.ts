@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import BaseEntity from './base.entity';
 
@@ -8,6 +9,10 @@ class Permission extends BaseEntity {
 
   @Column()
   public name!: string;
+
+  @IsOptional()
+  @Column({ nullable: true })
+  public label?: string;
 }
 
 export default Permission;

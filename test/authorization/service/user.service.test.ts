@@ -40,6 +40,7 @@ const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
     name: 'Customers',
+    label: 'Customers',
   },
 ];
 
@@ -341,6 +342,7 @@ describe('test UserService', () => {
       {
         id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
         name: 'CreateUser',
+        label: 'Create User',
       },
     ];
     const groupRoles = [
@@ -427,6 +429,7 @@ describe('test UserService', () => {
       {
         id: '366ad922-464c-4e48-a26b-d8d5a9090763',
         name: 'CreateEmployee',
+        label: 'Create Employee',
       },
     ];
     const groupRoles = [
@@ -522,14 +525,17 @@ describe('test UserService', () => {
       {
         id: 'b7896dde-adce-41a4-88e5-37b0bbd94051',
         name: 'CreateEmployee',
+        label: 'Create Employee',
       },
       {
         id: '920159fb-66c4-445c-a907-8a055b317c58',
         name: 'DeleteEmployee',
+        label: 'Delete Employee',
       },
       {
         id: '366ad922-464c-4e48-a26b-d8d5a9090763',
         name: 'EditEmployee',
+        label: 'Edit Employee',
       },
     ];
     userCacheService

@@ -5,10 +5,12 @@ type Permission {
 
 input NewPermissionInput {
   name: String!
+  label: String
 }
 
 input UpdatePermissionInput {
   name: String!
+  label: String
 }
 
 type Query {

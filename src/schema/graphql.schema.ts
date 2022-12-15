@@ -119,10 +119,12 @@ export interface GroupSearchCondition {
 
 export interface NewPermissionInput {
     name: string;
+    label?: string;
 }
 
 export interface UpdatePermissionInput {
     name: string;
+    label?: string;
 }
 
 export interface NewRoleInput {
