@@ -186,6 +186,9 @@ describe('Userauth Module', () => {
           status: Status.INVITED,
         },
       };
+      configService.get('JWT_SECRET').returns('s3cr3t1234567890');
+
+      const token = authenticationHelper.generateAccessToken(users[0]);
 
       const obj = Object.create(null);
       passwordAuthService
@@ -193,6 +196,7 @@ describe('Userauth Module', () => {
         .returns(Promise.resolve(usersResponse));
       return request(app.getHttpServer())
         .post(gql)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           query: `mutation { inviteTokenSignup(input: { email: "test@gmail.com"
           phone: "9947849200" firstName: "Test" lastName: "Name" }) { inviteToken tokenExpiryTime user{id firstName lastName inviteToken status}}}`,
@@ -247,8 +251,6 @@ describe('Userauth Module', () => {
           lastName: users[0].lastName,
         },
       ];
-
-      configService.get('JWT_SECRET').returns('s3cr3t1234567890');
 
       const token = authenticationHelper.generateAccessToken(users[0]);
 

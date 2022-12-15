@@ -482,7 +482,7 @@ describe('test UserService', () => {
     roleCacheService
       .getRolePermissionsFromRoleId('fcd858c6-26c5-462b-8c53-4b544830dca8')
       .resolves(groupRolePermissions.map((x) => x.permissionId));
-    const resp =  userService.verifyUserPermissions(
+    const resp = userService.verifyUserPermissions(
       'f95e6f6d-7678-4871-9e08-c3f23b87c3ff',
       ['CreateUser'],
     );
