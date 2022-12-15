@@ -1,4 +1,3 @@
-
 /*
  * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -131,10 +130,12 @@ export interface GroupSearchCondition {
 
 export interface NewPermissionInput {
     name: string;
+    label?: string;
 }
 
 export interface UpdatePermissionInput {
     name: string;
+    label?: string;
 }
 
 export interface NewRoleInput {
@@ -345,6 +346,7 @@ export interface GroupPaginated extends Paginated {
 export interface Permission {
     id: string;
     name: string;
+    label?: string;
 }
 
 export interface Role {
