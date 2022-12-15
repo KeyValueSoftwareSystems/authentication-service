@@ -41,11 +41,6 @@ type UserGroupResponse {
   name: String!
 }
 
-type UserPermissions {
-  id: ID!,
-  name: String!
-}
-
 enum OperationType {
   AND
   OR
@@ -87,13 +82,13 @@ type Query {
   getUsers(input: UserInputFilter): [User]!
   getUser(id: ID!): User
   getUserGroups(id: ID!): [UserGroupResponse]
-  getUserPermissions(id: ID!): [UserPermissions]
+  getUserPermissions(id: ID!): [Permission]
   verifyUserPermission(params: UserPermissionsVerification!): Boolean
 }
 
 type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): User
-  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput!): [UserPermissions]
+  updateUserPermissions(id: ID!, input: UpdateUserPermissionInput!): [Permission]
   updateUserGroups(id: ID!, input: UpdateUserGroupInput!): [UserGroupResponse]
 }
