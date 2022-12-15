@@ -1,4 +1,3 @@
-import UserGroup from '../authorization/entity/userGroup.entity';
 import {
   FilterConditions,
   FilterField,
@@ -7,40 +6,32 @@ import {
 import { SelectQueryBuilder } from 'typeorm';
 
 export class FilterBuilder<T> {
-  constructor(private qb: SelectQueryBuilder<T>) {}
+  constructor(
+    private qb: SelectQueryBuilder<T>,
+    private fieldMapping: Map<string, string>,
+  ) {}
 
-  ConditionMapping = new Map([
+  MatchOperatorMapping = new Map([
     [FilterConditions.EQUALS, '='],
     [FilterConditions.IN, 'IN'],
   ]);
 
-  private applyUserGroupFilter(field: FilterField) {
-    if (field.field == 'group') {
-      this.qb.innerJoin(
-        UserGroup,
-        'userGroup',
-        'userGroup.userId = User.id AND userGroup.groupId IN (:...groupIds)',
-        { groupIds: field.value },
-      );
-    }
-  }
+  private applyFieldsFilter(filter: FilterField) {
+    if (Array.from(this.fieldMapping.keys()).includes(filter.field)) {
+      const fieldToMatch = this.fieldMapping.get(filter.field);
+      const operator = this.MatchOperatorMapping.get(filter.condition);
+      const valueToMatch =
+        filter.condition == FilterConditions.EQUALS
+          ? filter.value[0]
+          : filter.value;
 
-  private applyUserFieldsFilter(field: FilterField) {
-    const fieldMapping = new Map([['status', 'User.status']]);
-    const userFields = ['status'];
-
-    if (userFields.includes(field.field)) {
-      this.qb.andWhere(
-        `${fieldMapping.get(field.field)} ${this.ConditionMapping.get(
-          field.condition,
-        )} (:...${field.field})`,
-        { [field.field]: field.value },
-      );
+      this.qb.andWhere(`${fieldToMatch} ${operator} (:...${filter.field})`, {
+        [filter.field]: valueToMatch,
+      });
     }
   }
 
   public build(filter: FilterInput) {
-    filter.operands.map((o) => this.applyUserFieldsFilter(o));
-    filter.operands.map((o) => this.applyUserGroupFilter(o));
+    filter.operands.map((o) => this.applyFieldsFilter(o));
   }
 }

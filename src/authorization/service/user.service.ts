@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
+  FilterField,
   OperationType,
   Status,
   UpdateUserGroupInput,
@@ -50,6 +51,21 @@ export default class UserService {
 
   getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {
     const SortFieldMapping = new Map([['firstName', 'User.firstName']]);
+    const filterFieldMapping = new Map([['status', 'User.status']]);
+
+    const applyUserGroupFilter = (
+      field: FilterField,
+      queryBuilder: SelectQueryBuilder<User>,
+    ) => {
+      if (field.field == 'group') {
+        queryBuilder.innerJoin(
+          UserGroup,
+          'userGroup',
+          'userGroup.userId = User.id AND userGroup.groupId IN (:...groupIds)',
+          { groupIds: field.value },
+        );
+      }
+    };
     const qb = this.usersRepository.createQueryBuilder();
     if (input?.search) {
       this.searchService.generateSearchTermForEntity(
@@ -59,7 +75,8 @@ export default class UserService {
       );
     }
     if (input?.filter) {
-      new FilterBuilder<User>(qb).build(input.filter);
+      input.filter.operands.forEach((o) => applyUserGroupFilter(o, qb));
+      new FilterBuilder<User>(qb, filterFieldMapping).build(input.filter);
     }
     if (input?.sort) {
       const sortField = SortFieldMapping.get(input.sort.field);
