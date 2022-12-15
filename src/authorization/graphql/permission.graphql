@@ -1,14 +1,17 @@
 type Permission {
   id: ID!
   name: String!
+  label: String
 }
 
 input NewPermissionInput {
   name: String!
+  label: String
 }
 
 input UpdatePermissionInput {
   name: String!
+  label: String
 }
 
 type Query {

@@ -8,6 +8,9 @@ class Permission extends BaseEntity {
 
   @Column()
   public name!: string;
+
+  @Column({ nullable: true })
+  public label?: string;
 }
 
 export default Permission;
