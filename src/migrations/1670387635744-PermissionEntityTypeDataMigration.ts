@@ -33,7 +33,7 @@ export class PermissionEntityTypeDataMigration1670387635744
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-        TRUNCATE entity;
+        TRUNCATE entity_model;
         TRUNCATE entity_permission;
     `);
   }

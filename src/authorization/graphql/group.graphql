@@ -24,11 +24,6 @@ input UpdateGroupRoleInput {
   roles: [ID!]!
 }
 
-type GroupPermission {
-  id: ID!,
-  name: String!
-}
-
 type GroupRole {
   id: ID!,
   name: String!
@@ -50,7 +45,7 @@ input GroupSearchCondition {
 type Query {
   getGroups(input: GroupInputFilter): [Group]!
   getGroup(id: ID!): Group
-  getGroupPermissions(id: ID!): [GroupPermission]
+  getGroupPermissions(id: ID!): [Permission]
   getGroupRoles(id: ID!): [GroupRole]
 }
 
@@ -58,6 +53,6 @@ type Mutation {
   createGroup(input: NewGroupInput!): Group
   updateGroup(id: ID!, input: UpdateGroupInput!): Group
   deleteGroup(id: ID!): Group
-  updateGroupPermissions(id: ID!, input: UpdateGroupPermissionInput!): [GroupPermission]
+  updateGroupPermissions(id: ID!, input: UpdateGroupPermissionInput!): [Permission]
   updateGroupRoles(id: ID!, input: UpdateGroupRoleInput!): [GroupRole]
 }

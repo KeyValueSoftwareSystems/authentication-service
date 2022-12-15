@@ -17,6 +17,7 @@ const permissions: Permission[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     name: 'Test1',
+    label: 'Test 1',
   },
 ];
 
