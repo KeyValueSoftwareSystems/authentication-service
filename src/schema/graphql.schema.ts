@@ -237,11 +237,11 @@ export interface IMutation {
     createEntity(input: NewEntityInput): Entity | Promise<Entity>;
     updateEntity(id: string, input: UpdateEntityInput): Entity | Promise<Entity>;
     deleteEntity(id: string): Entity | Promise<Entity>;
-    updateEntityPermissions(id: string, input: UpdateGroupPermissionInput): EntityPermission[] | Promise<EntityPermission[]>;
+    updateEntityPermissions(id: string, input: UpdateGroupPermissionInput): Permission[] | Promise<Permission[]>;
     createGroup(input: NewGroupInput): Group | Promise<Group>;
     updateGroup(id: string, input: UpdateGroupInput): Group | Promise<Group>;
     deleteGroup(id: string): Group | Promise<Group>;
-    updateGroupPermissions(id: string, input: UpdateGroupPermissionInput): GroupPermission[] | Promise<GroupPermission[]>;
+    updateGroupPermissions(id: string, input: UpdateGroupPermissionInput): Permission[] | Promise<Permission[]>;
     updateGroupRoles(id: string, input: UpdateGroupRoleInput): GroupRole[] | Promise<GroupRole[]>;
     createPermission(input: NewPermissionInput): Permission | Promise<Permission>;
     updatePermission(id: string, input: UpdatePermissionInput): Permission | Promise<Permission>;
@@ -249,10 +249,10 @@ export interface IMutation {
     createRole(input: NewRoleInput): Role | Promise<Role>;
     updateRole(id: string, input: UpdateRoleInput): Role | Promise<Role>;
     deleteRole(id: string): Role | Promise<Role>;
-    updateRolePermissions(id: string, input: UpdateRolePermissionInput): RolePermission[] | Promise<RolePermission[]>;
+    updateRolePermissions(id: string, input: UpdateRolePermissionInput): Permission[] | Promise<Permission[]>;
     updateUser(id: string, input: UpdateUserInput): User | Promise<User>;
     deleteUser(id: string): User | Promise<User>;
-    updateUserPermissions(id: string, input: UpdateUserPermissionInput): UserPermissions[] | Promise<UserPermissions[]>;
+    updateUserPermissions(id: string, input: UpdateUserPermissionInput): Permission[] | Promise<Permission[]>;
     updateUserGroups(id: string, input: UpdateUserGroupInput): UserGroupResponse[] | Promise<UserGroupResponse[]>;
 }
 
@@ -280,31 +280,26 @@ export interface InviteTokenResponse {
 export interface Entity {
     id: string;
     name: string;
-    permissions?: EntityPermission[];
-}
-
-export interface EntityPermission {
-    id: string;
-    name: string;
+    permissions?: Permission[];
 }
 
 export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
-    getEntityPermissions(id: string): EntityPermission[] | Promise<EntityPermission[]>;
+    getEntityPermissions(id: string): Permission[] | Promise<Permission[]>;
     getGroups(input?: GroupInputFilter): Group[] | Promise<Group[]>;
     getGroup(id: string): Group | Promise<Group>;
-    getGroupPermissions(id: string): GroupPermission[] | Promise<GroupPermission[]>;
+    getGroupPermissions(id: string): Permission[] | Promise<Permission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
     getPermission(id: string): Permission | Promise<Permission>;
     getRoles(input?: RoleInputFilter): Role[] | Promise<Role[]>;
     getRole(id: string): Role | Promise<Role>;
-    getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
+    getRolePermissions(id: string): Permission[] | Promise<Permission[]>;
     getUsers(input?: UserInputFilter): User[] | Promise<User[]>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
-    getUserPermissions(id: string): UserPermissions[] | Promise<UserPermissions[]>;
+    getUserPermissions(id: string): Permission[] | Promise<Permission[]>;
     verifyUserPermission(params: UserPermissionsVerification): boolean | Promise<boolean>;
 }
 
@@ -315,11 +310,6 @@ export interface Group {
     roles?: Role[];
     permissions?: Permission[];
     allPermissions?: Permission[];
-}
-
-export interface GroupPermission {
-    id: string;
-    name: string;
 }
 
 export interface GroupRole {
@@ -339,11 +329,6 @@ export interface Role {
     permissions?: Permission[];
 }
 
-export interface RolePermission {
-    id: string;
-    name: string;
-}
-
 export interface User {
     id: string;
     email?: string;
@@ -358,11 +343,6 @@ export interface User {
 }
 
 export interface UserGroupResponse {
-    id: string;
-    name: string;
-}
-
-export interface UserPermissions {
     id: string;
     name: string;
 }
