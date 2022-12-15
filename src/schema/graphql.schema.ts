@@ -298,13 +298,8 @@ export interface Entity {
 export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
-<<<<<<< HEAD
-    getEntityPermissions(id: string): EntityPermission[] | Promise<EntityPermission[]>;
-    getGroups(input?: GroupInputFilter): GroupPaginated | Promise<GroupPaginated>;
-=======
     getEntityPermissions(id: string): Permission[] | Promise<Permission[]>;
     getGroups(input?: GroupInputFilter): Group[] | Promise<Group[]>;
->>>>>>> origin/master
     getGroup(id: string): Group | Promise<Group>;
     getGroupPermissions(id: string): Permission[] | Promise<Permission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
@@ -312,13 +307,8 @@ export interface IQuery {
     getPermission(id: string): Permission | Promise<Permission>;
     getRoles(input?: RoleInputFilter): RolePaginated | Promise<RolePaginated>;
     getRole(id: string): Role | Promise<Role>;
-<<<<<<< HEAD
-    getRolePermissions(id: string): RolePermission[] | Promise<RolePermission[]>;
-    getUsers(input?: UserInputFilter): UserPaginated | Promise<UserPaginated>;
-=======
     getRolePermissions(id: string): Permission[] | Promise<Permission[]>;
     getUsers(input?: UserInputFilter): User[] | Promise<User[]>;
->>>>>>> origin/master
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): Permission[] | Promise<Permission[]>;
@@ -356,11 +346,6 @@ export interface Role {
     permissions?: Permission[];
 }
 
-<<<<<<< HEAD
-export interface RolePermission {
-    id: string;
-    name: string;
-}
 
 export interface RolePaginated extends Paginated {
     totalCount?: number;
@@ -372,8 +357,6 @@ export interface UserPaginated extends Paginated {
     results?: User[];
 }
 
-=======
->>>>>>> origin/master
 export interface User {
     id: string;
     email?: string;
