@@ -10,7 +10,7 @@ export class UserExistsException extends BadRequestException {
     super(
       `User with ${duplicate}: ${
         duplicate === 'email' ? user.email : user.phone
-      } exits. Cannot signup this user.`,
+      } exists. Cannot signup this user.`,
     );
   }
 }

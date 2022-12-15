@@ -86,7 +86,7 @@ export class RoleService {
     }
     const usage = await this.checkRoleUsage(id);
     if (usage) {
-      throw new RoleDeleteNotAllowedException(id);
+      throw new RoleDeleteNotAllowedException();
     }
     await this.rolesRepository.softDelete(id);
     await this.roleCacheService.invalidateRolePermissionsByRoleId(id);
