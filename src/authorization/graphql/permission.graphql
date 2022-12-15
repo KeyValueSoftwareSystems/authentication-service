@@ -1,6 +1,7 @@
 type Permission {
   id: ID!
   name: String!
+  label: String
 }
 
 input NewPermissionInput {

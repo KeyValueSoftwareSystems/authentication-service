@@ -1,4 +1,3 @@
-
 /*
  * ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -301,6 +300,7 @@ export interface GroupRole {
 export interface Permission {
     id: string;
     name: string;
+    label?: string;
 }
 
 export interface Role {
