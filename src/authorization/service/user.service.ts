@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {

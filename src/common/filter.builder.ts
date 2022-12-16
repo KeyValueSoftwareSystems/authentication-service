@@ -3,11 +3,11 @@ import {
   FilterField,
   FilterInput,
 } from '../schema/graphql.schema';
-import { SelectQueryBuilder } from 'typeorm';
+import { SelectQueryBuilder, WhereExpression } from 'typeorm';
 
 export class FilterBuilder<T> {
   constructor(
-    private qb: SelectQueryBuilder<T>,
+    private qb: WhereExpression,
     private fieldMapping: Map<string, string>,
   ) {}
 
@@ -21,11 +21,16 @@ export class FilterBuilder<T> {
       const fieldToMatch = this.fieldMapping.get(filter.field);
       const operator = this.MatchOperatorMapping.get(filter.condition);
       const valueToMatch =
-        filter.condition == FilterConditions.EQUALS
+        filter.condition === FilterConditions.EQUALS
           ? filter.value[0]
           : filter.value;
 
-      this.qb.andWhere(`${fieldToMatch} ${operator} (:...${filter.field})`, {
+      const valuePlaceHolder =
+        filter.condition === FilterConditions.EQUALS
+          ? `:${filter.field}`
+          : `(:...${filter.field})`;
+
+      this.qb.andWhere(`${fieldToMatch} ${operator} ${valuePlaceHolder}`, {
         [filter.field]: valueToMatch,
       });
     }

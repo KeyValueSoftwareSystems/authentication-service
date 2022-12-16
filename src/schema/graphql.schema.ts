@@ -299,7 +299,7 @@ export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
     getEntityPermissions(id: string): Permission[] | Promise<Permission[]>;
-    getGroups(input?: GroupInputFilter): Group[] | Promise<Group[]>;
+    getGroups(input?: GroupInputFilter): GroupPaginated | Promise<GroupPaginated>;
     getGroup(id: string): Group | Promise<Group>;
     getGroupPermissions(id: string): Permission[] | Promise<Permission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
@@ -308,7 +308,7 @@ export interface IQuery {
     getRoles(input?: RoleInputFilter): RolePaginated | Promise<RolePaginated>;
     getRole(id: string): Role | Promise<Role>;
     getRolePermissions(id: string): Permission[] | Promise<Permission[]>;
-    getUsers(input?: UserInputFilter): User[] | Promise<User[]>;
+    getUsers(input?: UserInputFilter): UserPaginated | Promise<UserPaginated>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): Permission[] | Promise<Permission[]>;
@@ -345,7 +345,6 @@ export interface Role {
     name: string;
     permissions?: Permission[];
 }
-
 
 export interface RolePaginated extends Paginated {
     totalCount?: number;
