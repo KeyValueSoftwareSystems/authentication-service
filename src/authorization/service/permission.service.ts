@@ -66,7 +66,7 @@ export class PermissionService {
       throw new PermissionNotFoundException(id);
     }
     if (await this.checkPermissionUsage(id)) {
-      throw new PermissionDeleteNotAllowedException(id);
+      throw new PermissionDeleteNotAllowedException();
     }
     await this.permissionsRepository.softDelete(id);
     await this.permissionCacheService.invalidatePermissionsCache(

@@ -7,7 +7,7 @@ export class PermissionNotFoundException extends NotFoundException {
 }
 
 export class PermissionDeleteNotAllowedException extends PreconditionFailedException {
-  constructor(permissionId: string) {
-    super(`Permission ${permissionId} cannot be deleted`);
+  constructor() {
+    super(`Permission cannot be deleted as it is already in use`);
   }
 }
