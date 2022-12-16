@@ -31,6 +31,8 @@ type GroupRole {
 
 input GroupInputFilter {
   search: GroupSearchInput
+  sort: SortInput
+  pagination: PaginationInput
 }
 
 input GroupSearchInput {
@@ -42,8 +44,13 @@ input GroupSearchCondition {
   name: StringSearchCondition
 }
 
+type GroupPaginated implements Paginated {
+  totalCount: Int
+  results: [Group]
+}
+
 type Query {
-  getGroups(input: GroupInputFilter): [Group]!
+  getGroups(input: GroupInputFilter): GroupPaginated!
   getGroup(id: ID!): Group
   getGroupPermissions(id: ID!): [Permission]
   getGroupRoles(id: ID!): [GroupRole]

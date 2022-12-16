@@ -7,7 +7,7 @@ import {
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { Connection, FindOperator, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -51,19 +51,27 @@ export class GroupService {
     private searchService: SearchService,
   ) {}
 
-  getAllGroups(input?: GroupInputFilter): Promise<Group[]> {
-    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
-    if (input) {
-      if (input.search) {
-        searchTerm = this.searchService.generateSearchTermForEntity(
-          SearchEntity.GROUP,
-          input.search,
-        );
-      }
+  getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
+    const SortFieldMapping = new Map([['name', 'Group.name']]);
+    let queryBuilder = this.groupsRepository.createQueryBuilder();
+
+    if (input?.search) {
+      queryBuilder = this.searchService.generateSearchTermForEntity(
+        queryBuilder,
+        SearchEntity.GROUP,
+        input.search,
+      );
     }
-    return this.groupsRepository.find({
-      where: searchTerm,
-    });
+    if (input?.sort) {
+      const field = SortFieldMapping.get(input.sort.field);
+      field && queryBuilder.orderBy(field, input.sort.direction);
+    }
+    if (input?.pagination) {
+      queryBuilder
+        .limit(input?.pagination?.limit ?? 10)
+        .offset(input?.pagination?.offset ?? 0);
+    }
+    return queryBuilder.getManyAndCount();
   }
 
   async getGroupById(id: string): Promise<Group> {

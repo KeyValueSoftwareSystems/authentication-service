@@ -1,0 +1,35 @@
+
+input FilterInput {
+    operands: [FilterField]!
+
+}
+
+input FilterField {
+    condition: FilterConditions!
+    field: String!
+    value: [String]!
+}
+
+enum FilterConditions {
+    EQUALS
+    IN
+}
+
+enum SortDirection {
+    ASC
+    DESC
+}
+
+input SortInput {
+    field: String!
+    direction: SortDirection!
+}
+
+input PaginationInput {
+    limit: Int
+    offset: Int
+}
+
+interface Paginated {
+    totalCount: Int
+}

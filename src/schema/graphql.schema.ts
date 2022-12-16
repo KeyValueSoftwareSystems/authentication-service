@@ -18,6 +18,16 @@ export enum OperationType {
     OR = "OR"
 }
 
+export enum FilterConditions {
+    EQUALS = "EQUALS",
+    IN = "IN"
+}
+
+export enum SortDirection {
+    ASC = "ASC",
+    DESC = "DESC"
+}
+
 export interface UserPasswordSignupInput {
     email?: string;
     phone?: string;
@@ -106,6 +116,8 @@ export interface UpdateGroupRoleInput {
 
 export interface GroupInputFilter {
     search?: GroupSearchInput;
+    sort?: SortInput;
+    pagination?: PaginationInput;
 }
 
 export interface GroupSearchInput {
@@ -141,6 +153,8 @@ export interface UpdateRolePermissionInput {
 
 export interface RoleInputFilter {
     search?: RoleSearchInput;
+    sort?: SortInput;
+    pagination?: PaginationInput;
 }
 
 export interface RoleSearchInput {
@@ -173,6 +187,9 @@ export interface UserPermissionsVerification {
 
 export interface UserInputFilter {
     search?: UserSearchInput;
+    filter?: FilterInput;
+    sort?: SortInput;
+    pagination?: PaginationInput;
 }
 
 export interface UserSearchInput {
@@ -189,7 +206,30 @@ export interface UserSearchParameter {
 
 export interface StringSearchCondition {
     contains?: string;
-    equals?: string;
+}
+
+export interface FilterInput {
+    operands: FilterField[];
+}
+
+export interface FilterField {
+    condition: FilterConditions;
+    field: string;
+    value: string[];
+}
+
+export interface SortInput {
+    field: string;
+    direction: SortDirection;
+}
+
+export interface PaginationInput {
+    limit?: number;
+    offset?: number;
+}
+
+export interface Paginated {
+    totalCount?: number;
 }
 
 export interface IMutation {
@@ -258,16 +298,16 @@ export interface IQuery {
     getEntities(): Entity[] | Promise<Entity[]>;
     getEntity(id: string): Entity | Promise<Entity>;
     getEntityPermissions(id: string): Permission[] | Promise<Permission[]>;
-    getGroups(input?: GroupInputFilter): Group[] | Promise<Group[]>;
+    getGroups(input?: GroupInputFilter): GroupPaginated | Promise<GroupPaginated>;
     getGroup(id: string): Group | Promise<Group>;
     getGroupPermissions(id: string): Permission[] | Promise<Permission[]>;
     getGroupRoles(id: string): GroupRole[] | Promise<GroupRole[]>;
     getPermissions(): Permission[] | Promise<Permission[]>;
     getPermission(id: string): Permission | Promise<Permission>;
-    getRoles(input?: RoleInputFilter): Role[] | Promise<Role[]>;
+    getRoles(input?: RoleInputFilter): RolePaginated | Promise<RolePaginated>;
     getRole(id: string): Role | Promise<Role>;
     getRolePermissions(id: string): Permission[] | Promise<Permission[]>;
-    getUsers(input?: UserInputFilter): User[] | Promise<User[]>;
+    getUsers(input?: UserInputFilter): UserPaginated | Promise<UserPaginated>;
     getUser(id: string): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): Permission[] | Promise<Permission[]>;
@@ -288,6 +328,11 @@ export interface GroupRole {
     name: string;
 }
 
+export interface GroupPaginated extends Paginated {
+    totalCount?: number;
+    results?: Group[];
+}
+
 export interface Permission {
     id: string;
     name: string;
@@ -298,6 +343,16 @@ export interface Role {
     id: string;
     name: string;
     permissions?: Permission[];
+}
+
+export interface RolePaginated extends Paginated {
+    totalCount?: number;
+    results?: Role[];
+}
+
+export interface UserPaginated extends Paginated {
+    totalCount?: number;
+    results?: User[];
 }
 
 export interface User {

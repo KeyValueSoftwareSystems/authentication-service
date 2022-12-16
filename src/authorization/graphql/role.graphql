@@ -18,6 +18,8 @@ input UpdateRolePermissionInput {
 
 input RoleInputFilter {
   search: RoleSearchInput
+  sort: SortInput
+  pagination: PaginationInput
 }
 
 input RoleSearchInput {
@@ -29,8 +31,13 @@ input RoleSearchCondition {
   name: StringSearchCondition
 }
 
+type RolePaginated implements Paginated {
+  totalCount: Int
+  results: [Role]
+}
+
 type Query {
-  getRoles(input: RoleInputFilter): [Role]!
+  getRoles(input: RoleInputFilter): RolePaginated!
   getRole(id: ID!): Role
   getRolePermissions(id: ID!): [Permission]
 }
