@@ -206,7 +206,6 @@ export interface UserSearchParameter {
 
 export interface StringSearchCondition {
     contains?: string;
-    equals?: string;
 }
 
 export interface FilterInput {

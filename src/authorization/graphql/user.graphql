@@ -77,7 +77,7 @@ input UserSearchParameter {
 
 input StringSearchCondition {
   contains: String
-  equals: String
+  # equals: String
   #----Can Include-----#
   # notContains: String
   # notEquals: String
