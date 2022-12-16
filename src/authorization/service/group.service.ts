@@ -112,7 +112,7 @@ export class GroupService {
     }
     const usage = await this.checkGroupUsage(id);
     if (usage) {
-      throw new GroupDeleteNotAllowedException(id);
+      throw new GroupDeleteNotAllowedException();
     }
     await this.groupsRepository.softDelete(id);
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);

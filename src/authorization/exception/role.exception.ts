@@ -6,7 +6,7 @@ export class RoleNotFoundException extends NotFoundException {
   }
 }
 export class RoleDeleteNotAllowedException extends PreconditionFailedException {
-  constructor(roleId: string) {
-    super(`Role ${roleId} cannot be deleted`);
+  constructor() {
+    super(`Role cannot be deleted as it is already in use`);
   }
 }

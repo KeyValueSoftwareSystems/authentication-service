@@ -6,7 +6,7 @@ export class GroupNotFoundException extends NotFoundException {
   }
 }
 export class GroupDeleteNotAllowedException extends PreconditionFailedException {
-  constructor(groupId: string) {
-    super(`Group ${groupId} cannot be deleted`);
+  constructor() {
+    super(`Group cannot be deleted as it is already in use`);
   }
 }
