@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, FindOperator, Repository } from 'typeorm';
+import { Brackets, Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
+  FilterField,
   OperationType,
   Status,
   UpdateUserGroupInput,
@@ -24,6 +25,7 @@ import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
+import { FilterBuilder } from '../../common/filter.builder';
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
 
 @Injectable()
@@ -47,19 +49,46 @@ export default class UserService {
     private roleCacheService: RoleCacheService,
   ) {}
 
-  getAllUsers(input?: UserInputFilter): Promise<User[]> {
-    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
-    if (input) {
-      if (input.search) {
-        searchTerm = this.searchService.generateSearchTermForEntity(
-          SearchEntity.USER,
-          input.search,
+  getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {
+    const SortFieldMapping = new Map([['firstName', 'User.firstName']]);
+    const filterFieldMapping = new Map([['status', 'User.status']]);
+
+    const applyUserGroupFilter = (
+      field: FilterField,
+      queryBuilder: SelectQueryBuilder<User>,
+    ) => {
+      if (field.field == 'group') {
+        queryBuilder.innerJoin(
+          UserGroup,
+          'userGroup',
+          'userGroup.userId = User.id AND userGroup.groupId IN (:...groupIds)',
+          { groupIds: field.value },
         );
       }
+    };
+    const qb = this.usersRepository.createQueryBuilder();
+    if (input?.search) {
+      this.searchService.generateSearchTermForEntity(
+        qb,
+        SearchEntity.USER,
+        input.search,
+      );
     }
-    return this.usersRepository.find({
-      where: searchTerm,
-    });
+    if (input?.filter) {
+      input.filter.operands.forEach((o) => applyUserGroupFilter(o, qb));
+      new FilterBuilder<User>(qb, filterFieldMapping).build(input.filter);
+    }
+    if (input?.sort) {
+      const sortField = SortFieldMapping.get(input.sort.field);
+      sortField && qb.orderBy(sortField, input.sort.direction);
+    }
+    if (input?.pagination) {
+      qb.limit(input?.pagination?.limit ?? 10).offset(
+        input?.pagination?.offset ?? 0,
+      );
+    }
+
+    return qb.getManyAndCount();
   }
 
   async getUserById(id: string): Promise<User> {

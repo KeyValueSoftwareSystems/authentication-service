@@ -6,7 +6,7 @@ import {
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { Connection, FindOperator, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
 import Permission from '../entity/permission.entity';
@@ -37,19 +37,26 @@ export class RoleService {
     private searchService: SearchService,
   ) {}
 
-  async getAllRoles(input?: RoleInputFilter): Promise<Role[]> {
-    let searchTerm: { [key: string]: FindOperator<string | undefined> }[] = [];
-    if (input) {
-      if (input.search) {
-        searchTerm = this.searchService.generateSearchTermForEntity(
-          SearchEntity.ROLE,
-          input.search,
-        );
-      }
+  async getAllRoles(input?: RoleInputFilter): Promise<[Role[], number]> {
+    const SortFieldMapping = new Map([['name', 'Role.name']]);
+    let queryBuilder = this.rolesRepository.createQueryBuilder();
+    if (input?.search) {
+      queryBuilder = this.searchService.generateSearchTermForEntity(
+        queryBuilder,
+        SearchEntity.ROLE,
+        input.search,
+      );
     }
-    return await this.rolesRepository.find({
-      where: searchTerm,
-    });
+    if (input?.sort) {
+      const field = SortFieldMapping.get(input.sort.field);
+      field && queryBuilder.orderBy(field, input.sort.direction);
+    }
+    if (input?.pagination) {
+      queryBuilder
+        .limit(input?.pagination?.limit ?? 10)
+        .offset(input?.pagination?.offset ?? 0);
+    }
+    return await queryBuilder.getManyAndCount();
   }
 
   async getRoleById(id: string): Promise<Role> {

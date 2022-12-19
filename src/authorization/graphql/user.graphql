@@ -4,6 +4,11 @@ enum Status {
   ACTIVE
 }
 
+type UserPaginated implements Paginated {
+  totalCount: Int
+  results: [User]
+}
+
 type User {
   id: ID!
   email: String
@@ -53,6 +58,9 @@ operation: OperationType
 
 input UserInputFilter {
   search: UserSearchInput
+  filter: FilterInput
+  sort: SortInput
+  pagination: PaginationInput
 }
 
 input UserSearchInput {
@@ -69,7 +77,7 @@ input UserSearchParameter {
 
 input StringSearchCondition {
   contains: String
-  equals: String
+  # equals: String
   #----Can Include-----#
   # notContains: String
   # notEquals: String
@@ -79,7 +87,7 @@ input StringSearchCondition {
 }
 
 type Query {
-  getUsers(input: UserInputFilter): [User]!
+  getUsers(input: UserInputFilter): UserPaginated!
   getUser(id: ID!): User
   getUserGroups(id: ID!): [UserGroupResponse]
   getUserPermissions(id: ID!): [Permission]

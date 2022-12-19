@@ -41,6 +41,11 @@ const usersInput: UserSignupResponse[] = [
   },
 ];
 
+const getUsersResponse = {
+  totalCount: 1,
+  results: usersInput,
+};
+
 const permissions: Permission[] = [
   {
     id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
@@ -92,16 +97,17 @@ describe('User Module', () => {
         configService.get('JWT_SECRET').returns('s3cr3t1234567890');
         const token = authenticationHelper.generateAccessToken(users[0]);
 
-        userService.getAllUsers().returns(Promise.resolve(users));
+        userService.getAllUsers().returns(Promise.resolve([users, 1]));
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
           .send({
-            query: '{getUsers { id email phone firstName lastName }}',
+            query:
+              '{getUsers { totalCount results { id email phone firstName lastName }}}',
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.data.getUsers).toEqual(usersInput);
+            expect(res.body.data.getUsers).toEqual(getUsersResponse);
           });
       });
 
