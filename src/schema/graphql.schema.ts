@@ -309,6 +309,7 @@ export interface IQuery {
     getRolePermissions(id: string): Permission[] | Promise<Permission[]>;
     getUsers(input?: UserInputFilter): UserPaginated | Promise<UserPaginated>;
     getUser(id: string): User | Promise<User>;
+    getCurrentUser(): User | Promise<User>;
     getUserGroups(id: string): UserGroupResponse[] | Promise<UserGroupResponse[]>;
     getUserPermissions(id: string): Permission[] | Promise<Permission[]>;
     verifyUserPermission(params: UserPermissionsVerification): boolean | Promise<boolean>;
