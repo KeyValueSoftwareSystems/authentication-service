@@ -13,6 +13,8 @@ export class CustomExceptionsFilter implements GqlExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const logger = LoggerService.getInstance(CustomExceptionsFilter.name);
     logger.error(exception);
+    logger.error(exception.stack);
+    logger.error(exception.message);
     const contextType = host.getType();
     const statusCode =
       exception instanceof HttpException

@@ -4,6 +4,7 @@ import {
   NewRoleInput,
   Permission,
   RoleInputFilter,
+  RolePaginated,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
@@ -18,8 +19,11 @@ export class RoleResolver {
 
   @Permissions(PermissionsType.ViewRoles)
   @Query()
-  getRoles(@Args('input') input: RoleInputFilter): Promise<Role[]> {
-    return this.roleService.getAllRoles(input);
+  async getRoles(
+    @Args('input') input: RoleInputFilter,
+  ): Promise<RolePaginated> {
+    const [results, totalCount] = await this.roleService.getAllRoles(input);
+    return { totalCount, results };
   }
 
   @Permissions(PermissionsType.ViewRoles)

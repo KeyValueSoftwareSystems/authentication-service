@@ -64,7 +64,7 @@ describe('test Permission service', () => {
 
   it('should get a permission by id', async () => {
     permissionRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
       .returns(Promise.resolve(permissions[0]));
     const resp = await permissionService.getPermissionById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

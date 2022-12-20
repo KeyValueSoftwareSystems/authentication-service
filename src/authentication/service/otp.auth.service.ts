@@ -51,9 +51,7 @@ export default class OTPAuthService implements Authenticatable {
   }
 
   async userLogin(userDetails: UserOTPLoginInput): Promise<TokenResponse> {
-    const userRecord:
-      | User
-      | undefined = await this.userService.getUserDetailsByUsername(
+    const userRecord = await this.userService.getUserDetailsByUsername(
       userDetails.username,
       userDetails.username,
     );

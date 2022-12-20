@@ -1,27 +1,25 @@
-import { ConnectionOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+
 /**
  * Uses env params to configure TypeORM database library
  */
-const rdbmsConfig: ConnectionOptions = {
+const dataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.POSTGRES_HOST,
+  port: parseInt(process.env.POSTGRES_PORT as string),
   database: process.env.POSTGRES_DB,
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  synchronize: false,
+  logging: false,
+  namingStrategy: new SnakeNamingStrategy(),
+  migrationsTableName: 'migrations',
   entities: [
     __dirname + '/../**/*.entity.ts',
     __dirname + '/../**/*.entity.js',
   ],
-  extra: { max: 5, min: 2 }, // connection pool
-  host: process.env.POSTGRES_HOST,
-  password: process.env.POSTGRES_PASSWORD,
-  port: Number(process.env.POSTGRES_PORT),
-  synchronize: false,
-  logging: false,
-  type: 'postgres',
-  username: process.env.POSTGRES_USER,
-  namingStrategy: new SnakeNamingStrategy(),
   migrations: ['dist/migrations/*.js'],
-  cli: {
-    migrationsDir: 'src/migrations',
-  },
-};
+});
 
-export = rdbmsConfig;
+export default dataSource;

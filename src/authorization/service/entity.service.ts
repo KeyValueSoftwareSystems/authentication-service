@@ -29,7 +29,7 @@ export class EntityService {
   }
 
   async getEntityById(id: string): Promise<EntityModel> {
-    const entity = await this.entityRepository.findOne(id);
+    const entity = await this.entityRepository.findOneBy({ id });
     if (entity) {
       return entity;
     }
@@ -46,7 +46,7 @@ export class EntityService {
     id: string,
     entity: UpdateEntityInput,
   ): Promise<EntityModel> {
-    const existingEntity = await this.entityRepository.findOne(id);
+    const existingEntity = await this.entityRepository.findOneBy({ id });
     if (!existingEntity) {
       throw new EntityNotFoundException(id);
     }
@@ -60,7 +60,7 @@ export class EntityService {
   }
 
   async deleteEntity(id: string): Promise<EntityModel> {
-    const existingEntity = await this.entityRepository.findOne(id);
+    const existingEntity = await this.entityRepository.findOneBy({ id });
     if (!existingEntity) {
       throw new EntityNotFoundException(id);
     }
@@ -72,7 +72,7 @@ export class EntityService {
     id: string,
     request: UpdateEntityPermissionInput,
   ): Promise<Permission[]> {
-    const updatedEntity = await this.entityRepository.findOne(id);
+    const updatedEntity = await this.entityRepository.findOneBy({ id });
     if (!updatedEntity) {
       throw new EntityNotFoundException(id);
     }

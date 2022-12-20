@@ -107,8 +107,8 @@ export default class PasswordAuthService implements Authenticatable {
         status: user.status,
       };
       return {
-        inviteToken: invitationToken!.token,
-        tokenExpiryTime: invitationToken!.tokenExpiryTime,
+        inviteToken: invitationToken.token,
+        tokenExpiryTime: invitationToken.tokenExpiryTime,
         user: userResponse,
       };
     });
@@ -136,9 +136,7 @@ export default class PasswordAuthService implements Authenticatable {
   }
 
   async userLogin(userDetails: UserPasswordLoginInput): Promise<TokenResponse> {
-    const userRecord:
-      | User
-      | undefined = await this.userService.getUserDetailsByUsername(
+    const userRecord = await this.userService.getUserDetailsByUsername(
       userDetails.username,
       userDetails.username,
     );

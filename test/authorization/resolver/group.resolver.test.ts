@@ -102,34 +102,37 @@ describe('Group Module', () => {
             name: 'Create-Roles',
           },
         ];
-        const response: GqlSchema.Group[] = [
-          {
-            id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-            name: 'Customers',
-            roles: [
-              {
-                id: 'f56bc83b-b163-4fa0-a685-c0fa0926614c',
-                name: 'Test Group Role',
-              },
-            ],
-            permissions: [
-              {
-                id: '6fcec8dd-196e-4649-a607-7085bf4032a3',
-                name: 'Edit-Roles',
-              },
-            ],
-            allPermissions: [
-              {
-                id: '48ef52c3-2ca7-4453-80fb-7c170affd6da',
-                name: 'Edit-Roles',
-              },
-              {
-                id: 'a36fc502-7307-4bef-aa53-975a700e5159',
-                name: 'Create-Roles',
-              },
-            ],
-          },
-        ];
+        const response: GqlSchema.GroupPaginated = {
+          totalCount: 1,
+          results: [
+            {
+              id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+              name: 'Customers',
+              roles: [
+                {
+                  id: 'f56bc83b-b163-4fa0-a685-c0fa0926614c',
+                  name: 'Test Group Role',
+                },
+              ],
+              permissions: [
+                {
+                  id: '6fcec8dd-196e-4649-a607-7085bf4032a3',
+                  name: 'Edit-Roles',
+                },
+              ],
+              allPermissions: [
+                {
+                  id: '48ef52c3-2ca7-4453-80fb-7c170affd6da',
+                  name: 'Edit-Roles',
+                },
+                {
+                  id: 'a36fc502-7307-4bef-aa53-975a700e5159',
+                  name: 'Create-Roles',
+                },
+              ],
+            },
+          ],
+        };
         const token = authenticationHelper.generateAccessToken(users[0]);
         groupService
           .getGroupPermissions(groups[0].id)
@@ -140,13 +143,13 @@ describe('Group Module', () => {
         groupService
           .getAllGroupPermissions(groups[0].id)
           .returns(Promise.resolve(allPermissions));
-        groupService.getAllGroups().returns(Promise.resolve(groups));
+        groupService.getAllGroups().returns(Promise.resolve([groups, 1]));
         return request(app.getHttpServer())
           .post(gql)
           .set('Authorization', `Bearer ${token}`)
           .send({
             query:
-              '{getGroups {id name permissions{id name} roles{ id name } allPermissions{ id name }}}',
+              '{getGroups { totalCount results { id name permissions{id name} roles{ id name } allPermissions{ id name }}}}',
           })
           .expect(200)
           .expect((res) => {
@@ -376,44 +379,6 @@ describe('Group Module', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.data.getGroup).toEqual(groups[0]);
-        });
-    });
-
-    it('should get all the groups with roles', () => {
-      const users: User[] = [
-        {
-          id: 'e5651863-d600-42db-b7f3-c44d09eb8629',
-          email: 'user@test.com',
-          phone: '91123456988910',
-          password: 's3cr3t1234567890',
-          firstName: 'Test1',
-          lastName: 'Test2',
-          origin: 'simple',
-          status: GqlSchema.Status.ACTIVE,
-        },
-      ];
-      const roles: Role[] = [
-        {
-          id: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
-          name: 'Role1',
-        },
-      ];
-      const finalResponse: GqlSchema.Group[] = [
-        {
-          id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-          name: 'Customers',
-          roles: roles,
-        },
-      ];
-      const token = authenticationHelper.generateAccessToken(users[0]);
-      return request(app.getHttpServer())
-        .post(gql)
-        .set('Authorization', `Bearer ${token}`)
-        .send({ query: '{getGroups {id name roles{id name}}}' })
-        .expect(200)
-        .expect((res) => {
-          res.body.data.getGroups[0].roles = roles;
-          expect(res.body.data.getGroups).toEqual(finalResponse);
         });
     });
   });

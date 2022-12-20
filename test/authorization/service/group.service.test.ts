@@ -73,7 +73,7 @@ describe('test Group Service', () => {
     SelectQueryBuilder<Permission>
   >();
   const roleQueryBuilder = Substitute.for<SelectQueryBuilder<Role>>();
-
+  const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -124,14 +124,15 @@ describe('test Group Service', () => {
   });
 
   it('should get all groups', async () => {
-    groupRepository.find({ where: [] }).returns(Promise.resolve(groups));
+    groupRepository.createQueryBuilder().returns(groupQueryBuilder);
+    groupQueryBuilder.getManyAndCount().returns(Promise.resolve([groups, 1]));
     const resp = await groupService.getAllGroups();
-    expect(resp).toEqual(groups);
+    expect(resp).toEqual([groups, 1]);
   });
 
   it('should get a group by id', async () => {
     groupRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
       .returns(Promise.resolve(groups[0]));
     const resp = await groupService.getGroupById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

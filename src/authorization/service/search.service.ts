@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Equal, FindOperator, ILike, Like } from 'typeorm';
+import { Brackets, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupSearchInput,
@@ -13,154 +13,162 @@ export default class SearchService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
-  public generateSearchTermForEntity(
+  public generateSearchTermForEntity<T extends ObjectLiteral>(
+    qb: SelectQueryBuilder<T>,
     entity: SearchEntity,
     input: UserSearchInput | GroupSearchInput | RoleSearchInput,
-  ) {
+  ): SelectQueryBuilder<T> {
     if (entity === SearchEntity.USER) {
-      return this.generateSearchTermForUsers(input as UserSearchInput);
+      return this.generateSearchTermForUsers(qb, input as UserSearchInput);
     } else if (entity === SearchEntity.GROUP) {
-      return this.generateSearchTermForGroups(input as GroupSearchInput);
-    } else if (entity === SearchEntity.ROLE) {
-      return this.generateSearchTermForRole(input as RoleSearchInput);
+      return this.generateSearchTermForGroups(qb, input as GroupSearchInput);
+    } else {
+      return this.generateSearchTermForRole(qb, input as RoleSearchInput);
     }
-
-    return [];
   }
 
-  private generateSearchTermForUsers(
+  private generateSearchTermForUsers<T extends ObjectLiteral>(
+    qb: SelectQueryBuilder<T>,
     input: UserSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
-    const searchWhereCondition = [];
-    const andConditions: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
+  ): SelectQueryBuilder<T> {
+    const andConditions: string[] = [];
+    const orConditions: string[] = [];
     if (input.and) {
       if (input.and.email) {
-        andConditions[`email`] = this.generateWhereClauseForStringSearch(
-          input.and.email,
+        andConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.email',
+            input.and.email,
+          ),
         );
       }
       if (input.and.firstName) {
-        andConditions[`firstName`] = this.generateWhereClauseForStringSearch(
-          input.and.firstName,
+        andConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.firstName',
+            input.and.firstName,
+          ),
         );
       }
       if (input.and.middleName) {
-        andConditions[`middleName`] = this.generateWhereClauseForStringSearch(
-          input.and.middleName,
+        andConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.middleName',
+            input.and.middleName,
+          ),
         );
       }
       if (input.and.lastName) {
-        andConditions[`lastName`] = this.generateWhereClauseForStringSearch(
-          input.and.lastName,
+        andConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.lastName',
+            input.and.lastName,
+          ),
         );
       }
-    }
-    if (Object.keys(andConditions).length) {
-      searchWhereCondition.push(andConditions);
     }
 
     if (input.or) {
       if (input.or.email) {
-        searchWhereCondition.push({
-          email: this.generateWhereClauseForStringSearch(input.or.email),
-        });
+        orConditions.push(
+          this.generateWhereClauseForStringSearch('User.email', input.or.email),
+        );
       }
       if (input.or.firstName) {
-        searchWhereCondition.push({
-          firstName: this.generateWhereClauseForStringSearch(
+        orConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.firstName',
             input.or.firstName,
           ),
-        });
+        );
       }
       if (input.or.middleName) {
-        searchWhereCondition.push({
-          middleName: this.generateWhereClauseForStringSearch(
+        orConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.middleName',
             input.or.middleName,
           ),
-        });
+        );
       }
       if (input.or.lastName) {
-        searchWhereCondition.push({
-          lastName: this.generateWhereClauseForStringSearch(input.or.lastName),
-        });
+        orConditions.push(
+          this.generateWhereClauseForStringSearch(
+            'User.lastName',
+            input.or.lastName,
+          ),
+        );
       }
     }
-    return searchWhereCondition;
+    if (orConditions.length) {
+      qb.andWhere(new Brackets((q) => orConditions.map((x) => q.orWhere(x))));
+    }
+    if (andConditions.length) {
+      qb.andWhere(new Brackets((q) => andConditions.map((x) => q.andWhere(x))));
+    }
+    return qb;
   }
 
-  private generateSearchTermForGroups(
+  private generateSearchTermForGroups<T extends ObjectLiteral>(
+    qb: SelectQueryBuilder<T>,
     input: GroupSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
-    const searchWhereCondition = [];
-    const andConditions: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
+  ): SelectQueryBuilder<T> {
+    const andConditions: string[] = [];
+    const orConditions: string[] = [];
     if (input.and) {
       if (input.and.name) {
-        andConditions[`name`] = this.generateWhereClauseForStringSearch(
-          input.and.name,
+        andConditions.push(
+          this.generateWhereClauseForStringSearch('name', input.and.name),
         );
       }
-    }
-    if (Object.keys(andConditions).length) {
-      searchWhereCondition.push(andConditions);
     }
 
     if (input.or) {
       if (input.or.name) {
-        searchWhereCondition.push({
-          name: this.generateWhereClauseForStringSearch(input.or.name),
-        });
+        orConditions.push(
+          this.generateWhereClauseForStringSearch('name', input.or.name),
+        );
       }
     }
-    return searchWhereCondition;
+    if (orConditions.length) {
+      qb.andWhere(new Brackets((q) => orConditions.map((x) => q.orWhere(x))));
+    }
+    if (andConditions.length) {
+      qb.andWhere(new Brackets((q) => andConditions.map((x) => q.andWhere(x))));
+    }
+    return qb;
   }
 
-  private generateSearchTermForRole(
+  private generateSearchTermForRole<T extends ObjectLiteral>(
+    qb: SelectQueryBuilder<T>,
     input: RoleSearchInput,
-  ): {
-    [key: string]: FindOperator<string | undefined>;
-  }[] {
-    const searchWhereCondition = [];
-    const andConditions: {
-      [key: string]: FindOperator<string | undefined>;
-    } = {};
-    if (input.and) {
-      if (input.and.name) {
-        andConditions[`name`] = this.generateWhereClauseForStringSearch(
-          input.and.name,
-        );
-      }
-    }
-    if (Object.keys(andConditions).length) {
-      searchWhereCondition.push(andConditions);
+  ): SelectQueryBuilder<T> {
+    const andConditions: string[] = [];
+    const orConditions: string[] = [];
+    if (input?.and?.name) {
+      andConditions.push(
+        this.generateWhereClauseForStringSearch(`name`, input.and.name),
+      );
     }
 
-    if (input.or) {
-      if (input.or.name) {
-        searchWhereCondition.push({
-          name: this.generateWhereClauseForStringSearch(input.or.name),
-        });
-      }
+    if (input?.or?.name) {
+      orConditions.push(
+        this.generateWhereClauseForStringSearch('name', input.or.name),
+      );
     }
-    return searchWhereCondition;
+
+    if (orConditions.length) {
+      qb.andWhere(new Brackets((q) => orConditions.map((x) => q.orWhere(x))));
+    }
+    if (andConditions.length) {
+      qb.andWhere(new Brackets((q) => andConditions.map((x) => q.andWhere(x))));
+    }
+    return qb;
   }
 
   public generateWhereClauseForStringSearch(
+    field: string,
     input: StringSearchCondition,
-  ): FindOperator<string | undefined> {
-    if (input.contains) {
-      return ILike(`%${input.contains}%`);
-    } else if (input.equals) {
-      return Equal(input.equals);
-    } else {
-      return Like(`%%`);
-    }
+  ): string {
+    return field + ' ' + `ILIKE('%${input.contains}%')`;
   }
 }

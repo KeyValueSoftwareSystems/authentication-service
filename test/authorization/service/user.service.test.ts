@@ -69,6 +69,7 @@ describe('test UserService', () => {
   const permissionCacheService = Substitute.for<PermissionCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
+  const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
@@ -132,14 +133,15 @@ describe('test UserService', () => {
   });
 
   it('should get all users', async () => {
-    userRepository.find({ where: [] }).returns(Promise.resolve(users));
+    userRepository.createQueryBuilder().returns(userQueryBuilder);
+    userQueryBuilder.getManyAndCount().resolves([users, 1]);
     const resp = await userService.getAllUsers();
-    expect(resp).toEqual(users);
+    expect(resp).toEqual([users, 1]);
   });
 
   it('should get a user by id', async () => {
     userRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
       .returns(Promise.resolve(users[0]));
     const resp = await userService.getUserById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
