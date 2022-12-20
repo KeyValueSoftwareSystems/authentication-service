@@ -46,6 +46,12 @@ export class UserResolver {
     return this.userService.getUserById(id);
   }
 
+  @UseGuards(AuthGuard)
+  @Query()
+  getCurrentUser(@Context('user') user: any): Promise<User> {
+    return this.userService.getUserById(user.id);
+  }
+
   @ResolveField('groups')
   async getUserGroupResolveField(user: User) {
     if (user.id) {

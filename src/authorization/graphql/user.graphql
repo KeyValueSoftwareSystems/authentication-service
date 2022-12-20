@@ -89,6 +89,7 @@ input StringSearchCondition {
 type Query {
   getUsers(input: UserInputFilter): UserPaginated!
   getUser(id: ID!): User
+  getCurrentUser: User
   getUserGroups(id: ID!): [UserGroupResponse]
   getUserPermissions(id: ID!): [Permission]
   verifyUserPermission(params: UserPermissionsVerification!): Boolean
