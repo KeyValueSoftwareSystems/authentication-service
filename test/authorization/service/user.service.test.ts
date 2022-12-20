@@ -141,7 +141,7 @@ describe('test UserService', () => {
 
   it('should get a user by id', async () => {
     userRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
       .returns(Promise.resolve(users[0]));
     const resp = await userService.getUserById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

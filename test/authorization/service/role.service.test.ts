@@ -95,7 +95,7 @@ describe('test Role Service', () => {
 
   it('should get a role by id', async () => {
     rolesRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
       .returns(Promise.resolve(roles[0]));
     const resp = await roleService.getRoleById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

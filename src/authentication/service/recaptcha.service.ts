@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { lastValueFrom } from 'rxjs';
 import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class RecaptchaService {
       throw new UnauthorizedException();
     }
     const verificationUrl = `${recaptchaVerifyURL}?secret=${recaptchaSecretKey}&response=${captcha}`;
-    const response = await this.httpService.get(verificationUrl).toPromise();
+    const response = await lastValueFrom(this.httpService.get(verificationUrl));
     const body = response.data;
     if (!body.score) {
       throw new BadRequestException(
@@ -44,7 +45,7 @@ export class RecaptchaService {
     }
     const verificationUrl = `${recaptchaVerifyURL}?secret=${recaptchaSecretKey}&response=${captcha}&remoteip=${ipAddress}`;
 
-    const response = await this.httpService.get(verificationUrl).toPromise();
+    const response = await lastValueFrom(this.httpService.get(verificationUrl));
     const body = response.data;
     if (body.success !== undefined && !body.success) {
       throw new UnauthorizedException();
