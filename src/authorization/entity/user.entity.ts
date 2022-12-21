@@ -1,8 +1,12 @@
 import { Status } from '../../schema/graphql.schema';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import BaseEntity from './base.entity';
 
 @Entity()
+@Index('user_phone_unique_idx', ['phone'], {
+  unique: true,
+  where: '"deleted_at" IS NULL',
+})
 class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
