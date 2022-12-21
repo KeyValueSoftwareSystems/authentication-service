@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Brackets, SelectQueryBuilder } from 'typeorm';
+import { Brackets, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupSearchInput,
@@ -14,7 +14,7 @@ export default class SearchService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
-  public generateSearchTermForEntity<T>(
+  public generateSearchTermForEntity<T extends ObjectLiteral>(
     qb: SelectQueryBuilder<T>,
     entity: SearchEntity,
     input: UserSearchInput | GroupSearchInput | RoleSearchInput,
@@ -28,7 +28,7 @@ export default class SearchService {
     }
   }
 
-  private generateSearchTermForUsers<T>(
+  private generateSearchTermForUsers<T extends ObjectLiteral>(
     qb: SelectQueryBuilder<T>,
     input: UserSearchInput,
   ): SelectQueryBuilder<T> {
@@ -109,7 +109,7 @@ export default class SearchService {
     return qb;
   }
 
-  private generateSearchTermForGroups<T>(
+  private generateSearchTermForGroups<T extends ObjectLiteral>(
     qb: SelectQueryBuilder<T>,
     input: GroupSearchInput,
   ): SelectQueryBuilder<T> {
@@ -139,7 +139,7 @@ export default class SearchService {
     return qb;
   }
 
-  private generateSearchTermForRole<T>(
+  private generateSearchTermForRole<T extends ObjectLiteral>(
     qb: SelectQueryBuilder<T>,
     input: RoleSearchInput,
   ): SelectQueryBuilder<T> {

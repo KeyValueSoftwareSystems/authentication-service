@@ -31,7 +31,7 @@ export class PermissionService {
   }
 
   async getPermissionById(id: string): Promise<Permission> {
-    const permission = await this.permissionsRepository.findOne(id);
+    const permission = await this.permissionsRepository.findOneBy({ id });
     if (permission) {
       return permission;
     }
@@ -48,7 +48,9 @@ export class PermissionService {
     id: string,
     permission: UpdatePermissionInput,
   ): Promise<Permission> {
-    const existingPermission = await this.permissionsRepository.findOne(id);
+    const existingPermission = await this.permissionsRepository.findOneBy({
+      id,
+    });
     if (!existingPermission) {
       throw new PermissionNotFoundException(id);
     }
@@ -61,7 +63,9 @@ export class PermissionService {
   }
 
   async deletePermission(id: string): Promise<Permission> {
-    const existingPermission = await this.permissionsRepository.findOne(id);
+    const existingPermission = await this.permissionsRepository.findOneBy({
+      id,
+    });
     if (!existingPermission) {
       throw new PermissionNotFoundException(id);
     }

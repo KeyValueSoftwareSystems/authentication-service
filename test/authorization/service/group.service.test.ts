@@ -132,7 +132,7 @@ describe('test Group Service', () => {
 
   it('should get a group by id', async () => {
     groupRepository
-      .findOne('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
       .returns(Promise.resolve(groups[0]));
     const resp = await groupService.getGroupById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

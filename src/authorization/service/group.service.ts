@@ -75,7 +75,7 @@ export class GroupService {
   }
 
   async getGroupById(id: string): Promise<Group> {
-    const group = await this.groupsRepository.findOne(id);
+    const group = await this.groupsRepository.findOneBy({ id });
     if (group) {
       return group;
     }
@@ -98,7 +98,7 @@ export class GroupService {
   }
 
   async updateGroup(id: string, group: UpdateGroupInput): Promise<Group> {
-    const existingGroup = await this.groupsRepository.findOne(id);
+    const existingGroup = await this.groupsRepository.findOneBy({ id });
     if (!existingGroup) {
       throw new GroupNotFoundException(id);
     }
@@ -114,7 +114,7 @@ export class GroupService {
   }
 
   async deleteGroup(id: string): Promise<Group> {
-    const existingGroup = await this.groupsRepository.findOne(id);
+    const existingGroup = await this.groupsRepository.findOneBy({ id });
     if (!existingGroup) {
       throw new GroupNotFoundException(id);
     }
@@ -131,7 +131,7 @@ export class GroupService {
     id: string,
     request: UpdateGroupPermissionInput,
   ): Promise<Permission[]> {
-    const updatedGroup = await this.groupsRepository.findOne(id);
+    const updatedGroup = await this.groupsRepository.findOneBy({ id });
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
@@ -239,7 +239,7 @@ export class GroupService {
     id: string,
     request: UpdateGroupRoleInput,
   ): Promise<Role[]> {
-    const updatedGroup = await this.groupsRepository.findOne(id);
+    const updatedGroup = await this.groupsRepository.findOneBy({ id });
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }

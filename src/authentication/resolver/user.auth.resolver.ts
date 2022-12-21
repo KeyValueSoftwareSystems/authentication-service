@@ -30,7 +30,6 @@ import OTPAuthService from '../service/otp.auth.service';
 import { TokenService } from '../service/token.service';
 import { Permissions } from '../../authorization/permissions.decorator';
 import { PermissionsType } from '../../authorization/constants/authorization.constants';
-import Permission from 'src/authorization/entity/permission.entity';
 @Resolver('Userauth')
 export default class UserAuthResolver {
   constructor(

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Connection, Repository, SelectQueryBuilder } from 'typeorm';
+import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -92,7 +92,7 @@ export default class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne(id);
+    const user = await this.usersRepository.findOneBy({ id });
     if (user) {
       return user;
     }
@@ -102,7 +102,9 @@ export default class UserService {
   async createUser(user: User): Promise<User> {
     const newUser = this.usersRepository.create(user);
     const result = await this.usersRepository.insert(newUser);
-    const savedUser = await this.usersRepository.findOne(result.raw[0].id);
+    const savedUser = await this.usersRepository.findOneBy({
+      id: result.raw[0].id,
+    });
     if (savedUser) {
       return savedUser;
     }
@@ -110,7 +112,7 @@ export default class UserService {
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
-    const existingUser = await this.usersRepository.findOne(id);
+    const existingUser = await this.usersRepository.findOneBy({ id });
     if (!existingUser) {
       throw new UserNotFoundException(id);
     }
@@ -333,7 +335,7 @@ export default class UserService {
   async verifyDuplicateUser(
     email?: string | undefined,
     phone?: string | undefined,
-  ): Promise<{ existingUserDetails: User | undefined; duplicate: string }> {
+  ): Promise<{ existingUserDetails?: User | null; duplicate: string }> {
     let user;
     if (email) {
       user = await this.usersRepository
@@ -376,7 +378,7 @@ export default class UserService {
   async getUserDetailsByUsername(
     email?: string | undefined,
     phone?: string | undefined,
-  ): Promise<User | undefined> {
+  ) {
     const nullCheckedEmail = email ? email : null;
     const nullCheckedPhone = phone ? phone : null;
     if (!nullCheckedEmail && !nullCheckedPhone) {
@@ -398,7 +400,7 @@ export default class UserService {
 
   async updateField(id: string, field: string, value: any): Promise<User> {
     await this.usersRepository.update(id, { [field]: value });
-    const updatedUser = await this.usersRepository.findOne(id);
+    const updatedUser = await this.usersRepository.findOneBy({ id });
     if (updatedUser) {
       return updatedUser;
     }

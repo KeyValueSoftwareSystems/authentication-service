@@ -60,7 +60,7 @@ export class RoleService {
   }
 
   async getRoleById(id: string): Promise<Role> {
-    const role = await this.rolesRepository.findOne(id);
+    const role = await this.rolesRepository.findOneBy({ id });
     if (!role) {
       throw new RoleNotFoundException(id);
     }
@@ -74,7 +74,7 @@ export class RoleService {
   }
 
   async updateRole(id: string, role: UpdateRoleInput): Promise<Role> {
-    const existingRole = await this.rolesRepository.findOne(id);
+    const existingRole = await this.rolesRepository.findOneBy({ id });
     if (!existingRole) {
       throw new RoleNotFoundException(id);
     }
@@ -87,7 +87,7 @@ export class RoleService {
   }
 
   async deleteRole(id: string): Promise<Role> {
-    const existingRole = await this.rolesRepository.findOne(id);
+    const existingRole = await this.rolesRepository.findOneBy({ id });
     if (!existingRole) {
       throw new RoleNotFoundException(id);
     }
@@ -104,7 +104,7 @@ export class RoleService {
     id: string,
     request: UpdateRolePermissionInput,
   ): Promise<Permission[]> {
-    const updatedRole = await this.rolesRepository.findOne(id);
+    const updatedRole = await this.rolesRepository.findOneBy({ id });
     if (!updatedRole) {
       throw new RoleNotFoundException(id);
     }
