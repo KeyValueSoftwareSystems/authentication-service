@@ -1,93 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import Permission from '../entity/permission.entity';
+import PermissionCacheService from './permissioncache.service';
+import { PermissionRepository } from '../repository/permission.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';
-import { Repository } from 'typeorm';
-import {
-  PermissionNotFoundException,
-  PermissionDeleteNotAllowedException,
-} from '../exception/permission.exception';
-import Permission from '../entity/permission.entity';
-import UserPermission from '../entity/userPermission.entity';
-import GroupPermission from '../entity/groupPermission.entity';
-import PermissionCacheService from './permissioncache.service';
 
 @Injectable()
 export class PermissionService {
   constructor(
-    @InjectRepository(Permission)
-    private permissionsRepository: Repository<Permission>,
-    @InjectRepository(UserPermission)
-    private userPermissionsRepository: Repository<UserPermission>,
-    @InjectRepository(GroupPermission)
-    private groupPermissionRepository: Repository<GroupPermission>,
+    private permissionRepository: PermissionRepository,
     private permissionCacheService: PermissionCacheService,
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
-    return this.permissionsRepository.find();
+    return this.permissionRepository.getAllPermissions();
   }
 
-  async getPermissionById(id: string): Promise<Permission> {
-    const permission = await this.permissionsRepository.findOneBy({ id });
-    if (permission) {
-      return permission;
-    }
-    throw new PermissionNotFoundException(id);
+  getPermissionById(id: string): Promise<Permission> {
+    return this.permissionRepository.getPermissionById(id);
   }
 
-  async createPermission(permission: NewPermissionInput): Promise<Permission> {
-    const newPermission = await this.permissionsRepository.create(permission);
-    const result = await this.permissionsRepository.insert(newPermission);
-    return { ...newPermission, id: result.raw[0].id };
-  }
-
-  async updatePermission(
-    id: string,
-    permission: UpdatePermissionInput,
+  createPermission(
+    newPermissionInput: NewPermissionInput,
   ): Promise<Permission> {
-    const existingPermission = await this.permissionsRepository.findOneBy({
+    return this.permissionRepository.createPermission(newPermissionInput);
+  }
+
+  updatePermission(
+    id: string,
+    updatePermissionInput: UpdatePermissionInput,
+  ): Promise<Permission> {
+    return this.permissionRepository.updatePermission(
       id,
-    });
-    if (!existingPermission) {
-      throw new PermissionNotFoundException(id);
-    }
-    const permissionToUpdate = this.permissionsRepository.create(permission);
-    await this.permissionsRepository.update(id, permissionToUpdate);
-    return {
-      ...existingPermission,
-      ...permissionToUpdate,
-    };
+      updatePermissionInput,
+    );
   }
 
   async deletePermission(id: string): Promise<Permission> {
-    const existingPermission = await this.permissionsRepository.findOneBy({
+    const deletedPermission = await this.permissionRepository.deletePermission(
       id,
-    });
-    if (!existingPermission) {
-      throw new PermissionNotFoundException(id);
-    }
-    if (await this.checkPermissionUsage(id)) {
-      throw new PermissionDeleteNotAllowedException();
-    }
-    await this.permissionsRepository.softDelete(id);
-    await this.permissionCacheService.invalidatePermissionsCache(
-      existingPermission.name,
     );
-    return existingPermission;
-  }
 
-  private async checkPermissionUsage(id: string) {
-    const userCount = await this.userPermissionsRepository.count({
-      where: { permissionId: id },
-    });
-    const groupCount = await this.groupPermissionRepository.count({
-      where: { permissionId: id },
-    });
+    await this.permissionCacheService.invalidatePermissionsCache(
+      deletedPermission.name,
+    );
 
-    const totalCount = userCount + groupCount;
-    return totalCount != 0;
+    return deletedPermission;
   }
 }
