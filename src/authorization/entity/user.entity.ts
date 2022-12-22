@@ -7,6 +7,7 @@ import BaseEntity from './base.entity';
   unique: true,
   where: '"deleted_at" IS NULL',
 })
+@Index('user_email_unique_idx', { synchronize: false })
 class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
