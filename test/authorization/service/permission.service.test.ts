@@ -1,7 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Arg, Substitute } from '@fluffy-spoon/substitute';
+import { Substitute } from '@fluffy-spoon/substitute';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
@@ -12,6 +11,9 @@ import UserPermission from '../../../src/authorization/entity/userPermission.ent
 import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
 import { PermissionDeleteNotAllowedException } from '../../../src/authorization/exception/permission.exception';
 import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
+import { PermissionRepository } from 'src/authorization/repository/permission.repository';
+import { UserPermissionRepository } from 'src/authorization/repository/userpermission.repository';
+import { GroupPermissionRepository } from 'src/authorization/repository/grouppermission.repository';
 
 const permissions: Permission[] = [
   {
@@ -23,12 +25,11 @@ const permissions: Permission[] = [
 
 describe('test Permission service', () => {
   let permissionService: PermissionService;
-  const permissionRepository = Substitute.for<Repository<Permission>>();
-  const groupPermissionRepository = Substitute.for<
-    Repository<GroupPermission>
-  >();
-  const userPermissionRepository = Substitute.for<Repository<UserPermission>>();
+  const permissionRepository = Substitute.for<PermissionRepository>();
+  const groupPermissionRepository = Substitute.for<GroupPermissionRepository>();
+  const userPermissionRepository = Substitute.for<UserPermissionRepository>();
   const permissionCacheService = Substitute.for<PermissionCacheService>();
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -53,22 +54,27 @@ describe('test Permission service', () => {
         },
       ],
     }).compile();
+
     permissionService = moduleRef.get<PermissionService>(PermissionService);
   });
 
   it('should get all permissions', async () => {
-    permissionRepository.find().returns(Promise.resolve(permissions));
+    permissionRepository.getAllPermissions().resolves(permissions);
+
     const resp = await permissionService.getAllPermissions();
+
     expect(resp).toEqual(permissions);
   });
 
   it('should get a permission by id', async () => {
     permissionRepository
-      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
-      .returns(Promise.resolve(permissions[0]));
+      .getPermissionById('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(permissions[0]);
+
     const resp = await permissionService.getPermissionById(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
+
     expect(resp).toEqual(permissions[0]);
   });
 
@@ -76,14 +82,11 @@ describe('test Permission service', () => {
     const input: NewPermissionInput = {
       name: 'Test1',
     };
-    permissionRepository.create(input).returns(permissions[0]);
-    const insertRes = { raw: permissions, identifiers: [], generatedMaps: [] };
 
-    permissionRepository
-      .insert(permissions[0])
-      .returns(Promise.resolve(insertRes));
+    permissionRepository.createPermission(input).resolves(permissions[0]);
 
     const resp = await permissionService.createPermission(input);
+
     expect(resp).toEqual(permissions[0]);
   });
 
@@ -91,55 +94,52 @@ describe('test Permission service', () => {
     const input: UpdatePermissionInput = {
       name: 'Test1',
     };
+
     permissionRepository
-      .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
-      .returns(Promise.resolve(Arg.any()));
+      .updatePermission('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
+      .resolves(permissions[0]);
 
     const resp = await permissionService.updatePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
       input,
     );
+
     expect(resp).toEqual(permissions[0]);
   });
 
   it('should delete a permission', async () => {
-    permissionRepository
-      .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-      .resolves(Arg.any());
     userPermissionRepository
-      .count({
-        where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
-      })
-      .returns(Promise.resolve(0));
+      .getUserPermissionCount('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(0);
     groupPermissionRepository
-      .count({
-        where: { permissionId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' },
-      })
-      .returns(Promise.resolve(0));
-    permissionCacheService.invalidatePermissionsCache(Arg.any()).resolves();
+      .getGroupPermissionCount('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(0);
+    permissionRepository
+      .deletePermission('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      .resolves(permissions[0]);
+
     const resp = await permissionService.deletePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
     );
+
     expect(resp).toEqual(permissions[0]);
   });
 
   it('should throw exception when deleting a permission in usage', async () => {
     userPermissionRepository
-      .count({
-        where: { permissionId: '0d88ef27-dd26-4a01-bfef-4d703bcdb05d' },
-      })
-      .returns(Promise.resolve(1));
+      .getUserPermissionCount('0d88ef27-dd26-4a01-bfef-4d703bcdb05d')
+      .resolves(1);
     groupPermissionRepository
-      .count({
-        where: { permissionId: '0d88ef27-dd26-4a01-bfef-4d703bcdb05d' },
-      })
-      .returns(Promise.resolve(0));
+      .getGroupPermissionCount('0d88ef27-dd26-4a01-bfef-4d703bcdb05d')
+      .resolves(0);
+    permissionRepository
+      .deletePermission('0d88ef27-dd26-4a01-bfef-4d703bcdb05d')
+      .throws(new PermissionDeleteNotAllowedException());
 
     const resp = permissionService.deletePermission(
       '0d88ef27-dd26-4a01-bfef-4d703bcdb05d',
     );
-    await expect(resp).rejects.toThrowError(
-      new PermissionDeleteNotAllowedException(),
-    );
+
+    await expect(resp).rejects.toThrow(PermissionDeleteNotAllowedException);
   });
 });
