@@ -2,44 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import Permission from '../entity/permission.entity';
 import { BaseRepository } from './base.repository';
-import { GroupPermissionRepository } from './grouppermission.repository';
-import { UserPermissionRepository } from './userpermission.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
-import {
-  PermissionDeleteNotAllowedException,
-  PermissionNotFoundException,
-} from '../exception/permission.exception';
 
 @Injectable()
 export class PermissionRepository extends BaseRepository<Permission> {
-  constructor(
-    private dataSource: DataSource,
-    private userPermissionRepository: UserPermissionRepository,
-    private groupPermissionRepository: GroupPermissionRepository,
-  ) {
+  constructor(private dataSource: DataSource) {
     super(Permission, dataSource);
   }
 
-  getAllPermissions(): Promise<Permission[]> {
+  getAllPermissions() {
     return this.find();
   }
 
-  async getPermissionById(id: string): Promise<Permission> {
-    const permission = await this.findOneBy({ id });
-
-    if (permission) {
-      return permission;
-    }
-
-    throw new PermissionNotFoundException(id);
+  getPermissionById(id: string) {
+    return this.findOneBy({ id });
   }
 
-  async createPermission(
-    newPermissionInput: NewPermissionInput,
-  ): Promise<Permission> {
+  createPermission(newPermissionInput: NewPermissionInput) {
     return this.save(newPermissionInput);
   }
 
@@ -47,36 +29,14 @@ export class PermissionRepository extends BaseRepository<Permission> {
     id: string,
     updatePermissionInput: UpdatePermissionInput,
   ) {
-    const existingPermission = await this.getPermissionById(id);
-    const updatedPermission = {
-      ...existingPermission,
-      ...updatePermissionInput,
-    };
+    const result = await this.update({ id }, updatePermissionInput);
 
-    return this.save(updatedPermission);
+    return result.affected === 1;
   }
 
-  async deletePermission(id: string): Promise<Permission> {
-    const existingPermission = await this.getPermissionById(id);
+  async deletePermission(id: string) {
+    const result = await this.softDelete({ id });
 
-    if (await this.isPermissionBeingUsed(id)) {
-      throw new PermissionDeleteNotAllowedException();
-    }
-
-    await this.softDelete({ id });
-
-    return existingPermission;
-  }
-
-  async isPermissionBeingUsed(id: string) {
-    const userPermissionCount = await this.userPermissionRepository.getUserPermissionCount(
-      id,
-    );
-    const groupPermissionCount = await this.groupPermissionRepository.getGroupPermissionCount(
-      id,
-    );
-    const totalCount = userPermissionCount + groupPermissionCount;
-
-    return totalCount != 0;
+    return result.affected === 1;
   }
 }

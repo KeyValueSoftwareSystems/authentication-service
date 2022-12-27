@@ -97,7 +97,7 @@ describe('test Permission service', () => {
 
     permissionRepository
       .updatePermission('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
-      .resolves(permissions[0]);
+      .resolves(true);
 
     const resp = await permissionService.updatePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -116,7 +116,7 @@ describe('test Permission service', () => {
       .resolves(0);
     permissionRepository
       .deletePermission('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-      .resolves(permissions[0]);
+      .resolves(true);
 
     const resp = await permissionService.deletePermission(
       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',

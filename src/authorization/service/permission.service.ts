@@ -6,47 +6,81 @@ import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';
+import { UserPermissionRepository } from '../repository/userpermission.repository';
+import { GroupPermissionRepository } from '../repository/grouppermission.repository';
+import {
+  PermissionDeleteNotAllowedException,
+  PermissionNotFoundException,
+} from '../exception/permission.exception';
 
 @Injectable()
 export class PermissionService {
   constructor(
     private permissionRepository: PermissionRepository,
+    private userPermissionRepository: UserPermissionRepository,
+    private groupPermissionRepository: GroupPermissionRepository,
     private permissionCacheService: PermissionCacheService,
   ) {}
 
-  getAllPermissions(): Promise<Permission[]> {
+  getAllPermissions() {
     return this.permissionRepository.getAllPermissions();
   }
 
-  getPermissionById(id: string): Promise<Permission> {
-    return this.permissionRepository.getPermissionById(id);
+  async getPermissionById(id: string) {
+    const permission = await this.permissionRepository.getPermissionById(id);
+
+    if (permission) {
+      return permission;
+    }
+
+    throw new PermissionNotFoundException(id);
   }
 
-  createPermission(
-    newPermissionInput: NewPermissionInput,
-  ): Promise<Permission> {
+  createPermission(newPermissionInput: NewPermissionInput) {
     return this.permissionRepository.createPermission(newPermissionInput);
   }
 
-  updatePermission(
+  async updatePermission(
     id: string,
     updatePermissionInput: UpdatePermissionInput,
-  ): Promise<Permission> {
-    return this.permissionRepository.updatePermission(
+  ) {
+    const updateSucceeded = await this.permissionRepository.updatePermission(
       id,
       updatePermissionInput,
     );
+
+    if (updateSucceeded) {
+      return await this.getPermissionById(id);
+    }
+
+    throw new PermissionNotFoundException(id);
   }
 
   async deletePermission(id: string): Promise<Permission> {
-    const deletedPermission = await this.permissionRepository.deletePermission(
+    const permissionToDelete = await this.getPermissionById(id);
+    const isPermissionBeingUsed = await this.isPermissionBeingUsed(id);
+
+    if (isPermissionBeingUsed) {
+      throw new PermissionDeleteNotAllowedException();
+    }
+
+    await this.permissionRepository.deletePermission(id);
+    await this.permissionCacheService.invalidatePermissionsCache(
+      permissionToDelete.name,
+    );
+
+    return permissionToDelete;
+  }
+
+  async isPermissionBeingUsed(id: string) {
+    const userPermissionCount = await this.userPermissionRepository.getUserPermissionCount(
       id,
     );
-
-    await this.permissionCacheService.invalidatePermissionsCache(
-      deletedPermission.name,
+    const groupPermissionCount = await this.groupPermissionRepository.getGroupPermissionCount(
+      id,
     );
+    const totalCount = userPermissionCount + groupPermissionCount;
 
-    return deletedPermission;
+    return totalCount !== 0;
   }
 }
