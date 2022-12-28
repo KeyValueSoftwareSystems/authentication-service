@@ -7,6 +7,7 @@ import {
 } from '../../schema/graphql.schema';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
 import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import Permission from '../entity/permission.entity';
 import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
@@ -21,11 +22,11 @@ export class PermissionService {
     private permissionCacheService: PermissionCacheService,
   ) {}
 
-  getAllPermissions() {
+  getAllPermissions(): Promise<Permission[]> {
     return this.permissionRepository.getAllPermissions();
   }
 
-  async getPermissionById(id: string) {
+  async getPermissionById(id: string): Promise<Permission> {
     const permission = await this.permissionRepository.getPermissionById(id);
 
     if (permission) {
@@ -35,14 +36,16 @@ export class PermissionService {
     throw new PermissionNotFoundException(id);
   }
 
-  createPermission(newPermissionInput: NewPermissionInput) {
+  createPermission(
+    newPermissionInput: NewPermissionInput,
+  ): Promise<Permission> {
     return this.permissionRepository.createPermission(newPermissionInput);
   }
 
   async updatePermission(
     id: string,
     updatePermissionInput: UpdatePermissionInput,
-  ) {
+  ): Promise<Permission> {
     const updateSucceeded = await this.permissionRepository.updatePermission(
       id,
       updatePermissionInput,
@@ -55,7 +58,7 @@ export class PermissionService {
     throw new PermissionNotFoundException(id);
   }
 
-  async deletePermission(id: string) {
+  async deletePermission(id: string): Promise<Permission> {
     const permissionToDelete = await this.getPermissionById(id);
     const isPermissionBeingUsed = await this.isPermissionBeingUsed(id);
 
@@ -71,7 +74,7 @@ export class PermissionService {
     return permissionToDelete;
   }
 
-  async isPermissionBeingUsed(id: string) {
+  async isPermissionBeingUsed(id: string): Promise<boolean> {
     const userPermissionCount = await this.userPermissionRepository.getUserPermissionCount(
       id,
     );
