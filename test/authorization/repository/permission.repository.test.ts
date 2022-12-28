@@ -7,9 +7,10 @@ import {
   UpdatePermissionInput,
 } from '../../../src/schema/graphql.schema';
 
+const VALID_PERMISSION_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
 const permissions: Permission[] = [
   {
-    id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    id: VALID_PERMISSION_ID,
     name: 'Test1',
     label: 'Test 1',
   },
@@ -22,7 +23,7 @@ const updateResult: UpdateResult = {
 
 describe('test Permission repository', () => {
   let permissionRepository: PermissionRepository;
-  const dataSource = { createEntityManager: jest.fn() };
+  const mockDataSource = { createEntityManager: jest.fn() };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -30,7 +31,7 @@ describe('test Permission repository', () => {
         PermissionRepository,
         {
           provide: DataSource,
-          useValue: dataSource,
+          useValue: mockDataSource,
         },
       ],
     }).compile();
@@ -57,9 +58,7 @@ describe('test Permission repository', () => {
   });
 
   it('should get a permission by id', () => {
-    const result = permissionRepository.getPermissionById(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-    );
+    const result = permissionRepository.getPermissionById(VALID_PERMISSION_ID);
 
     expect(result).resolves.toEqual(permissions[0]);
   });
@@ -80,7 +79,7 @@ describe('test Permission repository', () => {
     };
 
     const result = permissionRepository.updatePermission(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      VALID_PERMISSION_ID,
       input,
     );
 
@@ -88,9 +87,7 @@ describe('test Permission repository', () => {
   });
 
   it('should delete a permission', () => {
-    const result = permissionRepository.deletePermission(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-    );
+    const result = permissionRepository.deletePermission(VALID_PERMISSION_ID);
 
     expect(result).resolves.toEqual(true);
   });
