@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import Permission from '../entity/permission.entity';
 import PermissionCacheService from './permissioncache.service';
 import { PermissionRepository } from '../repository/permission.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';
-import { UserPermissionRepository } from '../repository/userpermission.repository';
-import { GroupPermissionRepository } from '../repository/grouppermission.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
@@ -56,7 +55,7 @@ export class PermissionService {
     throw new PermissionNotFoundException(id);
   }
 
-  async deletePermission(id: string): Promise<Permission> {
+  async deletePermission(id: string) {
     const permissionToDelete = await this.getPermissionById(id);
     const isPermissionBeingUsed = await this.isPermissionBeingUsed(id);
 
