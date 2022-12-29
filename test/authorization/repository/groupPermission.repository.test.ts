@@ -31,6 +31,9 @@ describe('test GroupPermission repository', () => {
       VALID_PERMISSION_ID,
     );
 
+    expect(groupPermissionRepository.count).toBeCalledWith({
+      where: { permissionId: VALID_PERMISSION_ID },
+    });
     expect(result).resolves.toEqual(0);
   });
 });

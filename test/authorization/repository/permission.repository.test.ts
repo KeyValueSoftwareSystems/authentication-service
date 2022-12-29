@@ -54,12 +54,16 @@ describe('test Permission repository', () => {
   it('should get all the permissions', () => {
     const result = permissionRepository.getAllPermissions();
 
+    expect(permissionRepository.find).toBeCalled();
     expect(result).resolves.toEqual(permissions);
   });
 
   it('should get a permission by id', () => {
     const result = permissionRepository.getPermissionById(VALID_PERMISSION_ID);
 
+    expect(permissionRepository.findOneBy).toBeCalledWith({
+      id: VALID_PERMISSION_ID,
+    });
     expect(result).resolves.toEqual(permissions[0]);
   });
 
@@ -70,6 +74,7 @@ describe('test Permission repository', () => {
 
     const result = permissionRepository.createPermission(input);
 
+    expect(permissionRepository.save).toBeCalledWith(input);
     expect(result).resolves.toEqual(permissions[0]);
   });
 
@@ -83,12 +88,19 @@ describe('test Permission repository', () => {
       input,
     );
 
+    expect(permissionRepository.update).toBeCalledWith(
+      { id: VALID_PERMISSION_ID },
+      input,
+    );
     expect(result).resolves.toEqual(true);
   });
 
   it('should delete a permission', () => {
     const result = permissionRepository.deletePermission(VALID_PERMISSION_ID);
 
+    expect(permissionRepository.softDelete).toBeCalledWith({
+      id: VALID_PERMISSION_ID,
+    });
     expect(result).resolves.toEqual(true);
   });
 });

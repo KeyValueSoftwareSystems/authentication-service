@@ -31,6 +31,9 @@ describe('test UserPermission repository', () => {
       VALID_PERMISSION_ID,
     );
 
+    expect(userPermissionRepository.count).toBeCalledWith({
+      where: { permissionId: VALID_PERMISSION_ID },
+    });
     expect(result).resolves.toEqual(0);
   });
 });
