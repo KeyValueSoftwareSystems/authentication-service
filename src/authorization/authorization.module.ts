@@ -28,7 +28,7 @@ import PermissionCacheService from './service/permissioncache.service';
 import { RoleService } from './service/role.service';
 import RoleCacheService from './service/rolecache.service';
 import SearchService from './service/search.service';
-import UserService from './service/user.service';
+import { UserServiceImpl } from './service/user.service.impl';
 import UserCacheService from './service/usercache.service';
 
 @Module({
@@ -55,7 +55,6 @@ import UserCacheService from './service/usercache.service';
     EntityService,
     PermissionResolver,
     PermissionCacheService,
-    UserService,
     UserResolver,
     EntityResolver,
     RedisCacheService,
@@ -67,7 +66,10 @@ import UserCacheService from './service/usercache.service';
     RoleService,
     RoleCacheService,
     SearchService,
+    {
+      provide: 'UserService',
+      useClass: UserServiceImpl,
+    },
   ],
-  exports: [UserService],
 })
 export class AuthorizationModule {}

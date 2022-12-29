@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   InviteTokenResponse,
   Status,
@@ -10,7 +10,7 @@ import {
   UserSignupResponse,
 } from '../../schema/graphql.schema';
 import User from '../../authorization/entity/user.entity';
-import UserService from '../../authorization/service/user.service';
+import { UserService } from '../../authorization/service/user.service';
 import {
   PasswordAlreadySetException,
   UserNotFoundException,
@@ -29,7 +29,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export default class PasswordAuthService implements Authenticatable {
   constructor(
-    private userService: UserService,
+    @Inject('UserService') private userService: UserService,
     private tokenService: TokenService,
     private authenticationHelper: AuthenticationHelper,
     private connection: Connection,

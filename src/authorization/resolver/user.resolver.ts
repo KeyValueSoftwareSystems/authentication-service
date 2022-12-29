@@ -19,17 +19,17 @@ import {
   UserInputFilter,
   UserPaginated,
 } from '../../schema/graphql.schema';
-import UserService from '../service/user.service';
+import { UserService } from '../service/user.service';
 import ValidationPipe from '../../validation/validation.pipe';
 import * as UserSchema from '../validation/user.validation.schema';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
-import { UseGuards } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../authentication/authentication.guard';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private userService: UserService) {}
+  constructor(@Inject('UserService') private userService: UserService) {}
 
   @Permissions(PermissionsType.ViewUser)
   @Query()

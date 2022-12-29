@@ -2,7 +2,8 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
 import { Connection, In, Repository, SelectQueryBuilder } from 'typeorm';
-import UserService from '../../../src/authorization/service/user.service';
+import { UserService } from '../../../src/authorization/service/user.service';
+import { UserServiceImpl } from '../../../src/authorization/service/user.service.impl';
 import { Arg, Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
 import Permission from '../../../src/authorization/entity/permission.entity';
@@ -23,6 +24,7 @@ import RolePermission from '../../../src/authorization/entity/rolePermission.ent
 import { Status } from '../../../src/schema/graphql.schema';
 import SearchService from '../../../src/authorization/service/search.service';
 import { UserNotAuthorized } from '../../../src/authentication/exception/userauth.exception';
+
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -82,7 +84,7 @@ describe('test UserService', () => {
       imports: [],
       controllers: [],
       providers: [
-        UserService,
+        UserServiceImpl,
         ConfigService,
         AuthenticationHelper,
         {
@@ -129,7 +131,7 @@ describe('test UserService', () => {
         },
       ],
     }).compile();
-    userService = moduleRef.get<UserService>(UserService);
+    userService = moduleRef.get<UserService>(UserServiceImpl);
   });
 
   it('should get all users', async () => {
