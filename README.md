@@ -114,7 +114,7 @@ Developers can customise this as per their requirement.
 | OTP_WINDOW | 300  |
 | OTP_STEP | 1 |
 
--   Run `npm run run-migrations`
+-   Run `npm run migration:run`
 -   Run `npm run start`
 -   Service should be up and running in http://localhost:${PORT}.
 - A default admin user with email **admin@domain.com** and password given in `DEFAULT_ADMIN_PASSWORD` will already be available in the application. This user will be associated to the default `Admin` group which will have the permissions to create/update permissions, create/update groups, create/update entities and update a user
