@@ -15,6 +15,9 @@ import RolePermission from './entity/rolePermission.entity';
 import User from './entity/user.entity';
 import UserGroup from './entity/userGroup.entity';
 import UserPermission from './entity/userPermission.entity';
+import { GroupPermissionRepository } from './repository/groupPermission.repository';
+import { PermissionRepository } from './repository/permission.repository';
+import { UserPermissionRepository } from './repository/userPermission.repository';
 import { EntityResolver } from './resolver/entity.resolver';
 import { GroupResolver } from './resolver/group.resolver';
 import { PermissionResolver } from './resolver/permission.resolver';
@@ -67,6 +70,9 @@ import UserCacheService from './service/usercache.service';
     RoleCacheService,
     SearchService,
     UserService,
+    PermissionRepository,
+    UserPermissionRepository,
+    GroupPermissionRepository,
   ],
 })
 export class AuthorizationModule {}

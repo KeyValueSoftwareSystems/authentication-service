@@ -3,7 +3,6 @@ import { Brackets, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupSearchInput,
-  OperationType,
   RoleSearchInput,
   StringSearchCondition,
   UserSearchInput,
