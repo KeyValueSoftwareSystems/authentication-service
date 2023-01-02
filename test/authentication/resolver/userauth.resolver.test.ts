@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
@@ -40,7 +40,7 @@ const users: User[] = [
 
 const gql = '/graphql';
 
-const userService = Substitute.for<UserService>();
+const userService = Substitute.for<UserServiceInterface>();
 const passwordAuthService = Substitute.for<PasswordAuthService>();
 const otpAuthService = Substitute.for<OTPAuthService>();
 const tokenService = Substitute.for<TokenService>();

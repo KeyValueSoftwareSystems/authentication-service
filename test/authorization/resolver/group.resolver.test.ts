@@ -13,7 +13,7 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import Role from 'src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
@@ -51,7 +51,7 @@ const groupService = Substitute.for<GroupService>();
 describe('Group Module', () => {
   let app: INestApplication;
 
-  const userService = Substitute.for<UserService>();
+  const userService = Substitute.for<UserServiceInterface>();
   let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
     userService

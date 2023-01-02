@@ -8,12 +8,12 @@ import {
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 
 describe('test TokenService', () => {
   let tokenService: TokenService;
   let authenticationHelper: AuthenticationHelper;
-  const userService = Substitute.for<UserService>();
+  const userService = Substitute.for<UserServiceInterface>();
   const configService = Substitute.for<ConfigService>();
   configService.get('ENV').returns('local');
   configService.get('JWT_SECRET').returns('s3cr3t1234567890');

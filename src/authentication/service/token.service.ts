@@ -5,7 +5,7 @@ import {
   InviteTokenAlreadyRevokedException,
 } from '../../authorization/exception/user.exception';
 import User from '../../authorization/entity/user.entity';
-import { UserService } from '../../authorization/service/user.service';
+import UserServiceInterface from '../../authorization/service/user.service.interface';
 import {
   InviteTokenResponse,
   TokenResponse,
@@ -15,7 +15,7 @@ import { AuthenticationHelper } from '../authentication.helper';
 @Injectable()
 export class TokenService {
   constructor(
-    @Inject('UserService') private userService: UserService,
+    @Inject('UserService') private userService: UserServiceInterface,
     private authenticationHelper: AuthenticationHelper,
     private configService: ConfigService,
   ) {}

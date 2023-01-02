@@ -2,8 +2,8 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../../../src/authorization/entity/user.entity';
 import { Connection, In, Repository, SelectQueryBuilder } from 'typeorm';
-import { UserService } from '../../../src/authorization/service/user.service';
-import { UserServiceImpl } from '../../../src/authorization/service/user.service.impl';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import UserService from '../../../src/authorization/service/user.service';
 import { Arg, Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
 import Group from '../../../src/authorization/entity/group.entity';
 import Permission from '../../../src/authorization/entity/permission.entity';
@@ -53,7 +53,7 @@ const groups: Group[] = [
   },
 ];
 describe('test UserService', () => {
-  let userService: UserService;
+  let userService: UserServiceInterface;
   const userRepository = Substitute.for<Repository<User>>();
   const groupRepository = Substitute.for<Repository<Group>>();
   const permissionRepository = Substitute.for<Repository<Permission>>();
@@ -84,7 +84,7 @@ describe('test UserService', () => {
       imports: [],
       controllers: [],
       providers: [
-        UserServiceImpl,
+        UserService,
         ConfigService,
         AuthenticationHelper,
         {
@@ -131,7 +131,7 @@ describe('test UserService', () => {
         },
       ],
     }).compile();
-    userService = moduleRef.get<UserService>(UserServiceImpl);
+    userService = moduleRef.get<UserServiceInterface>(UserService);
   });
 
   it('should get all users', async () => {

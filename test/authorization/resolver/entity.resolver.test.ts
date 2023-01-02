@@ -13,7 +13,7 @@ import {
 import { EntityService } from '../../../src/authorization/service/entity.service';
 import { EntityResolver } from '../../../src/authorization/resolver/entity.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 import User from '../../../src/authorization/entity/user.entity';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 
@@ -55,7 +55,7 @@ const entities: Entity[] = [
 ];
 
 const entityService = Substitute.for<EntityService>();
-const userService = Substitute.for<UserService>();
+const userService = Substitute.for<UserServiceInterface>();
 describe('Entity Module', () => {
   let app: INestApplication;
   userService

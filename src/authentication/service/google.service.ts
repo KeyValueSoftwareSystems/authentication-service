@@ -2,14 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InvalidPayloadException } from '../exception/userauth.exception';
 import User from '../../authorization/entity/user.entity';
 import { GoogleUserSchema } from '../validation/user.auth.schema.validation';
-import { UserService } from '../../authorization/service/user.service';
+import UserServiceInterface from '../../authorization/service/user.service.interface';
 import { AuthenticationHelper } from '../authentication.helper';
 import { GoogleLoginUser } from '../passport/googleStrategy';
 
 @Injectable()
 export class GoogleAuthService {
   constructor(
-    @Inject('UserService') private userService: UserService,
+    @Inject('UserService') private userService: UserServiceInterface,
     private authenticationHelper: AuthenticationHelper,
   ) {}
   private async validateInput(

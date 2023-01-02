@@ -10,7 +10,7 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { RoleService } from '../../../src/authorization/service/role.service';
 import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
@@ -50,7 +50,7 @@ const roleService = Substitute.for<RoleService>();
 describe('Role Module', () => {
   let app: INestApplication;
 
-  const userService = Substitute.for<UserService>();
+  const userService = Substitute.for<UserServiceInterface>();
   let authenticationHelper: AuthenticationHelper;
   beforeAll(async () => {
     userService

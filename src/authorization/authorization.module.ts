@@ -28,7 +28,7 @@ import PermissionCacheService from './service/permissioncache.service';
 import { RoleService } from './service/role.service';
 import RoleCacheService from './service/rolecache.service';
 import SearchService from './service/search.service';
-import { UserServiceImpl } from './service/user.service.impl';
+import UserService from './service/user.service';
 import UserCacheService from './service/usercache.service';
 
 @Module({
@@ -66,10 +66,7 @@ import UserCacheService from './service/usercache.service';
     RoleService,
     RoleCacheService,
     SearchService,
-    {
-      provide: 'UserService',
-      useClass: UserServiceImpl,
-    },
+    UserService,
   ],
 })
 export class AuthorizationModule {}

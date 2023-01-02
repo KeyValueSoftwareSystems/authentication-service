@@ -11,7 +11,7 @@ import {
 import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 import {
   Status,
   TokenResponse,
@@ -35,7 +35,7 @@ let users: User[] = [
 describe('test PasswordAuthService', () => {
   let passwordAuthService: PasswordAuthService;
   let authenticationHelper: AuthenticationHelper;
-  const userService = Substitute.for<UserService>();
+  const userService = Substitute.for<UserServiceInterface>();
   const configService = Substitute.for<ConfigService>();
   const tokenService = Substitute.for<TokenService>();
   const connectionMock = Substitute.for<Connection>();

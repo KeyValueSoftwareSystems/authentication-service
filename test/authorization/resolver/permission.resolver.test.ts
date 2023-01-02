@@ -11,7 +11,7 @@ import {
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
-import UserService from '../../../src/authorization/service/user.service';
+import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
@@ -36,7 +36,7 @@ const permissions: Permission[] = [
   },
 ];
 const permissionService = Substitute.for<PermissionService>();
-const userService = Substitute.for<UserService>();
+const userService = Substitute.for<UserServiceInterface>();
 describe('Permission Module', () => {
   let app: INestApplication;
   let token: string;

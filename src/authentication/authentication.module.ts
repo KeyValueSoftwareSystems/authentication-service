@@ -5,7 +5,7 @@ import GroupRole from 'src/authorization/entity/groupRole.entity';
 import Role from 'src/authorization/entity/role.entity';
 import RolePermission from 'src/authorization/entity/rolePermission.entity';
 import RoleCacheService from 'src/authorization/service/rolecache.service';
-import { UserServiceImpl } from 'src/authorization/service/user.service.impl';
+import UserService from 'src/authorization/service/user.service';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import Group from '../authorization/entity/group.entity';
 import GroupPermission from '../authorization/entity/groupPermission.entity';
@@ -67,10 +67,7 @@ const providers: Provider[] = [
   RecaptchaService,
   GoogleStrategy,
   RoleCacheService,
-  {
-    provide: 'UserService',
-    useClass: UserServiceImpl,
-  },
+  UserService,
 ];
 
 @Module({

@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
-import { UserService } from './service/user.service';
+import UserServiceInterface from './service/user.service.interface';
 
 @Injectable()
 export class AuthorizationGaurd implements CanActivate {
   constructor(
-    @Inject('UserService') private userService: UserService,
+    @Inject('UserService') private userService: UserServiceInterface,
     private reflector: Reflector,
   ) {}
   public async canActivate(context: ExecutionContext): Promise<boolean> {
