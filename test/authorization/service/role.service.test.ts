@@ -16,9 +16,10 @@ import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import Role from '../../../src/authorization/entity/role.entity';
 import { RoleService } from '../../../src/authorization/service/role.service';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
-import RoleCacheService from '../../../src/authorization/service/rolecache.service';
 import SearchService from '../../../src/authorization/service/search.service';
 import Group from '../../../src/authorization/entity/group.entity';
+import { RoleServiceInterface } from 'src/authorization/service/role.service.interface';
+import { RoleCacheServiceInterface } from '../../../src/authorization/service/rolecache.service.interface';
 const roles: Role[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -35,12 +36,12 @@ const permissions: Permission[] = [
 ];
 
 describe('test Role Service', () => {
-  let roleService: RoleService;
+  let roleService: RoleServiceInterface;
   const rolesRepository = Substitute.for<Repository<Role>>();
   const permissionRepository = Substitute.for<Repository<Permission>>();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
-  const roleCacheService = Substitute.for<RoleCacheService>();
+  const roleCacheService = Substitute.for<RoleCacheServiceInterface>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const searchService = Substitute.for<SearchService>();
   const connectionMock = Substitute.for<Connection>();
@@ -74,16 +75,16 @@ describe('test Role Service', () => {
           provide: getRepositoryToken(RolePermission),
           useValue: rolePermissionRepository,
         },
-        { provide: 'RoleCacheService', useValue: roleCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'SearchService', useValue: searchService },
+        { provide: RoleCacheServiceInterface, useValue: roleCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: Connection,
           useValue: connectionMock,
         },
       ],
     }).compile();
-    roleService = moduleRef.get<RoleService>(RoleService);
+    roleService = moduleRef.get<RoleServiceInterface>(RoleService);
   });
 
   it('should get all roles', async () => {

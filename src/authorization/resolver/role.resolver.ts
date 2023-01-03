@@ -1,4 +1,4 @@
-import { ParseUUIDPipe } from '@nestjs/common';
+import { Inject, ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
 import {
   NewRoleInput,
@@ -9,13 +9,15 @@ import {
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
 import Role from '../entity/role.entity';
-import { RoleService } from '../service/role.service';
 import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
+import { RoleServiceInterface } from '../service/role.service.interface';
 
 @Resolver('Role')
 export class RoleResolver {
-  constructor(private roleService: RoleService) {}
+  constructor(
+    @Inject(RoleServiceInterface) private roleService: RoleServiceInterface,
+  ) {}
 
   @Permissions(PermissionsType.ViewRoles)
   @Query()

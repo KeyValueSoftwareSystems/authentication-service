@@ -1,10 +1,11 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { HttpModule, Module, Provider } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import GroupRole from 'src/authorization/entity/groupRole.entity';
 import Role from 'src/authorization/entity/role.entity';
 import RolePermission from 'src/authorization/entity/rolePermission.entity';
 import RoleCacheService from 'src/authorization/service/rolecache.service';
+import { RoleCacheServiceInterface } from 'src/authorization/service/rolecache.service.interface';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import Group from '../authorization/entity/group.entity';
 import GroupPermission from '../authorization/entity/groupPermission.entity';
@@ -40,7 +41,7 @@ import { RecaptchaService } from './service/recaptcha.service';
 import { TokenService } from './service/token.service';
 import TwilioOTPService from './service/twilio.otp.service';
 
-const providers = [
+const providers: Provider[] = [
   UserAuthResolver,
   UserService,
   SearchService,
@@ -67,7 +68,10 @@ const providers = [
   LoggerService,
   RecaptchaService,
   GoogleStrategy,
-  RoleCacheService,
+  {
+    provide: RoleCacheServiceInterface,
+    useClass: RoleCacheService,
+  },
 ];
 
 @Module({

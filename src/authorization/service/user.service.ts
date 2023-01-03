@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
@@ -22,11 +22,11 @@ import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
-import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import { FilterBuilder } from '../../common/filter.builder';
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
+import { RoleCacheServiceInterface } from './rolecache.service.interface';
 
 @Injectable()
 export default class UserService {
@@ -46,7 +46,8 @@ export default class UserService {
     private permissionCacheService: PermissionCacheService,
     private connection: Connection,
     private searchService: SearchService,
-    private roleCacheService: RoleCacheService,
+    @Inject(RoleCacheServiceInterface)
+    private roleCacheService: RoleCacheServiceInterface,
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {

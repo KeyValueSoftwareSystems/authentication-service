@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   NewRoleInput,
@@ -15,14 +15,15 @@ import {
   RoleDeleteNotAllowedException,
 } from '../exception/role.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import RoleCacheService from './rolecache.service';
 import GroupRole from '../entity/groupRole.entity';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import Group from '../entity/group.entity';
+import { RoleServiceInterface } from './role.service.interface';
+import { RoleCacheServiceInterface } from './rolecache.service.interface';
 
 @Injectable()
-export class RoleService {
+export class RoleService implements RoleServiceInterface {
   constructor(
     @InjectRepository(Role)
     private rolesRepository: Repository<Role>,
@@ -32,7 +33,8 @@ export class RoleService {
     private rolePermissionRepository: Repository<RolePermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
-    private roleCacheService: RoleCacheService,
+    @Inject(RoleCacheServiceInterface)
+    private roleCacheService: RoleCacheServiceInterface,
     private connection: Connection,
     private searchService: SearchService,
   ) {}

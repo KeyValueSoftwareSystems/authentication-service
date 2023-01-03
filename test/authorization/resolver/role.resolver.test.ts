@@ -1,6 +1,7 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
 import {
@@ -12,11 +13,11 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import User from '../../../src/authorization/entity/user.entity';
 import UserService from '../../../src/authorization/service/user.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
-import { RoleService } from '../../../src/authorization/service/role.service';
 import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
 import Role from '../../../src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
 import Permission from 'src/authorization/entity/permission.entity';
+import { RoleServiceInterface } from '../../../src/authorization/service/role.service.interface';
 
 const gql = '/graphql';
 
@@ -46,7 +47,7 @@ const permissions = [
     name: 'Customers',
   },
 ];
-const roleService = Substitute.for<RoleService>();
+const roleService = Substitute.for<RoleServiceInterface>();
 describe('Role Module', () => {
   let app: INestApplication;
 
@@ -61,9 +62,9 @@ describe('Role Module', () => {
       providers: [
         AuthenticationHelper,
         RoleResolver,
-        { provide: 'RoleService', useValue: roleService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: RoleServiceInterface, useValue: roleService },
+        { provide: UserService, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

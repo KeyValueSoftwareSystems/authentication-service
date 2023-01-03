@@ -29,7 +29,9 @@ import GroupCacheService from './service/groupcache.service';
 import { PermissionService } from './service/permission.service';
 import PermissionCacheService from './service/permissioncache.service';
 import { RoleService } from './service/role.service';
+import { RoleServiceInterface } from './service/role.service.interface';
 import RoleCacheService from './service/rolecache.service';
+import { RoleCacheServiceInterface } from './service/rolecache.service.interface';
 import SearchService from './service/search.service';
 import UserService from './service/user.service';
 import UserCacheService from './service/usercache.service';
@@ -67,12 +69,18 @@ import UserCacheService from './service/usercache.service';
     AuthenticationHelper,
     ConfigService,
     RoleResolver,
-    RoleService,
-    RoleCacheService,
     SearchService,
     PermissionRepository,
     UserPermissionRepository,
     GroupPermissionRepository,
+    {
+      provide: RoleServiceInterface,
+      useClass: RoleService,
+    },
+    {
+      provide: RoleCacheServiceInterface,
+      useClass: RoleCacheService,
+    },
   ],
   exports: [UserService],
 })
