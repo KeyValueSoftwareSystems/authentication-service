@@ -33,7 +33,8 @@ import RoleCacheService from './service/rolecache.service';
 import SearchService from './service/search.service';
 import { UserService } from './service/user.service';
 import { UserServiceInterface } from './service/user.service.interface';
-import UserCacheService from './service/usercache.service';
+import { UserCacheService } from './service/usercache.service';
+import { UserCacheServiceInterface } from './service/usercache.service.interface';
 
 @Module({
   imports: [
@@ -62,7 +63,6 @@ import UserCacheService from './service/usercache.service';
     UserResolver,
     EntityResolver,
     RedisCacheService,
-    UserCacheService,
     GroupCacheService,
     AuthenticationHelper,
     ConfigService,
@@ -76,6 +76,10 @@ import UserCacheService from './service/usercache.service';
     {
       provide: UserServiceInterface,
       useClass: UserService,
+    },
+    {
+      provide: UserCacheServiceInterface,
+      useClass: UserCacheService,
     },
   ],
 })

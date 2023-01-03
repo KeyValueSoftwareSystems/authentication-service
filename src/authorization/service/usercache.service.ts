@@ -5,9 +5,10 @@ import { Repository } from 'typeorm';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
 import User from '../entity/user.entity';
+import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
-export default class UserCacheService {
+export class UserCacheService implements UserCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
     @InjectRepository(UserGroup)

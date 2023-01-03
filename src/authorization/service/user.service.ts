@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
@@ -19,7 +19,6 @@ import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import UserCacheService from './usercache.service';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
@@ -28,6 +27,7 @@ import { SearchEntity } from '../../constants/search.entity.enum';
 import { FilterBuilder } from '../../common/filter.builder';
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
 import { UserServiceInterface } from './user.service.interface';
+import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
 export class UserService implements UserServiceInterface {
@@ -42,7 +42,8 @@ export class UserService implements UserServiceInterface {
     private userPermissionRepository: Repository<UserPermission>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
-    private userCacheService: UserCacheService,
+    @Inject(UserCacheServiceInterface)
+    private userCacheService: UserCacheServiceInterface,
     private groupCacheService: GroupCacheService,
     private permissionCacheService: PermissionCacheService,
     private connection: Connection,

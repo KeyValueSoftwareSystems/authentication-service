@@ -7,6 +7,7 @@ import RolePermission from 'src/authorization/entity/rolePermission.entity';
 import RoleCacheService from 'src/authorization/service/rolecache.service';
 import { UserService } from 'src/authorization/service/user.service';
 import { UserServiceInterface } from 'src/authorization/service/user.service.interface';
+import { UserCacheServiceInterface } from 'src/authorization/service/usercache.service.interface';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import Group from '../authorization/entity/group.entity';
 import GroupPermission from '../authorization/entity/groupPermission.entity';
@@ -17,7 +18,7 @@ import UserPermission from '../authorization/entity/userPermission.entity';
 import GroupCacheService from '../authorization/service/groupcache.service';
 import PermissionCacheService from '../authorization/service/permissioncache.service';
 import SearchService from '../authorization/service/search.service';
-import UserCacheService from '../authorization/service/usercache.service';
+import { UserCacheService } from '../authorization/service/usercache.service';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import { ProviderFactory } from '../factory/provider.factory';
 import { LoggerService } from '../logger/logger.service';
@@ -49,7 +50,6 @@ const providers: Provider[] = [
   ConfigService,
   AuthenticationHelper,
   ConfigService,
-  UserCacheService,
   GroupCacheService,
   PermissionCacheService,
   LoggerService,
@@ -71,6 +71,10 @@ const providers: Provider[] = [
   {
     provide: UserServiceInterface,
     useClass: UserService,
+  },
+  {
+    provide: UserCacheServiceInterface,
+    useClass: UserCacheService,
   },
 ];
 

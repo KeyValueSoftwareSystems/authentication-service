@@ -21,9 +21,9 @@ import GroupCacheService from '../../../src/authorization/service/groupcache.ser
 import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import Role from '../../../src/authorization/entity/role.entity';
 import User from '../../../src/authorization/entity/user.entity';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
 import SearchService from '../../../src/authorization/service/search.service';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
+import { UserCacheServiceInterface } from '../../../src/authorization/service/usercache.service.interface';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -66,7 +66,7 @@ describe('test Group Service', () => {
   const userRepository = Substitute.for<Repository<User>>();
   const roleRepository = Substitute.for<Repository<Role>>();
   const connectionMock = Substitute.for<Connection>();
-  const userCacheService = Substitute.for<UserCacheService>();
+  const userCacheService = Substitute.for<UserCacheServiceInterface>();
   const searchService = Substitute.for<SearchService>();
   const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
@@ -110,10 +110,10 @@ describe('test Group Service', () => {
           provide: getRepositoryToken(Role),
           useValue: roleRepository,
         },
-        { provide: 'UserCacheService', useValue: userCacheService },
-        { provide: 'GroupCacheService', useValue: groupCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'SearchService', useValue: searchService },
+        { provide: UserCacheServiceInterface, useValue: userCacheService },
+        { provide: GroupCacheService, useValue: groupCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: Connection,
           useValue: connectionMock,

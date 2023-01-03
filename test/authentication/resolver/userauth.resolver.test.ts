@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
@@ -18,12 +19,11 @@ import {
 } from '../../../src/schema/graphql.schema';
 import UserAuthResolver from '../../../src/authentication/resolver/user.auth.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import { ConfigService } from '@nestjs/config';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
 import OTPAuthService from '../../../src/authentication/service/otp.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';
+import { UserCacheServiceInterface } from '../../../src/authorization/service/usercache.service.interface';
 
 const users: User[] = [
   {
@@ -44,7 +44,7 @@ const userService = Substitute.for<UserServiceInterface>();
 const passwordAuthService = Substitute.for<PasswordAuthService>();
 const otpAuthService = Substitute.for<OTPAuthService>();
 const tokenService = Substitute.for<TokenService>();
-const userCacheService = Substitute.for<UserCacheService>();
+const userCacheService = Substitute.for<UserCacheServiceInterface>();
 const redisCacheService = Substitute.for<RedisCacheService>();
 
 describe('Userauth Module', () => {
@@ -65,7 +65,7 @@ describe('Userauth Module', () => {
         { provide: PasswordAuthService, useValue: passwordAuthService },
         { provide: OTPAuthService, useValue: otpAuthService },
         { provide: ConfigService, useValue: configService },
-        { provide: UserCacheService, useValue: userCacheService },
+        { provide: UserCacheServiceInterface, useValue: userCacheService },
         { provide: RedisCacheService, useValue: redisCacheService },
       ],
     }).compile();
