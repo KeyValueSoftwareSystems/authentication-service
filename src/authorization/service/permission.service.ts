@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import PermissionCacheService from './permissioncache.service';
+import { Inject, Injectable } from '@nestjs/common';
 import { PermissionRepository } from '../repository/permission.repository';
 import {
   NewPermissionInput,
@@ -12,14 +11,17 @@ import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
 } from '../exception/permission.exception';
+import { PermissionServiceInterface } from './permission.service.interface';
+import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 
 @Injectable()
-export class PermissionService {
+export class PermissionService implements PermissionServiceInterface {
   constructor(
     private permissionRepository: PermissionRepository,
     private userPermissionRepository: UserPermissionRepository,
     private groupPermissionRepository: GroupPermissionRepository,
-    private permissionCacheService: PermissionCacheService,
+    @Inject(PermissionCacheServiceInterface)
+    private permissionCacheService: PermissionCacheServiceInterface,
   ) {}
 
   getAllPermissions(): Promise<Permission[]> {
@@ -74,7 +76,7 @@ export class PermissionService {
     return permissionToDelete;
   }
 
-  async isPermissionBeingUsed(id: string): Promise<boolean> {
+  private async isPermissionBeingUsed(id: string): Promise<boolean> {
     const userPermissionCount = await this.userPermissionRepository.getUserPermissionCount(
       id,
     );

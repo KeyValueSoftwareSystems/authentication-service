@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 
@@ -21,12 +21,12 @@ import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
 import UserCacheService from './usercache.service';
 import GroupCacheService from './groupcache.service';
-import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import { FilterBuilder } from '../../common/filter.builder';
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
+import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 
 @Injectable()
 export default class UserService {
@@ -43,7 +43,8 @@ export default class UserService {
     private permissionRepository: Repository<Permission>,
     private userCacheService: UserCacheService,
     private groupCacheService: GroupCacheService,
-    private permissionCacheService: PermissionCacheService,
+    @Inject(PermissionCacheServiceInterface)
+    private permissionCacheService: PermissionCacheServiceInterface,
     private connection: Connection,
     private searchService: SearchService,
     private roleCacheService: RoleCacheService,

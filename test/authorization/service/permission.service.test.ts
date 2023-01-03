@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
-import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
 import { PermissionRepository } from '../../../src/authorization/repository/permission.repository';
 import { UserPermissionRepository } from '../../../src/authorization/repository/userPermission.repository';
 import { GroupPermissionRepository } from '../../../src/authorization/repository/groupPermission.repository';
@@ -14,6 +13,8 @@ import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
 } from '../../../src/authorization/exception/permission.exception';
+import { PermissionServiceInterface } from '../../../src/authorization/service/permission.service.interface';
+import { PermissionCacheServiceInterface } from '../../../src/authorization/service/permissioncache.service.interface';
 
 const VALID_PERMISSION_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
 const INVALID_PERMISSION_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f9';
@@ -27,7 +28,7 @@ const permissions: Permission[] = [
 ];
 
 describe('test Permission service', () => {
-  let permissionService: PermissionService;
+  let permissionService: PermissionServiceInterface;
   let permissionRepository: PermissionRepository;
   let userPermissionRepository: UserPermissionRepository;
   let groupPermissionRepository: GroupPermissionRepository;
@@ -47,13 +48,15 @@ describe('test Permission service', () => {
           useValue: mockDataSource,
         },
         {
-          provide: PermissionCacheService,
+          provide: PermissionCacheServiceInterface,
           useValue: mockPermissionCacheService,
         },
       ],
     }).compile();
 
-    permissionService = moduleRef.get<PermissionService>(PermissionService);
+    permissionService = moduleRef.get<PermissionServiceInterface>(
+      PermissionService,
+    );
     permissionRepository = moduleRef.get<PermissionRepository>(
       PermissionRepository,
     );

@@ -27,7 +27,9 @@ import { EntityService } from './service/entity.service';
 import { GroupService } from './service/group.service';
 import GroupCacheService from './service/groupcache.service';
 import { PermissionService } from './service/permission.service';
+import { PermissionServiceInterface } from './service/permission.service.interface';
 import PermissionCacheService from './service/permissioncache.service';
+import { PermissionCacheServiceInterface } from './service/permissioncache.service.interface';
 import { RoleService } from './service/role.service';
 import RoleCacheService from './service/rolecache.service';
 import SearchService from './service/search.service';
@@ -54,10 +56,8 @@ import UserCacheService from './service/usercache.service';
   providers: [
     GroupResolver,
     GroupService,
-    PermissionService,
     EntityService,
     PermissionResolver,
-    PermissionCacheService,
     UserService,
     UserResolver,
     EntityResolver,
@@ -73,6 +73,14 @@ import UserCacheService from './service/usercache.service';
     PermissionRepository,
     UserPermissionRepository,
     GroupPermissionRepository,
+    {
+      provide: PermissionServiceInterface,
+      useClass: PermissionService,
+    },
+    {
+      provide: PermissionCacheServiceInterface,
+      useClass: PermissionCacheService,
+    },
   ],
   exports: [UserService],
 })

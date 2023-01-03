@@ -2,9 +2,11 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import Permission from '../entity/permission.entity';
 import { PermissionRepository } from '../repository/permission.repository';
+import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 
 @Injectable()
-export default class PermissionCacheService {
+export default class PermissionCacheService
+  implements PermissionCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
     private permissionsRepository: PermissionRepository,
