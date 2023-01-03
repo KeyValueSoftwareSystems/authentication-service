@@ -10,7 +10,7 @@ import OTPAuthService from '../../../src/authentication/service/otp.auth.service
 import { TokenService } from '../../../src/authentication/service/token.service';
 import TwilioOTPService from '../../../src/authentication/service/twilio.otp.service';
 import User from '../../../src/authorization/entity/user.entity';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import {
   Status,
   TokenResponse,
@@ -46,9 +46,9 @@ describe('test OTPAuthService', () => {
       imports: [ConfigModule],
       controllers: [],
       providers: [
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: configService },
-        { provide: 'TokenService', useValue: tokenService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: configService },
+        { provide: TokenService, useValue: tokenService },
         { provide: 'OTPVerifiable', useValue: otpService },
         OTPAuthService,
         AuthenticationHelper,

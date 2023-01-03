@@ -9,7 +9,7 @@ import {
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
 
-export default interface UserServiceInterface {
+export interface UserServiceInterface {
   getAllUsers(input?: UserInputFilter): Promise<[User[], number]>;
 
   getUserById(id: string): Promise<User>;
@@ -62,3 +62,5 @@ export default interface UserServiceInterface {
 
   setOtpSecret(user: User, twoFASecret: string): Promise<void>;
 }
+
+export const UserServiceInterface = Symbol('UserServiceInterface');

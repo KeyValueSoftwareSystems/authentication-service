@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import User from '../../authorization/entity/user.entity';
 import { UserNotFoundException } from '../../authorization/exception/user.exception';
-import UserServiceInterface from '../../authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../authorization/service/user.service.interface';
 import {
   Status,
   TokenResponse,
@@ -20,7 +20,7 @@ import { TokenService } from './token.service';
 @Injectable()
 export default class OTPAuthService implements Authenticatable {
   constructor(
-    @Inject('UserService') private userService: UserServiceInterface,
+    @Inject(UserServiceInterface) private userService: UserServiceInterface,
     private tokenService: TokenService,
     private otpService: OTPVerifiable,
   ) {}

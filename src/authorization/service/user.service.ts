@@ -27,10 +27,10 @@ import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import { FilterBuilder } from '../../common/filter.builder';
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
-import UserServiceInterface from './user.service.interface';
+import { UserServiceInterface } from './user.service.interface';
 
 @Injectable()
-export default class UserService implements UserServiceInterface {
+export class UserService implements UserServiceInterface {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,

@@ -11,10 +11,11 @@ import {
 import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 const users: User[] = [
@@ -45,9 +46,9 @@ describe('Permission Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         PermissionResolver,
-        { provide: 'PermissionService', useValue: permissionService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: PermissionService, useValue: permissionService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
         AuthenticationHelper,
       ],
     }).compile();

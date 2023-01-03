@@ -8,7 +8,7 @@ import {
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 
 describe('test TokenService', () => {
   let tokenService: TokenService;
@@ -24,8 +24,8 @@ describe('test TokenService', () => {
       imports: [ConfigModule],
       controllers: [],
       providers: [
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: configService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: configService },
         TokenService,
         AuthenticationHelper,
       ],

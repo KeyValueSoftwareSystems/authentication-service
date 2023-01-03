@@ -13,11 +13,12 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import Role from 'src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
 import Permission from 'src/authorization/entity/permission.entity';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -62,9 +63,9 @@ describe('Group Module', () => {
       providers: [
         AuthenticationHelper,
         GroupResolver,
-        { provide: 'GroupService', useValue: groupService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: GroupService, useValue: groupService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

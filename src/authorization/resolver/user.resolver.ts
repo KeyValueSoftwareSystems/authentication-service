@@ -19,7 +19,7 @@ import {
   UserInputFilter,
   UserPaginated,
 } from '../../schema/graphql.schema';
-import UserServiceInterface from '../service/user.service.interface';
+import { UserServiceInterface } from '../service/user.service.interface';
 import ValidationPipe from '../../validation/validation.pipe';
 import * as UserSchema from '../validation/user.validation.schema';
 import { Permissions } from '../permissions.decorator';
@@ -30,7 +30,7 @@ import { AuthGuard } from '../../authentication/authentication.guard';
 @Resolver('User')
 export class UserResolver {
   constructor(
-    @Inject('UserService') private userService: UserServiceInterface,
+    @Inject(UserServiceInterface) private userService: UserServiceInterface,
   ) {}
 
   @Permissions(PermissionsType.ViewUser)

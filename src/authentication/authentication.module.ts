@@ -5,7 +5,8 @@ import GroupRole from 'src/authorization/entity/groupRole.entity';
 import Role from 'src/authorization/entity/role.entity';
 import RolePermission from 'src/authorization/entity/rolePermission.entity';
 import RoleCacheService from 'src/authorization/service/rolecache.service';
-import UserService from 'src/authorization/service/user.service';
+import { UserService } from 'src/authorization/service/user.service';
+import { UserServiceInterface } from 'src/authorization/service/user.service.interface';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import Group from '../authorization/entity/group.entity';
 import GroupPermission from '../authorization/entity/groupPermission.entity';
@@ -67,7 +68,10 @@ const providers: Provider[] = [
   RecaptchaService,
   GoogleStrategy,
   RoleCacheService,
-  UserService,
+  {
+    provide: UserServiceInterface,
+    useClass: UserService,
+  },
 ];
 
 @Module({
@@ -90,7 +94,7 @@ const providers: Provider[] = [
     TwilioImplModule,
     HttpModule,
   ],
-  providers: providers,
+  providers,
   controllers: [GoogleAuthController],
 })
 export class UserAuthModule {}

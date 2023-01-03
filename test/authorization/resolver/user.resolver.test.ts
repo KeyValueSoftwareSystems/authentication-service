@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import Substitute from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
@@ -76,8 +76,8 @@ describe('User Module', () => {
       providers: [
         UserResolver,
         AuthenticationHelper,
-        { provide: 'ConfigService', useValue: configService },
-        { provide: 'UserService', useValue: userService },
+        { provide: ConfigService, useValue: configService },
+        { provide: UserServiceInterface, useValue: userService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

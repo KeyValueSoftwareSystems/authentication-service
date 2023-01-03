@@ -13,9 +13,10 @@ import {
 import { EntityService } from '../../../src/authorization/service/entity.service';
 import { EntityResolver } from '../../../src/authorization/resolver/entity.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import User from '../../../src/authorization/entity/user.entity';
 import { mockedConfigService } from '../../utils/mocks/config.service';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -68,9 +69,9 @@ describe('Entity Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         EntityResolver,
-        { provide: 'EntityService', useValue: entityService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: EntityService, useValue: entityService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
         AuthenticationHelper,
       ],
     }).compile();

@@ -31,7 +31,8 @@ import PermissionCacheService from './service/permissioncache.service';
 import { RoleService } from './service/role.service';
 import RoleCacheService from './service/rolecache.service';
 import SearchService from './service/search.service';
-import UserService from './service/user.service';
+import { UserService } from './service/user.service';
+import { UserServiceInterface } from './service/user.service.interface';
 import UserCacheService from './service/usercache.service';
 
 @Module({
@@ -69,10 +70,13 @@ import UserCacheService from './service/usercache.service';
     RoleService,
     RoleCacheService,
     SearchService,
-    UserService,
     PermissionRepository,
     UserPermissionRepository,
     GroupPermissionRepository,
+    {
+      provide: UserServiceInterface,
+      useClass: UserService,
+    },
   ],
 })
 export class AuthorizationModule {}

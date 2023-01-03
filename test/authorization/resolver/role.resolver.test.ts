@@ -10,13 +10,14 @@ import {
 } from '../../../src/schema/graphql.schema';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { RoleService } from '../../../src/authorization/service/role.service';
 import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
 import Role from '../../../src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
 import Permission from 'src/authorization/entity/permission.entity';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -61,9 +62,9 @@ describe('Role Module', () => {
       providers: [
         AuthenticationHelper,
         RoleResolver,
-        { provide: 'RoleService', useValue: roleService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: RoleService, useValue: roleService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

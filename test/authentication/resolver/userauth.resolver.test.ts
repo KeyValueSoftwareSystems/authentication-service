@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import UserServiceInterface from '../../../src/authorization/service/user.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
@@ -60,13 +60,13 @@ describe('Userauth Module', () => {
         UserAuthResolver,
         ConfigService,
         AuthenticationHelper,
-        { provide: 'UserService', useValue: userService },
-        { provide: 'TokenService', useValue: tokenService },
-        { provide: 'PasswordAuthService', useValue: passwordAuthService },
-        { provide: 'OTPAuthService', useValue: otpAuthService },
-        { provide: 'ConfigService', useValue: configService },
-        { provide: 'UserCacheService', useValue: userCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: TokenService, useValue: tokenService },
+        { provide: PasswordAuthService, useValue: passwordAuthService },
+        { provide: OTPAuthService, useValue: otpAuthService },
+        { provide: ConfigService, useValue: configService },
+        { provide: UserCacheService, useValue: userCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(
