@@ -11,9 +11,10 @@ import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
 import { EntityNotFoundException } from '../exception/entity.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
+import { EntityServiceInterface } from './entity.service.interface';
 
 @Injectable()
-export class EntityService {
+export class EntityService implements EntityServiceInterface {
   constructor(
     @InjectRepository(EntityModel)
     private entityRepository: Repository<EntityModel>,
