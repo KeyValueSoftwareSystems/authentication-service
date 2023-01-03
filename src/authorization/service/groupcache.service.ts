@@ -5,9 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupRole from '../entity/groupRole.entity';
+import { GroupCacheServiceInterface } from './groupcache.service.interface';
 
 @Injectable()
-export default class GroupCacheService {
+export class GroupCacheService implements GroupCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
     @InjectRepository(GroupPermission)

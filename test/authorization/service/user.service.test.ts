@@ -14,7 +14,6 @@ import GroupPermission from '../../../src/authorization/entity/groupPermission.e
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
-import GroupCacheService from '../../../src/authorization/service/groupcache.service';
 import { ConfigService } from '@nestjs/config';
 import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
 import RoleCacheService from '../../../src/authorization/service/rolecache.service';
@@ -23,6 +22,7 @@ import RolePermission from '../../../src/authorization/entity/rolePermission.ent
 import { Status } from '../../../src/schema/graphql.schema';
 import SearchService from '../../../src/authorization/service/search.service';
 import { UserNotAuthorized } from '../../../src/authentication/exception/userauth.exception';
+import { GroupCacheServiceInterface } from '../../../src/authorization/service/groupcache.service.interface';
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -65,7 +65,7 @@ describe('test UserService', () => {
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
   const userCacheService = Substitute.for<UserCacheService>();
-  const groupCacheService = Substitute.for<GroupCacheService>();
+  const groupCacheService = Substitute.for<GroupCacheServiceInterface>();
   const permissionCacheService = Substitute.for<PermissionCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
@@ -117,12 +117,12 @@ describe('test UserService', () => {
           provide: getRepositoryToken(RolePermission),
           useValue: rolePermissionRepository,
         },
-        { provide: 'UserCacheService', useValue: userCacheService },
-        { provide: 'GroupCacheService', useValue: groupCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'PermissionCacheService', useValue: permissionCacheService },
-        { provide: 'RoleCacheService', useValue: roleCacheService },
-        { provide: 'SearchService', useValue: searchService },
+        { provide: UserCacheService, useValue: userCacheService },
+        { provide: GroupCacheServiceInterface, useValue: groupCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: PermissionCacheService, useValue: permissionCacheService },
+        { provide: RoleCacheService, useValue: roleCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: Connection,
           useValue: connectionMock,

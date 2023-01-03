@@ -17,13 +17,14 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import { ConfigService } from '@nestjs/config';
-import GroupCacheService from '../../../src/authorization/service/groupcache.service';
 import GroupRole from '../../../src/authorization/entity/groupRole.entity';
 import Role from '../../../src/authorization/entity/role.entity';
 import User from '../../../src/authorization/entity/user.entity';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import SearchService from '../../../src/authorization/service/search.service';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
+import { GroupServiceInterface } from '../../../src/authorization/service/group.service.interface';
+import { GroupCacheServiceInterface } from '../../../src/authorization/service/groupcache.service.interface';
 const groups: Group[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -53,14 +54,14 @@ const users: User[] = [
 ];
 
 describe('test Group Service', () => {
-  let groupService: GroupService;
+  let groupService: GroupServiceInterface;
   const groupRepository = Substitute.for<Repository<Group>>();
   const permissionRepository = Substitute.for<Repository<Permission>>();
   const groupPermissionRepository = Substitute.for<
     Repository<GroupPermission>
   >();
   const userGroupRepository = Substitute.for<Repository<UserGroup>>();
-  const groupCacheService = Substitute.for<GroupCacheService>();
+  const groupCacheService = Substitute.for<GroupCacheServiceInterface>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const userRepository = Substitute.for<Repository<User>>();
@@ -110,17 +111,17 @@ describe('test Group Service', () => {
           provide: getRepositoryToken(Role),
           useValue: roleRepository,
         },
-        { provide: 'UserCacheService', useValue: userCacheService },
-        { provide: 'GroupCacheService', useValue: groupCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'SearchService', useValue: searchService },
+        { provide: UserCacheService, useValue: userCacheService },
+        { provide: GroupCacheServiceInterface, useValue: groupCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: Connection,
           useValue: connectionMock,
         },
       ],
     }).compile();
-    groupService = moduleRef.get<GroupService>(GroupService);
+    groupService = moduleRef.get<GroupServiceInterface>(GroupService);
   });
 
   it('should get all groups', async () => {

@@ -25,7 +25,9 @@ import { RoleResolver } from './resolver/role.resolver';
 import { UserResolver } from './resolver/user.resolver';
 import { EntityService } from './service/entity.service';
 import { GroupService } from './service/group.service';
-import GroupCacheService from './service/groupcache.service';
+import { GroupServiceInterface } from './service/group.service.interface';
+import { GroupCacheService } from './service/groupcache.service';
+import { GroupCacheServiceInterface } from './service/groupcache.service.interface';
 import { PermissionService } from './service/permission.service';
 import PermissionCacheService from './service/permissioncache.service';
 import { RoleService } from './service/role.service';
@@ -53,7 +55,6 @@ import UserCacheService from './service/usercache.service';
   ],
   providers: [
     GroupResolver,
-    GroupService,
     PermissionService,
     EntityService,
     PermissionResolver,
@@ -63,7 +64,6 @@ import UserCacheService from './service/usercache.service';
     EntityResolver,
     RedisCacheService,
     UserCacheService,
-    GroupCacheService,
     AuthenticationHelper,
     ConfigService,
     RoleResolver,
@@ -73,6 +73,14 @@ import UserCacheService from './service/usercache.service';
     PermissionRepository,
     UserPermissionRepository,
     GroupPermissionRepository,
+    {
+      provide: GroupServiceInterface,
+      useClass: GroupService,
+    },
+    {
+      provide: GroupCacheServiceInterface,
+      useClass: GroupCacheService,
+    },
   ],
   exports: [UserService],
 })
