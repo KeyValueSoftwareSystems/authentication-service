@@ -28,7 +28,7 @@ import { GroupService } from './service/group.service';
 import GroupCacheService from './service/groupcache.service';
 import { PermissionService } from './service/permission.service';
 import { PermissionServiceInterface } from './service/permission.service.interface';
-import PermissionCacheService from './service/permissioncache.service';
+import { PermissionCacheService } from './service/permissioncache.service';
 import { PermissionCacheServiceInterface } from './service/permissioncache.service.interface';
 import { RoleService } from './service/role.service';
 import RoleCacheService from './service/rolecache.service';

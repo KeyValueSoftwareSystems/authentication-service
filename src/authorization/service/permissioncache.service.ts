@@ -5,8 +5,7 @@ import { PermissionRepository } from '../repository/permission.repository';
 import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 
 @Injectable()
-export default class PermissionCacheService
-  implements PermissionCacheServiceInterface {
+export class PermissionCacheService implements PermissionCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
     private permissionsRepository: PermissionRepository,
