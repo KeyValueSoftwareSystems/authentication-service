@@ -1,6 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  DataSource,
+  Repository,
+  SelectQueryBuilder,
+  UpdateResult,
+} from 'typeorm';
 import { Arg, Substitute } from '@fluffy-spoon/substitute';
 import {
   NewRoleInput,
@@ -13,59 +18,71 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import { ConfigService } from '@nestjs/config';
 import GroupRole from '../../../src/authorization/entity/groupRole.entity';
-import Role from '../../../src/authorization/entity/role.entity';
 import { RoleService } from '../../../src/authorization/service/role.service';
 import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
 import RoleCacheService from '../../../src/authorization/service/rolecache.service';
 import SearchService from '../../../src/authorization/service/search.service';
 import Group from '../../../src/authorization/entity/group.entity';
-const roles: Role[] = [
-  {
-    id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-    name: 'Test1',
-  },
-];
-
-const permissions: Permission[] = [
-  {
-    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-    name: 'Customers',
-    label: 'Customers',
-  },
-];
+import { RoleRepository } from '../../../src/authorization/repository/role.repository';
+import { PermissionRepository } from '../../../src/authorization/repository/permission.repository';
+import Role from 'src/authorization/entity/role.entity';
+import { RoleNotFoundException } from '../../../src/authorization/exception/role.exception';
 
 describe('test Role Service', () => {
   let roleService: RoleService;
-  const rolesRepository = Substitute.for<Repository<Role>>();
-  const permissionRepository = Substitute.for<Repository<Permission>>();
+  let roleRepository: RoleRepository;
+  let permissionRepository: PermissionRepository;
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
   const roleCacheService = Substitute.for<RoleCacheService>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const searchService = Substitute.for<SearchService>();
-  const connectionMock = Substitute.for<Connection>();
   const groupRoleQueryBuilder = Substitute.for<SelectQueryBuilder<GroupRole>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
-  const rolesQueryBuilder = Substitute.for<SelectQueryBuilder<Role>>();
+
+  let createQueryBuilderMock: jest.Mock;
+  let getManyAndCountMock: jest.Mock;
+  let findOneByMock: jest.Mock;
+  let saveMock: jest.Mock;
+  let updateMock: jest.Mock;
+  let getManyMock: jest.Mock;
+
+  const mockDataSource = {
+    createEntityManager: jest.fn(),
+    transaction: jest.fn(),
+  };
+
+  const VALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
+  const INVALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f9';
+  const roles: Role[] = [
+    {
+      id: VALID_ROLE_ID,
+      name: 'Test1',
+    },
+  ];
+  const permissions: Permission[] = [
+    {
+      id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+      name: 'Customers',
+      label: 'Customers',
+    },
+  ];
+  const updateResult: UpdateResult = {
+    raw: '',
+    affected: 1,
+    generatedMaps: [],
+  };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [],
-      controllers: [],
       providers: [
         RoleService,
         ConfigService,
         AuthenticationHelper,
-        {
-          provide: getRepositoryToken(Role),
-          useValue: rolesRepository,
-        },
-        {
-          provide: getRepositoryToken(Permission),
-          useValue: permissionRepository,
-        },
+        RoleRepository,
+        PermissionRepository,
         {
           provide: getRepositoryToken(GroupRole),
           useValue: groupRoleRepository,
@@ -78,170 +95,226 @@ describe('test Role Service', () => {
         { provide: 'RedisCacheService', useValue: redisCacheService },
         { provide: 'SearchService', useValue: searchService },
         {
-          provide: Connection,
-          useValue: connectionMock,
+          provide: DataSource,
+          useValue: mockDataSource,
         },
       ],
     }).compile();
-    roleService = moduleRef.get<RoleService>(RoleService);
+
+    roleService = moduleRef.get(RoleService);
+    roleRepository = moduleRef.get(RoleRepository);
+    permissionRepository = moduleRef.get(PermissionRepository);
+
+    createQueryBuilderMock = roleRepository.createQueryBuilder = jest
+      .fn()
+      .mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getManyAndCount: (getManyAndCountMock = jest.fn()),
+      });
+
+    findOneByMock = roleRepository.findOneBy = jest.fn();
+    saveMock = roleRepository.save = jest.fn();
+    updateMock = roleRepository.update = jest.fn();
   });
 
-  it('should get all roles', async () => {
-    rolesRepository.createQueryBuilder().returns(rolesQueryBuilder);
-    rolesQueryBuilder.getManyAndCount().returns(Promise.resolve([roles, 1]));
-    const resp = await roleService.getAllRoles();
-    expect(resp).toEqual([roles, 1]);
+  describe('getAllRoles', () => {
+    it('should get all roles when no parameters are passed', async () => {
+      getManyAndCountMock.mockReturnValue([roles, 1]);
+
+      const result = await roleService.getAllRoles();
+
+      expect(createQueryBuilderMock.mock.calls[0][0]).toStrictEqual('role');
+
+      expect(createQueryBuilderMock().where).not.toBeCalled();
+
+      expect(getManyAndCountMock).toBeCalledTimes(1);
+
+      expect(result).toEqual([roles, 1]);
+    });
   });
 
-  it('should get a role by id', async () => {
-    rolesRepository
-      .findOneBy({ id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8' })
-      .returns(Promise.resolve(roles[0]));
-    const resp = await roleService.getRoleById(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-    );
-    expect(resp).toEqual(roles[0]);
+  describe('getRoleById', () => {
+    it('should get a role for valid id', async () => {
+      findOneByMock.mockResolvedValue(roles[0]);
+
+      const result = await roleService.getRoleById(VALID_ROLE_ID);
+
+      expect(findOneByMock).toBeCalledWith({
+        id: VALID_ROLE_ID,
+      });
+
+      expect(result).toEqual(roles[0]);
+    });
+
+    it('should throw exception for invalid id', async () => {
+      let result;
+      findOneByMock.mockResolvedValue(null);
+
+      try {
+        result = await roleService.getRoleById(INVALID_ROLE_ID);
+      } catch (error) {
+        expect(findOneByMock).toBeCalledWith({
+          id: INVALID_ROLE_ID,
+        });
+
+        expect(error).toBeInstanceOf(RoleNotFoundException);
+      }
+    });
   });
 
-  it('should create a role', async () => {
-    const input: NewRoleInput = {
-      name: 'Test1',
-    };
-    rolesRepository.create(input).returns(roles[0]);
+  describe('createRole', () => {
+    it('should create a role', async () => {
+      const input: NewRoleInput = {
+        name: 'Test1',
+      };
 
-    rolesRepository.insert(roles[0]).returns(Arg.any());
+      saveMock.mockResolvedValue(roles[0]);
 
-    const resp = await roleService.createRole(input);
-    expect(resp).toEqual(roles[0]);
+      const result = await roleService.createRole(input);
+
+      expect(saveMock).toBeCalledWith(input);
+
+      expect(result).toEqual(roles[0]);
+    });
   });
 
-  it('should update a role', async () => {
-    const input: UpdateRoleInput = {
-      name: 'Test1',
-    };
+  describe('updateRole', () => {
+    it('should update a role for a valid role id', async () => {
+      const input: UpdateRoleInput = {
+        name: 'Test1',
+      };
 
-    rolesRepository
-      .update('ae032b1b-cc3c-4e44-9197-276ca877a7f8', input)
-      .returns(Promise.resolve(Arg.any()));
+      updateMock.mockResolvedValue(updateResult);
 
-    const resp = await roleService.updateRole(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-      input,
-    );
-    expect(resp).toEqual(roles[0]);
+      const result = await roleService.updateRole(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        input,
+      );
+
+      expect(updateMock).toBeCalledWith(VALID_ROLE_ID, input);
+
+      expect(result).toEqual(true);
+    });
   });
 
-  it('should add permissions to a role', async () => {
-    const request = [
-      {
-        roleId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-        permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-      },
-    ];
-    const input: UpdateRolePermissionInput = {
-      permissions: ['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'],
-    };
-
-    permissionRepository
-      .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
-      .resolves(permissions);
-
-    rolePermissionRepository.create(request).returns(request);
-
-    permissionRepository
-      .createQueryBuilder('permission')
-      .returns(permissionQueryBuilder);
-    permissionQueryBuilder
-      .leftJoinAndSelect(
-        RolePermission,
-        'rolePermission',
-        'permission.id = rolePermission.permissionId',
-      )
-      .returns(permissionQueryBuilder);
-
-    permissionQueryBuilder
-      .where('rolePermission.roleId = :roleId', {
-        roleId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-      })
-      .returns(permissionQueryBuilder);
-
-    permissionQueryBuilder.getMany().resolves(permissions);
-
-    connectionMock.transaction(Arg.any()).resolves(request);
-
-    const resp = await roleService.updateRolePermissions(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-      input,
-    );
-    expect(resp).toEqual(permissions);
+  describe('deleteRole', () => {
+    it('should delete a role', async () => {
+      // roleRepository
+      //   .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
+      //   .resolves(Arg.any());
+      groupRoleRepository.createQueryBuilder().returns(groupRoleQueryBuilder);
+      groupRoleQueryBuilder
+        .innerJoinAndSelect(Group, 'group', 'group.id = GroupRole.groupId')
+        .returns(groupRoleQueryBuilder);
+      groupRoleQueryBuilder
+        .where('GroupRole.roleId= :id', {
+          id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        })
+        .returns(groupRoleQueryBuilder);
+      groupRoleQueryBuilder.getCount().resolves(0);
+      const resp = await roleService.deleteRole(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      );
+      expect(resp).toEqual(roles[0]);
+    });
   });
 
-  it('should throw exception when adding invalid permissions to a role', async () => {
-    const input: UpdateRolePermissionInput = {
-      permissions: ['3e9e78c9-3fcd-4eed-b027-62f794680b03'],
-    };
+  describe('updateRolePermissions', () => {
+    it('should add permissions to a role', async () => {
+      const request = [
+        {
+          roleId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+          permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+        },
+      ];
+      const input: UpdateRolePermissionInput = {
+        permissions: ['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'],
+      };
 
-    permissionRepository
-      .findByIds(['3e9e78c9-3fcd-4eed-b027-62f794680b03'])
-      .resolves([]);
+      // permissionRepository
+      //   .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
+      //   .resolves(permissions);
 
-    const resp = roleService.updateRolePermissions(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-      input,
-    );
-    await expect(resp).rejects.toThrowError(
-      new PermissionNotFoundException(
-        ['3e9e78c9-3fcd-4eed-b027-62f794680b03'].toString(),
-      ),
-    );
+      // rolePermissionRepository.create(request).returns(request);
+
+      // permissionRepository
+      //   .createQueryBuilder('permission')
+      //   .returns(permissionQueryBuilder);
+      permissionQueryBuilder
+        .leftJoinAndSelect(
+          RolePermission,
+          'rolePermission',
+          'permission.id = rolePermission.permissionId',
+        )
+        .returns(permissionQueryBuilder);
+
+      permissionQueryBuilder
+        .where('rolePermission.roleId = :roleId', {
+          roleId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        })
+        .returns(permissionQueryBuilder);
+
+      permissionQueryBuilder.getMany().resolves(permissions);
+
+      mockDataSource.transaction(Arg.any()).resolves(request);
+
+      const result = await roleService.updateRolePermissions(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        input,
+      );
+      expect(result).toEqual(permissions);
+    });
+
+    it('should throw exception when adding invalid permissions to a role', async () => {
+      const input: UpdateRolePermissionInput = {
+        permissions: ['3e9e78c9-3fcd-4eed-b027-62f794680b03'],
+      };
+
+      // permissionRepository
+      //   .findByIds(['3e9e78c9-3fcd-4eed-b027-62f794680b03'])
+      //   .resolves([]);
+
+      const result = roleService.updateRolePermissions(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+        input,
+      );
+      await expect(result).rejects.toThrowError(
+        new PermissionNotFoundException(
+          ['3e9e78c9-3fcd-4eed-b027-62f794680b03'].toString(),
+        ),
+      );
+    });
   });
 
-  it('should delete a role', async () => {
-    rolesRepository
-      .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-      .resolves(Arg.any());
-    groupRoleRepository.createQueryBuilder().returns(groupRoleQueryBuilder);
-    groupRoleQueryBuilder
-      .innerJoinAndSelect(Group, 'group', 'group.id = GroupRole.groupId')
-      .returns(groupRoleQueryBuilder);
-    groupRoleQueryBuilder
-      .where('GroupRole.roleId= :id', {
-        id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-      })
-      .returns(groupRoleQueryBuilder);
-    groupRoleQueryBuilder.getCount().resolves(0);
-    const resp = await roleService.deleteRole(
-      'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-    );
-    expect(resp).toEqual(roles[0]);
-  });
-
-  it('should return all permissions of the role', async () => {
-    const permissions: Permission[] = [
-      {
-        id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-        name: 'Customers',
-        label: 'Customers',
-      },
-    ];
-    permissionRepository
-      .createQueryBuilder('permission')
-      .returns(permissionQueryBuilder);
-    permissionQueryBuilder
-      .leftJoinAndSelect(
-        RolePermission,
-        'rolePermission',
-        'permission.id = rolePermission.permissionId',
-      )
-      .returns(permissionQueryBuilder);
-    permissionQueryBuilder
-      .where('rolePermission.roleId = :roleId', {
-        roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
-      })
-      .returns(permissionQueryBuilder);
-    const resp = await roleService.getRolePermissions(
-      'fcd858c6-26c5-462b-8c53-4b544830dca8',
-    );
-    expect(resp).toEqual(permissions);
+  describe('getRolePermissions', () => {
+    it('should return all permissions of the role', async () => {
+      const permissions: Permission[] = [
+        {
+          id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+          name: 'Customers',
+          label: 'Customers',
+        },
+      ];
+      // permissionRepository
+      //   .createQueryBuilder('permission')
+      //   .returns(permissionQueryBuilder);
+      permissionQueryBuilder
+        .leftJoinAndSelect(
+          RolePermission,
+          'rolePermission',
+          'permission.id = rolePermission.permissionId',
+        )
+        .returns(permissionQueryBuilder);
+      permissionQueryBuilder
+        .where('rolePermission.roleId = :roleId', {
+          roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
+        })
+        .returns(permissionQueryBuilder);
+      const result = await roleService.getRolePermissions(
+        'fcd858c6-26c5-462b-8c53-4b544830dca8',
+      );
+      expect(result).toEqual(permissions);
+    });
   });
 });

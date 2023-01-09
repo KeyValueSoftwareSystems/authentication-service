@@ -23,7 +23,7 @@ import {
 } from '../exception/userauth.exception';
 import { Authenticatable } from '../interfaces/authenticatable';
 import { TokenService } from './token.service';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -32,7 +32,7 @@ export default class PasswordAuthService implements Authenticatable {
     private userService: UserService,
     private tokenService: TokenService,
     private authenticationHelper: AuthenticationHelper,
-    private connection: Connection,
+    private dataSource: DataSource,
     private configService: ConfigService,
   ) {}
 
@@ -87,7 +87,7 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.lastName = userDetails.lastName;
     userFromInput.status = Status.INVITED;
     let invitationToken: { token: any; tokenExpiryTime?: any };
-    const transaction = await this.connection.manager.transaction(async () => {
+    const transaction = await this.dataSource.manager.transaction(async () => {
       const savedUser = await this.userService.createUser(userFromInput);
       invitationToken = this.authenticationHelper.generateInvitationToken(
         { id: savedUser.id },

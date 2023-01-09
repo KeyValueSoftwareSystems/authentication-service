@@ -7,7 +7,7 @@ import {
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -27,33 +27,39 @@ import User from '../entity/user.entity';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import RolePermission from '../entity/rolePermission.entity';
+import { PermissionRepository } from '../repository/permission.repository';
+import { RoleRepository } from '../repository/role.repository';
+import { GroupRoleRepository } from '../repository/groupRole.repository';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { GroupRepository } from '../repository/group.repository';
+import { UserRepository } from '../repository/user.repository';
 
 @Injectable()
 export class GroupService {
   constructor(
     @InjectRepository(Group)
-    private groupsRepository: Repository<Group>,
+    private groupRepository: GroupRepository,
     @InjectRepository(UserGroup)
     private userGroupRepository: Repository<UserGroup>,
     @InjectRepository(GroupPermission)
-    private groupPermissionRepository: Repository<GroupPermission>,
+    private groupPermissionRepository: GroupPermissionRepository,
     @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>,
+    private permissionRepository: PermissionRepository,
     private groupCacheService: GroupCacheService,
     @InjectRepository(GroupRole)
-    private groupRoleRepository: Repository<GroupRole>,
+    private groupRoleRepository: GroupRoleRepository,
     @InjectRepository(Role)
-    private rolesRepository: Repository<Role>,
+    private rolesRepository: RoleRepository,
     @InjectRepository(User)
-    private userRepository: Repository<User>,
-    private connection: Connection,
+    private userRepository: UserRepository,
+    private dataSource: DataSource,
     private userCacheService: UserCacheService,
     private searchService: SearchService,
   ) {}
 
   getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
     const SortFieldMapping = new Map([['name', 'Group.name']]);
-    let queryBuilder = this.groupsRepository.createQueryBuilder();
+    let queryBuilder = this.groupRepository.createQueryBuilder();
 
     if (input?.search) {
       queryBuilder = this.searchService.generateSearchTermForEntity(
@@ -75,7 +81,7 @@ export class GroupService {
   }
 
   async getGroupById(id: string): Promise<Group> {
-    const group = await this.groupsRepository.findOneBy({ id });
+    const group = await this.groupRepository.getGroupById(id);
     if (group) {
       return group;
     }
@@ -92,21 +98,19 @@ export class GroupService {
   }
 
   async createGroup(group: NewGroupInput): Promise<Group> {
-    const newGroup = await this.groupsRepository.create(group);
-    await this.groupsRepository.insert(newGroup);
-    return newGroup;
+    return this.groupRepository.save(group);
   }
 
   async updateGroup(id: string, group: UpdateGroupInput): Promise<Group> {
-    const existingGroup = await this.groupsRepository.findOneBy({ id });
+    const existingGroup = await this.groupRepository.getGroupById(id);
     if (!existingGroup) {
       throw new GroupNotFoundException(id);
     }
     if (group.users) {
       await this.updateGroupUsers(id, group.users);
     }
-    const groupToUpdate = this.groupsRepository.create(group);
-    await this.groupsRepository.update(id, groupToUpdate);
+    const groupToUpdate = this.groupRepository.create(group);
+    await this.groupRepository.update(id, groupToUpdate);
     return {
       ...existingGroup,
       ...groupToUpdate,
@@ -114,7 +118,7 @@ export class GroupService {
   }
 
   async deleteGroup(id: string): Promise<Group> {
-    const existingGroup = await this.groupsRepository.findOneBy({ id });
+    const existingGroup = await this.groupRepository.getGroupById(id);
     if (!existingGroup) {
       throw new GroupNotFoundException(id);
     }
@@ -122,7 +126,7 @@ export class GroupService {
     if (usage) {
       throw new GroupDeleteNotAllowedException();
     }
-    await this.groupsRepository.softDelete(id);
+    await this.groupRepository.softDelete(id);
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return existingGroup;
   }
@@ -131,7 +135,7 @@ export class GroupService {
     id: string,
     request: UpdateGroupPermissionInput,
   ): Promise<Permission[]> {
-    const updatedGroup = await this.groupsRepository.findOneBy({ id });
+    const updatedGroup = await this.groupRepository.getGroupById(id);
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
@@ -164,7 +168,7 @@ export class GroupService {
       })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const groupPermissionsRepo = entityManager.getRepository(GroupPermission);
       await groupPermissionsRepo.remove(permissionsToBeRemovedFromGroup);
       await groupPermissionsRepo.save(groupPermission);
@@ -200,7 +204,7 @@ export class GroupService {
       userIds.map((userId) => ({ userId: userId, groupId: id })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const userGroupsRepo = entityManager.getRepository(UserGroup);
       await userGroupsRepo.remove(usersToBeRemovedFromGroup);
       await userGroupsRepo.save(userGroups);
@@ -239,7 +243,7 @@ export class GroupService {
     id: string,
     request: UpdateGroupRoleInput,
   ): Promise<Role[]> {
-    const updatedGroup = await this.groupsRepository.findOneBy({ id });
+    const updatedGroup = await this.groupRepository.getGroupById(id);
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
@@ -268,7 +272,7 @@ export class GroupService {
       })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const groupRolesRepo = entityManager.getRepository(GroupRole);
       await groupRolesRepo.remove(rolesToBeRemovedFromGroup);
       await groupRolesRepo.save(groupRoles);

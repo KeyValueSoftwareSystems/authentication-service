@@ -6,7 +6,7 @@ import {
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { Connection, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
 import Permission from '../entity/permission.entity';
@@ -19,27 +19,30 @@ import RoleCacheService from './rolecache.service';
 import GroupRole from '../entity/groupRole.entity';
 import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
-import Group from '../entity/group.entity';
+import { RoleRepository } from '../repository/role.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { GroupRoleRepository } from '../repository/groupRole.repository';
+import { RolePermissionRepository } from '../repository/rolePermission.repository';
 
 @Injectable()
 export class RoleService {
   constructor(
     @InjectRepository(Role)
-    private rolesRepository: Repository<Role>,
+    private rolesRepository: RoleRepository,
     @InjectRepository(GroupRole)
-    private groupRoleRepository: Repository<GroupRole>,
+    private groupRoleRepository: GroupRoleRepository,
     @InjectRepository(RolePermission)
-    private rolePermissionRepository: Repository<RolePermission>,
+    private rolePermissionRepository: RolePermissionRepository,
     @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>,
+    private permissionRepository: PermissionRepository,
     private roleCacheService: RoleCacheService,
-    private connection: Connection,
+    private dataSource: DataSource,
     private searchService: SearchService,
   ) {}
 
   async getAllRoles(input?: RoleInputFilter): Promise<[Role[], number]> {
     const SortFieldMapping = new Map([['name', 'Role.name']]);
-    let queryBuilder = this.rolesRepository.createQueryBuilder();
+    let queryBuilder = this.rolesRepository.createQueryBuilder('role');
     if (input?.search) {
       queryBuilder = this.searchService.generateSearchTermForEntity(
         queryBuilder,
@@ -56,11 +59,11 @@ export class RoleService {
         .limit(input?.pagination?.limit ?? 10)
         .offset(input?.pagination?.offset ?? 0);
     }
-    return await queryBuilder.getManyAndCount();
+    return queryBuilder.getManyAndCount();
   }
 
   async getRoleById(id: string): Promise<Role> {
-    const role = await this.rolesRepository.findOneBy({ id });
+    const role = await this.rolesRepository.getRoleById(id);
     if (!role) {
       throw new RoleNotFoundException(id);
     }
@@ -68,26 +71,19 @@ export class RoleService {
   }
 
   async createRole(role: NewRoleInput): Promise<Role> {
-    const newRole = this.rolesRepository.create(role);
-    await this.rolesRepository.insert(newRole);
-    return newRole;
+    return this.rolesRepository.save(role);
   }
 
   async updateRole(id: string, role: UpdateRoleInput): Promise<Role> {
-    const existingRole = await this.rolesRepository.findOneBy({ id });
-    if (!existingRole) {
+    const updatedRole = await this.rolesRepository.updateRoleById(id, role);
+    if (!updatedRole) {
       throw new RoleNotFoundException(id);
     }
-    const roleToUpdate = this.rolesRepository.create(role);
-    await this.rolesRepository.update(id, roleToUpdate);
-    return {
-      ...existingRole,
-      ...roleToUpdate,
-    };
+    return this.getRoleById(id);
   }
 
   async deleteRole(id: string): Promise<Role> {
-    const existingRole = await this.rolesRepository.findOneBy({ id });
+    const existingRole = await this.rolesRepository.getRoleById(id);
     if (!existingRole) {
       throw new RoleNotFoundException(id);
     }
@@ -95,7 +91,13 @@ export class RoleService {
     if (usage) {
       throw new RoleDeleteNotAllowedException();
     }
-    await this.rolesRepository.softDelete(id);
+
+    await this.dataSource.manager.transaction(async (entityManager) => {
+      const roleRepo = entityManager.getRepository(Role);
+      const rolePermissionsRepo = entityManager.getRepository(RolePermission);
+      await rolePermissionsRepo.softDelete({ roleId: id });
+      await roleRepo.softDelete(id);
+    });
     await this.roleCacheService.invalidateRolePermissionsByRoleId(id);
     return existingRole;
   }
@@ -104,12 +106,12 @@ export class RoleService {
     id: string,
     request: UpdateRolePermissionInput,
   ): Promise<Permission[]> {
-    const updatedRole = await this.rolesRepository.findOneBy({ id });
+    const updatedRole = await this.rolesRepository.getRoleById(id);
     if (!updatedRole) {
       throw new RoleNotFoundException(id);
     }
 
-    const permissionsInRequest = await this.permissionRepository.findByIds(
+    const permissionsInRequest = await this.permissionRepository.getPermissionsByIds(
       request.permissions,
     );
     const existingPermissionsOfRole = await this.getRolePermissions(id);
@@ -137,7 +139,7 @@ export class RoleService {
       })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const rolePermissionsRepo = entityManager.getRepository(RolePermission);
       await rolePermissionsRepo.remove(permissionsToBeRemovedFromRole);
       await rolePermissionsRepo.save(rolePermissions);
@@ -150,24 +152,13 @@ export class RoleService {
   }
 
   async getRolePermissions(id: string): Promise<Permission[]> {
-    const permissions = await this.permissionRepository
-      .createQueryBuilder('permission')
-      .leftJoinAndSelect(
-        RolePermission,
-        'rolePermission',
-        'permission.id = rolePermission.permissionId',
-      )
-      .where('rolePermission.roleId = :roleId', { roleId: id })
-      .getMany();
-    return permissions;
+    return this.permissionRepository.getPermissionsByRoleId(id);
   }
 
-  private async checkRoleUsage(id: string) {
-    const groupCount = await this.groupRoleRepository
-      .createQueryBuilder()
-      .innerJoinAndSelect(Group, 'group', 'group.id = GroupRole.groupId')
-      .where('GroupRole.roleId= :id', { id: id })
-      .getCount();
-    return groupCount != 0;
+  private async checkRoleUsage(roleId: string) {
+    const groupCount = await this.groupRoleRepository.getGroupCountForRoleId(
+      roleId,
+    );
+    return groupCount !== 0;
   }
 }

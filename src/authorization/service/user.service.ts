@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -27,24 +27,28 @@ import SearchService from './search.service';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import { FilterBuilder } from '../../common/filter.builder';
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
+import { UserRepository } from '../repository/user.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { GroupRepository } from '../repository/group.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
 
 @Injectable()
 export default class UserService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersRepository: UserRepository,
     @InjectRepository(UserGroup)
     private userGroupRepository: Repository<UserGroup>,
     @InjectRepository(Group)
-    private groupRepository: Repository<Group>,
+    private groupRepository: GroupRepository,
     @InjectRepository(UserPermission)
-    private userPermissionRepository: Repository<UserPermission>,
+    private userPermissionRepository: UserPermissionRepository,
     @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>,
+    private permissionRepository: PermissionRepository,
     private userCacheService: UserCacheService,
     private groupCacheService: GroupCacheService,
     private permissionCacheService: PermissionCacheService,
-    private connection: Connection,
+    private dataSource: DataSource,
     private searchService: SearchService,
     private roleCacheService: RoleCacheService,
   ) {}
@@ -92,7 +96,7 @@ export default class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.getUserById(id);
     if (user) {
       return user;
     }
@@ -100,10 +104,9 @@ export default class UserService {
   }
 
   async createUser(user: User): Promise<User> {
-    const newUser = this.usersRepository.create(user);
-    const result = await this.usersRepository.insert(newUser);
+    const result = await this.usersRepository.save(user);
     const savedUser = await this.usersRepository.findOneBy({
-      id: result.raw[0].id,
+      id: result.id,
     });
     if (savedUser) {
       return savedUser;
@@ -145,7 +148,7 @@ export default class UserService {
       user.groups.map((group) => ({ userId: id, groupId: group })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const userGroupsRepo = entityManager.getRepository(UserGroup);
       await userGroupsRepo.remove(groupsToBeRemovedFromUser);
       await userGroupsRepo.save(userGroups);
@@ -195,7 +198,7 @@ export default class UserService {
       })),
     );
 
-    const userPermissionsUpdated = await this.connection.transaction(
+    const userPermissionsUpdated = await this.dataSource.transaction(
       async (entityManager) => {
         const userPermissionsRepo = entityManager.getRepository(UserPermission);
         await userPermissionsRepo.remove(userPermissionsToBeRemoved);
@@ -234,7 +237,7 @@ export default class UserService {
       throw new UserNotFoundException(id);
     }
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const usersRepo = entityManager.getRepository(User);
       await usersRepo.update(id, { status: Status.INACTIVE });
       await usersRepo.softDelete(id);

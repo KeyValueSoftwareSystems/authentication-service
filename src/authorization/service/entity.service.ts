@@ -5,31 +5,33 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../schema/graphql.schema';
-import { Connection, createQueryBuilder, Repository } from 'typeorm';
+import { DataSource, createQueryBuilder, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
 import { EntityNotFoundException } from '../exception/entity.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
+import { PermissionRepository } from '../repository/permission.repository';
+import { EntityRepository } from '../repository/entity.repository';
 
 @Injectable()
 export class EntityService {
   constructor(
     @InjectRepository(EntityModel)
-    private entityRepository: Repository<EntityModel>,
+    private entityRepository: EntityRepository,
     @InjectRepository(EntityPermission)
     private entityPermissionRepository: Repository<EntityPermission>,
     @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>,
-    private connection: Connection,
+    private permissionRepository: PermissionRepository,
+    private dataSource: DataSource,
   ) {}
 
   getAllEntities(): Promise<EntityModel[]> {
-    return this.entityRepository.find();
+    return this.entityRepository.getAllEntities();
   }
 
   async getEntityById(id: string): Promise<EntityModel> {
-    const entity = await this.entityRepository.findOneBy({ id });
+    const entity = await this.entityRepository.getEntityById(id);
     if (entity) {
       return entity;
     }
@@ -37,16 +39,14 @@ export class EntityService {
   }
 
   async createEntity(entity: NewEntityInput): Promise<EntityModel> {
-    const newEntity = this.entityRepository.create(entity);
-    await this.entityRepository.insert(newEntity);
-    return newEntity;
+    return this.entityRepository.save(entity);
   }
 
   async updateEntity(
     id: string,
     entity: UpdateEntityInput,
   ): Promise<EntityModel> {
-    const existingEntity = await this.entityRepository.findOneBy({ id });
+    const existingEntity = await this.entityRepository.getEntityById(id);
     if (!existingEntity) {
       throw new EntityNotFoundException(id);
     }
@@ -60,7 +60,7 @@ export class EntityService {
   }
 
   async deleteEntity(id: string): Promise<EntityModel> {
-    const existingEntity = await this.entityRepository.findOneBy({ id });
+    const existingEntity = await this.entityRepository.getEntityById(id);
     if (!existingEntity) {
       throw new EntityNotFoundException(id);
     }
@@ -72,7 +72,7 @@ export class EntityService {
     id: string,
     request: UpdateEntityPermissionInput,
   ): Promise<Permission[]> {
-    const updatedEntity = await this.entityRepository.findOneBy({ id });
+    const updatedEntity = await this.entityRepository.getEntityById(id);
     if (!updatedEntity) {
       throw new EntityNotFoundException(id);
     }
@@ -105,7 +105,7 @@ export class EntityService {
       })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const entityPermissionsRepo = entityManager.getRepository(
         EntityPermission,
       );
