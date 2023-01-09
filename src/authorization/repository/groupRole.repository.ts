@@ -10,10 +10,16 @@ export class GroupRoleRepository extends BaseRepository<GroupRole> {
     super(GroupRole, dataSource);
   }
 
-  async getGroupCountForRoleId(roleId: string) {
+  async getGroupCountForRoleId(roleId: string): Promise<number> {
     return this.createQueryBuilder('groupRole')
       .innerJoinAndSelect(Group, 'group', 'group.id = groupRole.groupId')
       .where('groupRole.roleId= :roleId', { roleId })
       .getCount();
+  }
+
+  async getGroupRolesForGroupId(groupId: string): Promise<GroupRole[]> {
+    return this.find({
+      where: { groupId },
+    });
   }
 }

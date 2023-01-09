@@ -7,7 +7,7 @@ import {
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -33,6 +33,7 @@ import { GroupRoleRepository } from '../repository/groupRole.repository';
 import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import { GroupRepository } from '../repository/group.repository';
 import { UserRepository } from '../repository/user.repository';
+import { UserGroupRepository } from '../repository/userGroup.repository';
 
 @Injectable()
 export class GroupService {
@@ -40,7 +41,7 @@ export class GroupService {
     @InjectRepository(Group)
     private groupRepository: GroupRepository,
     @InjectRepository(UserGroup)
-    private userGroupRepository: Repository<UserGroup>,
+    private userGroupRepository: UserGroupRepository,
     @InjectRepository(GroupPermission)
     private groupPermissionRepository: GroupPermissionRepository,
     @InjectRepository(Permission)
@@ -57,7 +58,7 @@ export class GroupService {
     private searchService: SearchService,
   ) {}
 
-  getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
+  async getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
     const SortFieldMapping = new Map([['name', 'Group.name']]);
     let queryBuilder = this.groupRepository.createQueryBuilder();
 
@@ -82,19 +83,10 @@ export class GroupService {
 
   async getGroupById(id: string): Promise<Group> {
     const group = await this.groupRepository.getGroupById(id);
-    if (group) {
-      return group;
+    if (!group) {
+      throw new GroupNotFoundException(id);
     }
-    throw new GroupNotFoundException(id);
-  }
-
-  async getGroupUsers(id: string): Promise<User[]> {
-    const users = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId = user.id')
-      .where('userGroup.groupId = :groupId', { groupId: id })
-      .getMany();
-    return users;
+    return group;
   }
 
   async createGroup(group: NewGroupInput): Promise<Group> {
@@ -109,11 +101,10 @@ export class GroupService {
     if (group.users) {
       await this.updateGroupUsers(id, group.users);
     }
-    const groupToUpdate = this.groupRepository.create(group);
-    await this.groupRepository.update(id, groupToUpdate);
+    await this.groupRepository.updateGroupById(id, group);
     return {
       ...existingGroup,
-      ...groupToUpdate,
+      ...group,
     };
   }
 
@@ -126,7 +117,14 @@ export class GroupService {
     if (usage) {
       throw new GroupDeleteNotAllowedException();
     }
-    await this.groupRepository.softDelete(id);
+
+    await this.dataSource.manager.transaction(async (entityManager) => {
+      const groupRepo = entityManager.getRepository(Group);
+      const groupPermissionRepo = entityManager.getRepository(GroupPermission);
+      await groupPermissionRepo.softDelete({ groupId: id });
+      await groupRepo.softDelete(id);
+    });
+
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return existingGroup;
   }
@@ -140,7 +138,7 @@ export class GroupService {
       throw new GroupNotFoundException(id);
     }
 
-    const permissionsInRequest = await this.permissionRepository.findByIds(
+    const permissionsInRequest = await this.permissionRepository.getPermissionsByIds(
       request.permissions,
     );
     const existingPermissionsOfGroup = await this.getGroupPermissions(id);
@@ -175,21 +173,13 @@ export class GroupService {
     });
 
     const permissions = await this.getGroupPermissions(id);
+
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return permissions;
   }
 
   async getGroupPermissions(id: string): Promise<Permission[]> {
-    const permissions = await this.permissionRepository
-      .createQueryBuilder('permission')
-      .leftJoinAndSelect(
-        GroupPermission,
-        'groupPermission',
-        'permission.id = groupPermission.permissionId',
-      )
-      .where('groupPermission.groupId = :groupId', { groupId: id })
-      .getMany();
-    return permissions;
+    return this.permissionRepository.getPermissionsByGroupId(id);
   }
 
   async updateGroupUsers(id: string, userIds: string[]): Promise<User[]> {
@@ -217,8 +207,12 @@ export class GroupService {
     return users;
   }
 
+  async getGroupUsers(groupId: string): Promise<User[]> {
+    return this.userRepository.getUsersByGroupId(groupId);
+  }
+
   private async validateUsers(userIds: string[]): Promise<Set<string>> {
-    const usersInRequest = await this.userRepository.findByIds(userIds);
+    const usersInRequest = await this.userRepository.getUsersByIds(userIds);
     const validUsersInRequest: Set<string> = new Set(
       usersInRequest.map((p) => p.id),
     );
@@ -231,12 +225,7 @@ export class GroupService {
   }
 
   async getGroupRoles(id: string): Promise<Role[]> {
-    const roles = await this.rolesRepository
-      .createQueryBuilder('role')
-      .leftJoinAndSelect(GroupRole, 'groupRole', 'role.id = groupRole.roleId')
-      .where('groupRole.groupId = :groupId', { groupId: id })
-      .getMany();
-    return roles;
+    return this.rolesRepository.getRolesForGroupId(id);
   }
 
   async updateGroupRoles(
@@ -249,7 +238,9 @@ export class GroupService {
     }
 
     const existingRolesOfGroup = await this.getGroupRoles(id);
-    const rolesInRequest = await this.rolesRepository.findByIds(request.roles);
+    const rolesInRequest = await this.rolesRepository.getRolesByIds(
+      request.roles,
+    );
     const validRolesInRequest: Set<string> = new Set(
       rolesInRequest.map((p) => p.id),
     );

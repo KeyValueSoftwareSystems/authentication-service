@@ -5,7 +5,7 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../schema/graphql.schema';
-import { DataSource, createQueryBuilder, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
@@ -26,7 +26,7 @@ export class EntityService {
     private dataSource: DataSource,
   ) {}
 
-  getAllEntities(): Promise<EntityModel[]> {
+  async getAllEntities(): Promise<EntityModel[]> {
     return this.entityRepository.getAllEntities();
   }
 
@@ -46,17 +46,15 @@ export class EntityService {
     id: string,
     entity: UpdateEntityInput,
   ): Promise<EntityModel> {
-    const existingEntity = await this.entityRepository.getEntityById(id);
-    if (!existingEntity) {
+    const updateEntity = await this.entityRepository.updateEntityById(
+      id,
+      entity,
+    );
+    if (!updateEntity) {
       throw new EntityNotFoundException(id);
     }
-    const entityToUpdate = this.entityRepository.create(entity);
-    await this.entityRepository.update(id, entityToUpdate);
 
-    return {
-      ...existingEntity,
-      ...entityToUpdate,
-    };
+    return this.getEntityById(id);
   }
 
   async deleteEntity(id: string): Promise<EntityModel> {
@@ -77,7 +75,7 @@ export class EntityService {
       throw new EntityNotFoundException(id);
     }
 
-    const permissionsInRequest = await this.permissionRepository.findByIds(
+    const permissionsInRequest = await this.permissionRepository.getPermissionsByIds(
       request.permissions,
     );
     const existingPermissionsOfEntity = await this.getEntityPermissions(id);
@@ -116,17 +114,7 @@ export class EntityService {
     return permissions;
   }
 
-  async getEntityPermissions(id: string): Promise<Permission[]> {
-    const permissions = await createQueryBuilder<Permission>('permission')
-      .leftJoinAndSelect(
-        EntityPermission,
-        'entityPermission',
-        'Permission.id = cast(entityPermission.permissionId as uuid)',
-      )
-      .where('entityPermission.entityId = :entityId', {
-        entityId: id,
-      })
-      .getMany();
-    return permissions;
+  async getEntityPermissions(entityId: string): Promise<Permission[]> {
+    return this.permissionRepository.getPermissionsByEntityId(entityId);
   }
 }

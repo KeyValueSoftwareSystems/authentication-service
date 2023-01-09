@@ -7,6 +7,8 @@ import {
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
 import RolePermission from '../entity/rolePermission.entity';
+import EntityPermission from '../entity/entityPermission.entity';
+import GroupPermission from '../entity/groupPermission.entity';
 
 @Injectable()
 export class PermissionRepository extends BaseRepository<Permission> {
@@ -56,11 +58,27 @@ export class PermissionRepository extends BaseRepository<Permission> {
       .getMany();
   }
 
-  async findByIds(ids: string[]) {
-    return this.find({
-      where: {
-        id: In(ids),
-      },
-    });
+  async getPermissionsByGroupId(groupId: string): Promise<Permission[]> {
+    return this.createQueryBuilder('permission')
+      .leftJoinAndSelect(
+        GroupPermission,
+        'groupPermission',
+        'permission.id = groupPermission.permissionId',
+      )
+      .where('groupPermission.groupId = :groupId', { groupId })
+      .getMany();
+  }
+
+  async getPermissionsByEntityId(entityId: string): Promise<Permission[]> {
+    return this.createQueryBuilder('permission')
+      .leftJoinAndSelect(
+        EntityPermission,
+        'entityPermission',
+        'Permission.id = cast(entityPermission.permissionId as uuid)',
+      )
+      .where('entityPermission.entityId = :entityId', {
+        entityId,
+      })
+      .getMany();
   }
 }

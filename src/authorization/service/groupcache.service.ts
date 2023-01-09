@@ -2,20 +2,22 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import GroupPermission from '../entity/groupPermission.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupRole from '../entity/groupRole.entity';
+import { GroupRepository } from '../repository/group.repository';
+import { GroupRoleRepository } from '../repository/groupRole.repository';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 
 @Injectable()
 export default class GroupCacheService {
   constructor(
     private cacheManager: RedisCacheService,
     @InjectRepository(GroupPermission)
-    private groupPermissionRepository: Repository<GroupPermission>,
+    private groupPermissionRepository: GroupPermissionRepository,
     @InjectRepository(GroupRole)
-    private groupRoleRepository: Repository<GroupRole>,
+    private groupRoleRepository: GroupRoleRepository,
     @InjectRepository(Group)
-    private groupRepository: Repository<Group>,
+    private groupRepository: GroupRepository,
   ) {}
 
   async getGroupPermissionsFromGroupId(groupId: string): Promise<string[]> {
@@ -29,7 +31,7 @@ export default class GroupCacheService {
           .findOneOrFail({ where: { id: groupId } })
           .then(() =>
             this.groupPermissionRepository.find({
-              where: { groupId: groupId },
+              where: { groupId },
             }),
           )
       ).map((x) => x.permissionId);
@@ -54,11 +56,7 @@ export default class GroupCacheService {
       (
         await this.groupRepository
           .findOneOrFail({ where: { id: groupId } })
-          .then(() =>
-            this.groupRoleRepository.find({
-              where: { groupId: groupId },
-            }),
-          )
+          .then(() => this.groupRoleRepository.getGroupRolesForGroupId(groupId))
       ).map((groupRole) => groupRole.roleId);
     rolesFromCache ||
       (await this.cacheManager.set(`GROUP:${groupId}:ROLES`, roles));

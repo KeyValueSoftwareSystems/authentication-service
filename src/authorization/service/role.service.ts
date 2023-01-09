@@ -98,6 +98,7 @@ export class RoleService {
       await rolePermissionsRepo.softDelete({ roleId: id });
       await roleRepo.softDelete(id);
     });
+
     await this.roleCacheService.invalidateRolePermissionsByRoleId(id);
     return existingRole;
   }

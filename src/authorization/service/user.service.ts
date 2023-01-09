@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { DataSource, SelectQueryBuilder } from 'typeorm';
 
 import User from '../entity/user.entity';
 import {
@@ -31,6 +31,7 @@ import { UserRepository } from '../repository/user.repository';
 import { PermissionRepository } from '../repository/permission.repository';
 import { GroupRepository } from '../repository/group.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
+import { UserGroupRepository } from '../repository/userGroup.repository';
 
 @Injectable()
 export default class UserService {
@@ -38,7 +39,7 @@ export default class UserService {
     @InjectRepository(User)
     private usersRepository: UserRepository,
     @InjectRepository(UserGroup)
-    private userGroupRepository: Repository<UserGroup>,
+    private userGroupRepository: UserGroupRepository,
     @InjectRepository(Group)
     private groupRepository: GroupRepository,
     @InjectRepository(UserPermission)
@@ -129,7 +130,9 @@ export default class UserService {
     user: UpdateUserGroupInput,
   ): Promise<Group[]> {
     await this.getUserById(id);
-    const groupsInRequest = await this.groupRepository.findByIds(user.groups);
+    const groupsInRequest = await this.groupRepository.getGroupsByIds(
+      user.groups,
+    );
     const existingGroupsOfUser = await this.getUserGroups(id);
 
     const validGroupsInRequest: Set<string> = new Set(
@@ -176,7 +179,7 @@ export default class UserService {
     const existingUserPermissions: Permission[] = await this.getUserPermissions(
       id,
     );
-    const permissionsInRequest: Permission[] = await this.permissionRepository.findByIds(
+    const permissionsInRequest: Permission[] = await this.permissionRepository.getPermissionsByIds(
       request.permissions,
     );
     const validPermissions = new Set(permissionsInRequest.map((p) => p.id));
@@ -206,7 +209,7 @@ export default class UserService {
       },
     );
 
-    const userPermissions = await this.permissionRepository.findByIds(
+    const userPermissions = await this.permissionRepository.getPermissionsByIds(
       userPermissionsUpdated.map((u) => u.permissionId),
     );
 
@@ -286,7 +289,7 @@ export default class UserService {
       id,
     );
     const arrOfPermissions = Array.from(setOfPermissions);
-    const allPermissions = await this.permissionRepository.findByIds(
+    const allPermissions = await this.permissionRepository.getPermissionsByIds(
       arrOfPermissions,
     );
     return allPermissions;

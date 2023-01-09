@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateRoleInput } from 'src/schema/graphql.schema';
 import { DataSource, In } from 'typeorm';
+import GroupRole from '../entity/groupRole.entity';
 import Role from '../entity/role.entity';
 import { BaseRepository } from './base.repository';
 
@@ -19,11 +20,18 @@ export class RoleRepository extends BaseRepository<Role> {
     return updatedRole.affected !== 0;
   }
 
-  async findByIds(ids: string[]) {
+  async getRolesByIds(ids: string[]): Promise<Role[]> {
     return this.find({
       where: {
         id: In(ids),
       },
     });
+  }
+
+  async getRolesForGroupId(groupId: string): Promise<Role[]> {
+    return this.createQueryBuilder('role')
+      .leftJoinAndSelect(GroupRole, 'groupRole', 'role.id = groupRole.roleId')
+      .where('groupRole.groupId = :groupId', { groupId })
+      .getMany();
   }
 }

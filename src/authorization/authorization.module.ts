@@ -23,6 +23,7 @@ import { PermissionRepository } from './repository/permission.repository';
 import { RoleRepository } from './repository/role.repository';
 import { RolePermissionRepository } from './repository/rolePermission.repository';
 import { UserRepository } from './repository/user.repository';
+import { UserGroupRepository } from './repository/userGroup.repository';
 import { UserPermissionRepository } from './repository/userPermission.repository';
 import { EntityResolver } from './resolver/entity.resolver';
 import { GroupResolver } from './resolver/group.resolver';
@@ -85,6 +86,7 @@ import UserCacheService from './service/usercache.service';
     EntityRepository,
     GroupRepository,
     UserRepository,
+    UserGroupRepository,
   ],
   exports: [UserService],
 })

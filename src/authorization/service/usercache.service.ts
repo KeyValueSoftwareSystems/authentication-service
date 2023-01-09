@@ -1,21 +1,23 @@
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
 import User from '../entity/user.entity';
+import { UserGroupRepository } from '../repository/userGroup.repository';
+import { UserRepository } from '../repository/user.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
 
 @Injectable()
 export default class UserCacheService {
   constructor(
     private cacheManager: RedisCacheService,
     @InjectRepository(UserGroup)
-    private userGroupRepository: Repository<UserGroup>,
+    private userGroupRepository: UserGroupRepository,
     @InjectRepository(UserPermission)
-    private userPermissionRepository: Repository<UserPermission>,
+    private userPermissionRepository: UserPermissionRepository,
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private userRepository: UserRepository,
   ) {}
 
   async getUserGroupsByUserId(userId: string): Promise<string[]> {
@@ -27,9 +29,7 @@ export default class UserCacheService {
       (
         await this.userRepository
           .findOneOrFail({ where: { id: userId } })
-          .then(() =>
-            this.userGroupRepository.find({ where: { userId: userId } }),
-          )
+          .then(() => this.userGroupRepository.getUserGroupsByUserId(userId))
       ).map((x) => x.groupId);
     groupsFromCache ||
       (await this.cacheManager.set(`USER:${userId}:GROUPS`, groups));
@@ -46,7 +46,7 @@ export default class UserCacheService {
         await this.userRepository
           .findOneOrFail({ where: { id: userId } })
           .then(() =>
-            this.userPermissionRepository.find({ where: { userId: userId } }),
+            this.userPermissionRepository.getUserPermissionsByUserId(userId),
           )
       ).map((x) => x.permissionId);
     permissionsFromCache ||
