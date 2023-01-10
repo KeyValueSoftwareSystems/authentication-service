@@ -15,7 +15,8 @@ import RolePermission from './entity/rolePermission.entity';
 import User from './entity/user.entity';
 import UserGroup from './entity/userGroup.entity';
 import UserPermission from './entity/userPermission.entity';
-import { EntityRepository } from './repository/entity.repository';
+import { EntityModelRepository } from './repository/entity.repository';
+import { EntityPermissionRepository } from './repository/entityPermission.repository';
 import { GroupRepository } from './repository/group.repository';
 import { GroupPermissionRepository } from './repository/groupPermission.repository';
 import { GroupRoleRepository } from './repository/groupRole.repository';
@@ -83,10 +84,11 @@ import UserCacheService from './service/usercache.service';
     RoleRepository,
     RolePermissionRepository,
     GroupRoleRepository,
-    EntityRepository,
+    EntityModelRepository,
     GroupRepository,
     UserRepository,
     UserGroupRepository,
+    EntityPermissionRepository,
   ],
   exports: [UserService],
 })

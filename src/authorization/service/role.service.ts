@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   NewRoleInput,
   RoleInputFilter,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import { DataSource } from 'typeorm';
+import GroupRole from '../entity/groupRole.entity';
+import Permission from '../entity/permission.entity';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
-import Permission from '../entity/permission.entity';
-import {
-  RoleNotFoundException,
-  RoleDeleteNotAllowedException,
-} from '../exception/role.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import RoleCacheService from './rolecache.service';
-import GroupRole from '../entity/groupRole.entity';
-import SearchService from './search.service';
-import { SearchEntity } from '../../constants/search.entity.enum';
-import { RoleRepository } from '../repository/role.repository';
-import { PermissionRepository } from '../repository/permission.repository';
+import {
+  RoleDeleteNotAllowedException,
+  RoleNotFoundException,
+} from '../exception/role.exception';
 import { GroupRoleRepository } from '../repository/groupRole.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { RoleRepository } from '../repository/role.repository';
 import { RolePermissionRepository } from '../repository/rolePermission.repository';
+import RoleCacheService from './rolecache.service';
+import SearchService from './search.service';
 
 @Injectable()
 export class RoleService {

@@ -2,7 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, SelectQueryBuilder } from 'typeorm';
 
-import User from '../entity/user.entity';
+import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
+import { FilterBuilder } from '../../common/filter.builder';
+import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   FilterField,
   OperationType,
@@ -12,26 +14,24 @@ import {
   UpdateUserPermissionInput,
   UserInputFilter,
 } from '../../schema/graphql.schema';
-import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
+import User from '../entity/user.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import UserCacheService from './usercache.service';
+import { UserNotFoundException } from '../exception/user.exception';
+import { GroupRepository } from '../repository/group.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { UserRepository } from '../repository/user.repository';
+import { UserGroupRepository } from '../repository/userGroup.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
 import GroupCacheService from './groupcache.service';
 import PermissionCacheService from './permissioncache.service';
 import RoleCacheService from './rolecache.service';
 import SearchService from './search.service';
-import { SearchEntity } from '../../constants/search.entity.enum';
-import { FilterBuilder } from '../../common/filter.builder';
-import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
-import { UserRepository } from '../repository/user.repository';
-import { PermissionRepository } from '../repository/permission.repository';
-import { GroupRepository } from '../repository/group.repository';
-import { UserPermissionRepository } from '../repository/userPermission.repository';
-import { UserGroupRepository } from '../repository/userGroup.repository';
+import UserCacheService from './usercache.service';
 
 @Injectable()
 export default class UserService {
@@ -105,10 +105,7 @@ export default class UserService {
   }
 
   async createUser(user: User): Promise<User> {
-    const result = await this.usersRepository.save(user);
-    const savedUser = await this.usersRepository.findOneBy({
-      id: result.id,
-    });
+    const savedUser = await this.usersRepository.save(user);
     if (savedUser) {
       return savedUser;
     }
@@ -116,13 +113,13 @@ export default class UserService {
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
-    const existingUser = await this.usersRepository.findOneBy({ id });
-    if (!existingUser) {
+    const updatedUser = await this.usersRepository.updateUserById(id, user);
+
+    if (!updatedUser) {
       throw new UserNotFoundException(id);
     }
-    const newUser = this.usersRepository.create(user);
-    await this.usersRepository.update(id, newUser);
-    return { ...existingUser, ...newUser };
+
+    return this.getUserById(id);
   }
 
   async updateUserGroups(
@@ -163,12 +160,7 @@ export default class UserService {
   }
 
   async getUserGroups(id: string): Promise<Group[]> {
-    const groups = await this.groupRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect(UserGroup, 'userGroup', 'Group.id = userGroup.groupId')
-      .where('userGroup.userId = :userId', { userId: id })
-      .getMany();
-    return groups;
+    return this.groupRepository.getGroupsForUserId(id);
   }
 
   async updateUserPermissions(
@@ -218,16 +210,7 @@ export default class UserService {
   }
 
   async getUserPermissions(id: string): Promise<Permission[]> {
-    const permissions = await this.permissionRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect(
-        UserPermission,
-        'userPermission',
-        'Permission.id = userPermission.permissionId',
-      )
-      .where('userPermission.userId = :userId', { userId: id })
-      .getMany();
-    return permissions;
+    return this.permissionRepository.getPermissionsByUserId(id);
   }
 
   async deleteUser(id: string): Promise<User> {
@@ -241,9 +224,13 @@ export default class UserService {
     }
 
     await this.dataSource.manager.transaction(async (entityManager) => {
-      const usersRepo = entityManager.getRepository(User);
-      await usersRepo.update(id, { status: Status.INACTIVE });
-      await usersRepo.softDelete(id);
+      const userRepo = entityManager.getRepository(User);
+      const userGroupRepo = entityManager.getRepository(UserGroup);
+      const userPermissionRepo = entityManager.getRepository(UserPermission);
+      await userPermissionRepo.softDelete({ userId: id });
+      await userGroupRepo.softDelete({ userId: id });
+      await userRepo.update(id, { status: Status.INACTIVE });
+      await userRepo.softDelete(id);
     });
 
     await this.userCacheService.invalidateUserPermissionsCache(id);
@@ -339,21 +326,16 @@ export default class UserService {
   }
 
   async verifyDuplicateUser(
-    email?: string | undefined,
-    phone?: string | undefined,
+    email?: string,
+    phone?: string,
   ): Promise<{ existingUserDetails?: User | null; duplicate: string }> {
     let user;
     if (email) {
-      user = await this.usersRepository
-        .createQueryBuilder('user')
-        .where('lower(user.email) = lower(:email)', { email })
-        .getOne();
+      user = await this.usersRepository.getUserByEmail(email);
     }
 
     if (phone && !user) {
-      user = await this.usersRepository.findOne({
-        where: { phone: phone },
-      });
+      user = await this.usersRepository.getUserByPhone(phone);
       return { existingUserDetails: user, duplicate: 'phone number' };
     }
 
@@ -361,30 +343,22 @@ export default class UserService {
   }
 
   async getUserDetailsByEmailOrPhone(
-    email?: string | undefined,
-    phone?: string | undefined,
+    email?: string,
+    phone?: string,
   ): Promise<any> {
     let user;
     if (email) {
-      user = await this.usersRepository
-        .createQueryBuilder('user')
-        .where('lower(user.email) = lower(:email)', { email })
-        .getOne();
+      user = await this.usersRepository.getUserByEmail(email);
     }
 
     if (phone && !user) {
-      user = await this.usersRepository.findOne({
-        where: { phone: phone },
-      });
+      user = await this.usersRepository.getUserByPhone(phone);
     }
 
     return user;
   }
 
-  async getUserDetailsByUsername(
-    email?: string | undefined,
-    phone?: string | undefined,
-  ) {
+  async getUserDetailsByUsername(email?: string, phone?: string) {
     const nullCheckedEmail = email ? email : null;
     const nullCheckedPhone = phone ? phone : null;
     if (!nullCheckedEmail && !nullCheckedPhone) {
@@ -406,7 +380,7 @@ export default class UserService {
 
   async updateField(id: string, field: string, value: any): Promise<User> {
     await this.usersRepository.update(id, { [field]: value });
-    const updatedUser = await this.usersRepository.findOneBy({ id });
+    const updatedUser = await this.usersRepository.getUserById(id);
     if (updatedUser) {
       return updatedUser;
     }
@@ -414,9 +388,7 @@ export default class UserService {
   }
 
   async getActiveUserByPhoneNumber(phone: string) {
-    return await this.usersRepository.findOne({
-      where: { phone },
-    });
+    return this.usersRepository.getUserByPhone(phone);
   }
 
   async setOtpSecret(user: User, twoFASecret: string) {

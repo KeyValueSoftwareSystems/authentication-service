@@ -1,11 +1,11 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
+import User from '../entity/user.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
-import User from '../entity/user.entity';
-import { UserGroupRepository } from '../repository/userGroup.repository';
 import { UserRepository } from '../repository/user.repository';
+import { UserGroupRepository } from '../repository/userGroup.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
 
 @Injectable()

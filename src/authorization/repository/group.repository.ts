@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UpdateGroupInput } from 'src/schema/graphql.schema';
 import { DataSource, In } from 'typeorm';
 import Group from '../entity/group.entity';
+import UserGroup from '../entity/userGroup.entity';
 import { BaseRepository } from './base.repository';
 
 @Injectable()
@@ -29,5 +30,12 @@ export class GroupRepository extends BaseRepository<Group> {
         id: In(ids),
       },
     });
+  }
+
+  async getGroupsForUserId(userId: string): Promise<Group[]> {
+    return this.createQueryBuilder('group')
+      .leftJoinAndSelect(UserGroup, 'userGroup', 'group.id = userGroup.groupId')
+      .where('userGroup.userId = :userId', { userId })
+      .getMany();
   }
 }

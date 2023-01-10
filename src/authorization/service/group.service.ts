@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupInputFilter,
   NewGroupInput,
@@ -7,33 +9,30 @@ import {
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
 } from '../../schema/graphql.schema';
-import { DataSource } from 'typeorm';
 import Group from '../entity/group.entity';
 import GroupPermission from '../entity/groupPermission.entity';
+import GroupRole from '../entity/groupRole.entity';
 import Permission from '../entity/permission.entity';
+import Role from '../entity/role.entity';
+import User from '../entity/user.entity';
 import UserGroup from '../entity/userGroup.entity';
 import {
-  GroupNotFoundException,
   GroupDeleteNotAllowedException,
+  GroupNotFoundException,
 } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import GroupCacheService from './groupcache.service';
-import GroupRole from '../entity/groupRole.entity';
-import Role from '../entity/role.entity';
 import { RoleNotFoundException } from '../exception/role.exception';
 import { UserNotFoundException } from '../exception/user.exception';
-import UserCacheService from './usercache.service';
-import User from '../entity/user.entity';
-import SearchService from './search.service';
-import { SearchEntity } from '../../constants/search.entity.enum';
-import RolePermission from '../entity/rolePermission.entity';
+import { GroupRepository } from '../repository/group.repository';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { GroupRoleRepository } from '../repository/groupRole.repository';
 import { PermissionRepository } from '../repository/permission.repository';
 import { RoleRepository } from '../repository/role.repository';
-import { GroupRoleRepository } from '../repository/groupRole.repository';
-import { GroupPermissionRepository } from '../repository/groupPermission.repository';
-import { GroupRepository } from '../repository/group.repository';
 import { UserRepository } from '../repository/user.repository';
 import { UserGroupRepository } from '../repository/userGroup.repository';
+import GroupCacheService from './groupcache.service';
+import SearchService from './search.service';
+import UserCacheService from './usercache.service';
 
 @Injectable()
 export class GroupService {
@@ -120,11 +119,14 @@ export class GroupService {
 
     await this.dataSource.manager.transaction(async (entityManager) => {
       const groupRepo = entityManager.getRepository(Group);
+      const groupRoleRepo = entityManager.getRepository(GroupRole);
       const groupPermissionRepo = entityManager.getRepository(GroupPermission);
       await groupPermissionRepo.softDelete({ groupId: id });
+      await groupRoleRepo.softDelete({ groupId: id });
       await groupRepo.softDelete(id);
     });
 
+    await this.groupCacheService.invalidateGroupRolesByGroupId(id);
     await this.groupCacheService.invalidateGroupPermissionsByGroupId(id);
     return existingGroup;
   }
@@ -275,11 +277,7 @@ export class GroupService {
   }
 
   private async checkGroupUsage(id: string) {
-    const userCount = await this.userRepository
-      .createQueryBuilder()
-      .innerJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId=User.id')
-      .where('userGroup.groupId = :id', { id: id })
-      .getCount();
+    const userCount = await this.userRepository.getUserCountForGroupId(id);
     return userCount != 0;
   }
 
@@ -287,20 +285,9 @@ export class GroupService {
     const groupPermissions: Permission[] = await this.getGroupPermissions(
       groupId,
     );
-    const groupRolePermissions: Permission[] = await this.permissionRepository
-      .createQueryBuilder('permission')
-      .innerJoin(
-        RolePermission,
-        'rolePermission',
-        'permission.id = rolePermission.permissionId',
-      )
-      .innerJoin(
-        GroupRole,
-        'groupRole',
-        'rolePermission.roleId = groupRole.roleId',
-      )
-      .where('groupRole.groupId = :groupId', { groupId: groupId })
-      .getMany();
+    const groupRolePermissions: Permission[] = await this.permissionRepository.getGroupRolePermissionsByGroupId(
+      groupId,
+    );
     const allPermissionsOfGroup = groupPermissions.concat(groupRolePermissions);
     const permissionIds = allPermissionsOfGroup.map(
       (permission) => permission.id,

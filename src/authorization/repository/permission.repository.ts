@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, In } from 'typeorm';
-import Permission from '../entity/permission.entity';
-import { BaseRepository } from './base.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from 'src/schema/graphql.schema';
-import RolePermission from '../entity/rolePermission.entity';
+import { DataSource, In } from 'typeorm';
 import EntityPermission from '../entity/entityPermission.entity';
 import GroupPermission from '../entity/groupPermission.entity';
+import GroupRole from '../entity/groupRole.entity';
+import Permission from '../entity/permission.entity';
+import RolePermission from '../entity/rolePermission.entity';
+import UserPermission from '../entity/userPermission.entity';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class PermissionRepository extends BaseRepository<Permission> {
@@ -74,11 +76,40 @@ export class PermissionRepository extends BaseRepository<Permission> {
       .leftJoinAndSelect(
         EntityPermission,
         'entityPermission',
-        'Permission.id = cast(entityPermission.permissionId as uuid)',
+        'permission.id = cast(entityPermission.permissionId as uuid)',
       )
       .where('entityPermission.entityId = :entityId', {
         entityId,
       })
+      .getMany();
+  }
+
+  async getPermissionsByUserId(userId: string): Promise<Permission[]> {
+    return this.createQueryBuilder('permission')
+      .leftJoinAndSelect(
+        UserPermission,
+        'userPermission',
+        'permission.id = userPermission.permissionId',
+      )
+      .where('userPermission.userId = :userId', { userId })
+      .getMany();
+  }
+
+  async getGroupRolePermissionsByGroupId(
+    groupId: string,
+  ): Promise<Permission[]> {
+    return this.createQueryBuilder('permission')
+      .innerJoin(
+        RolePermission,
+        'rolePermission',
+        'permission.id = rolePermission.permissionId',
+      )
+      .innerJoin(
+        GroupRole,
+        'groupRole',
+        'rolePermission.roleId = groupRole.roleId',
+      )
+      .where('groupRole.groupId = :groupId', { groupId })
       .getMany();
   }
 }

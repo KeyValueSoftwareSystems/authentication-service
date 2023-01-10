@@ -1,8 +1,8 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import RolePermission from '../entity/rolePermission.entity';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import Role from '../entity/role.entity';
+import RolePermission from '../entity/rolePermission.entity';
 import { RoleRepository } from '../repository/role.repository';
 import { RolePermissionRepository } from '../repository/rolePermission.repository';
 

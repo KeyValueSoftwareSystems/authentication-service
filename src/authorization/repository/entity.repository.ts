@@ -5,7 +5,7 @@ import EntityModel from '../entity/entity.entity';
 import { BaseRepository } from './base.repository';
 
 @Injectable()
-export class EntityRepository extends BaseRepository<EntityModel> {
+export class EntityModelRepository extends BaseRepository<EntityModel> {
   constructor(private dataSource: DataSource) {
     super(EntityModel, dataSource);
   }

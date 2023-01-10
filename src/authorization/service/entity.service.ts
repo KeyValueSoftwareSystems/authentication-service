@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import {
   NewEntityInput,
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../schema/graphql.schema';
-import { DataSource, Repository } from 'typeorm';
 import EntityModel from '../entity/entity.entity';
 import EntityPermission from '../entity/entityPermission.entity';
 import Permission from '../entity/permission.entity';
 import { EntityNotFoundException } from '../exception/entity.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
+import { EntityModelRepository } from '../repository/entity.repository';
+import { EntityPermissionRepository } from '../repository/entityPermission.repository';
 import { PermissionRepository } from '../repository/permission.repository';
-import { EntityRepository } from '../repository/entity.repository';
 
 @Injectable()
 export class EntityService {
   constructor(
     @InjectRepository(EntityModel)
-    private entityRepository: EntityRepository,
+    private entityRepository: EntityModelRepository,
     @InjectRepository(EntityPermission)
-    private entityPermissionRepository: Repository<EntityPermission>,
+    private entityPermissionRepository: EntityPermissionRepository,
     @InjectRepository(Permission)
     private permissionRepository: PermissionRepository,
     private dataSource: DataSource,
@@ -62,6 +63,16 @@ export class EntityService {
     if (!existingEntity) {
       throw new EntityNotFoundException(id);
     }
+
+    await this.dataSource.manager.transaction(async (entityManager) => {
+      const entityRepo = entityManager.getRepository(EntityModel);
+      const entityPermissionRepo = entityManager.getRepository(
+        EntityPermission,
+      );
+      await entityPermissionRepo.softDelete({ entityId: id });
+      await entityRepo.softDelete(id);
+    });
+
     await this.entityRepository.softDelete(id);
     return existingEntity;
   }

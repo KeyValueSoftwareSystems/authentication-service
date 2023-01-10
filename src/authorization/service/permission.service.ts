@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import PermissionCacheService from './permissioncache.service';
-import { PermissionRepository } from '../repository/permission.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';
-import { UserPermissionRepository } from '../repository/userPermission.repository';
-import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import Permission from '../entity/permission.entity';
 import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
 } from '../exception/permission.exception';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
+import PermissionCacheService from './permissioncache.service';
 
 @Injectable()
 export class PermissionService {

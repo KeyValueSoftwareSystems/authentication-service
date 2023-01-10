@@ -1,12 +1,12 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
-import GroupPermission from '../entity/groupPermission.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import Group from '../entity/group.entity';
+import GroupPermission from '../entity/groupPermission.entity';
 import GroupRole from '../entity/groupRole.entity';
 import { GroupRepository } from '../repository/group.repository';
-import { GroupRoleRepository } from '../repository/groupRole.repository';
 import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { GroupRoleRepository } from '../repository/groupRole.repository';
 
 @Injectable()
 export default class GroupCacheService {

@@ -22,9 +22,7 @@ export class TokenService {
 
   async refresh(refreshToken: string): Promise<TokenResponse> {
     const response = this.authenticationHelper.validateAuthToken(refreshToken);
-    const userRecord: User | undefined = await this.userService.getUserById(
-      response.sub,
-    );
+    const userRecord: User = await this.userService.getUserById(response.sub);
     if (userRecord.refreshToken !== refreshToken) {
       throw new UnauthorizedException();
     }
