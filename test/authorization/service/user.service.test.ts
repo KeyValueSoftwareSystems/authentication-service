@@ -1,28 +1,35 @@
+import { Arg, Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
+import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import User from '../../../src/authorization/entity/user.entity';
-import { Connection, In, Repository, SelectQueryBuilder } from 'typeorm';
-import UserService from '../../../src/authorization/service/user.service';
-import { Arg, Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
-import Group from '../../../src/authorization/entity/group.entity';
-import Permission from '../../../src/authorization/entity/permission.entity';
-import UserPermission from '../../../src/authorization/entity/userPermission.entity';
-import UserGroup from '../../../src/authorization/entity/userGroup.entity';
-import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
-import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
-import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
+import {
+  Connection,
+  DataSource,
+  In,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
-import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { UserNotAuthorized } from '../../../src/authentication/exception/userauth.exception';
+import Group from '../../../src/authorization/entity/group.entity';
+import GroupPermission from '../../../src/authorization/entity/groupPermission.entity';
+import GroupRole from '../../../src/authorization/entity/groupRole.entity';
+import Permission from '../../../src/authorization/entity/permission.entity';
+import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
+import User from '../../../src/authorization/entity/user.entity';
+import UserGroup from '../../../src/authorization/entity/userGroup.entity';
+import UserPermission from '../../../src/authorization/entity/userPermission.entity';
+import { GroupNotFoundException } from '../../../src/authorization/exception/group.exception';
+import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
 import GroupCacheService from '../../../src/authorization/service/groupcache.service';
-import { ConfigService } from '@nestjs/config';
 import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
 import RoleCacheService from '../../../src/authorization/service/rolecache.service';
-import GroupRole from '../../../src/authorization/entity/groupRole.entity';
-import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
-import { Status } from '../../../src/schema/graphql.schema';
 import SearchService from '../../../src/authorization/service/search.service';
-import { UserNotAuthorized } from '../../../src/authentication/exception/userauth.exception';
+import UserService from '../../../src/authorization/service/user.service';
+import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
+import { Status } from '../../../src/schema/graphql.schema';
+
 const users: User[] = [
   {
     id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -50,8 +57,10 @@ const groups: Group[] = [
     name: 'Customers',
   },
 ];
+
 describe('test UserService', () => {
   let userService: UserService;
+
   const userRepository = Substitute.for<Repository<User>>();
   const groupRepository = Substitute.for<Repository<Group>>();
   const permissionRepository = Substitute.for<Repository<Permission>>();
@@ -76,6 +85,8 @@ describe('test UserService', () => {
   const connectionMock = Substitute.for<Connection>();
   const roleCacheService = Substitute.for<RoleCacheService>();
   const searchService = Substitute.for<SearchService>();
+
+  const mockDataSource = { createEntityManager: jest.fn() };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -124,8 +135,8 @@ describe('test UserService', () => {
         { provide: 'RoleCacheService', useValue: roleCacheService },
         { provide: 'SearchService', useValue: searchService },
         {
-          provide: Connection,
-          useValue: connectionMock,
+          provide: DataSource,
+          useValue: mockDataSource,
         },
       ],
     }).compile();

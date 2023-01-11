@@ -1,32 +1,53 @@
+import { Arg, Substitute } from '@fluffy-spoon/substitute';
+import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import Role from 'src/authorization/entity/role.entity';
 import {
   DataSource,
   Repository,
   SelectQueryBuilder,
   UpdateResult,
 } from 'typeorm';
-import { Arg, Substitute } from '@fluffy-spoon/substitute';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import Group from '../../../src/authorization/entity/group.entity';
+import GroupRole from '../../../src/authorization/entity/groupRole.entity';
+import Permission from '../../../src/authorization/entity/permission.entity';
+import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
+import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
+import { RoleNotFoundException } from '../../../src/authorization/exception/role.exception';
+import { PermissionRepository } from '../../../src/authorization/repository/permission.repository';
+import { RoleRepository } from '../../../src/authorization/repository/role.repository';
+import { RoleService } from '../../../src/authorization/service/role.service';
+import RoleCacheService from '../../../src/authorization/service/rolecache.service';
+import SearchService from '../../../src/authorization/service/search.service';
+import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import {
   NewRoleInput,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../../src/schema/graphql.schema';
-import Permission from '../../../src/authorization/entity/permission.entity';
-import { PermissionNotFoundException } from '../../../src/authorization/exception/permission.exception';
-import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
-import { ConfigService } from '@nestjs/config';
-import GroupRole from '../../../src/authorization/entity/groupRole.entity';
-import { RoleService } from '../../../src/authorization/service/role.service';
-import RolePermission from '../../../src/authorization/entity/rolePermission.entity';
-import RoleCacheService from '../../../src/authorization/service/rolecache.service';
-import SearchService from '../../../src/authorization/service/search.service';
-import Group from '../../../src/authorization/entity/group.entity';
-import { RoleRepository } from '../../../src/authorization/repository/role.repository';
-import { PermissionRepository } from '../../../src/authorization/repository/permission.repository';
-import Role from 'src/authorization/entity/role.entity';
-import { RoleNotFoundException } from '../../../src/authorization/exception/role.exception';
+
+const VALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
+const INVALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f9';
+const roles: Role[] = [
+  {
+    id: VALID_ROLE_ID,
+    name: 'Test1',
+  },
+];
+const permissions: Permission[] = [
+  {
+    id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    name: 'Customers',
+    label: 'Customers',
+  },
+];
+const updateResult: UpdateResult = {
+  raw: '',
+  affected: 1,
+  generatedMaps: [],
+};
 
 describe('test Role Service', () => {
   let roleService: RoleService;
@@ -52,27 +73,6 @@ describe('test Role Service', () => {
   const mockDataSource = {
     createEntityManager: jest.fn(),
     transaction: jest.fn(),
-  };
-
-  const VALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
-  const INVALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f9';
-  const roles: Role[] = [
-    {
-      id: VALID_ROLE_ID,
-      name: 'Test1',
-    },
-  ];
-  const permissions: Permission[] = [
-    {
-      id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-      name: 'Customers',
-      label: 'Customers',
-    },
-  ];
-  const updateResult: UpdateResult = {
-    raw: '',
-    affected: 1,
-    generatedMaps: [],
   };
 
   beforeEach(async () => {

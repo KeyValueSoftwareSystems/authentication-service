@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  PasswordAlreadySetException,
-  InviteTokenAlreadyRevokedException,
-} from '../../authorization/exception/user.exception';
 import User from '../../authorization/entity/user.entity';
+import {
+  InviteTokenAlreadyRevokedException,
+  PasswordAlreadySetException,
+} from '../../authorization/exception/user.exception';
 import UserService from '../../authorization/service/user.service';
 import {
   InviteTokenResponse,

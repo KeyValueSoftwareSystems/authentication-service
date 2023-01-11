@@ -1,4 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { DataSource } from 'typeorm';
+import User from '../../authorization/entity/user.entity';
+import {
+  PasswordAlreadySetException,
+  UserNotFoundException,
+} from '../../authorization/exception/user.exception';
+import UserService from '../../authorization/service/user.service';
 import {
   InviteTokenResponse,
   Status,
@@ -9,12 +17,6 @@ import {
   UserPasswordSignupInput,
   UserSignupResponse,
 } from '../../schema/graphql.schema';
-import User from '../../authorization/entity/user.entity';
-import UserService from '../../authorization/service/user.service';
-import {
-  PasswordAlreadySetException,
-  UserNotFoundException,
-} from '../../authorization/exception/user.exception';
 import { AuthenticationHelper } from '../authentication.helper';
 import {
   InvalidCredentialsException,
@@ -23,8 +25,6 @@ import {
 } from '../exception/userauth.exception';
 import { Authenticatable } from '../interfaces/authenticatable';
 import { TokenService } from './token.service';
-import { DataSource } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export default class PasswordAuthService implements Authenticatable {
@@ -62,8 +62,7 @@ export default class PasswordAuthService implements Authenticatable {
     userFromInput.password = this.authenticationHelper.generatePasswordHash(
       plainTextPassword,
     );
-    const resp = await this.userService.createUser(userFromInput);
-    return resp;
+    return this.userService.createUser(userFromInput);
   }
 
   async inviteTokenSignup(
@@ -190,7 +189,7 @@ export default class PasswordAuthService implements Authenticatable {
         hashedPassword,
       )
     ) {
-      return await this.tokenService.getNewToken(userRecord);
+      return this.tokenService.getNewToken(userRecord);
     }
   }
 }

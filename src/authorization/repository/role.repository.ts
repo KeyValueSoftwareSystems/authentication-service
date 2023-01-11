@@ -15,7 +15,7 @@ export class RoleRepository extends BaseRepository<Role> {
     return this.findOneBy({ id });
   }
 
-  async updateRoleById(id: string, role: UpdateRoleInput): Promise<Boolean> {
+  async updateRoleById(id: string, role: UpdateRoleInput): Promise<boolean> {
     const updatedRole = await this.update(id, role);
     return updatedRole.affected !== 0;
   }

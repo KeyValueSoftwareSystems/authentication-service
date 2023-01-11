@@ -21,7 +21,7 @@ export class EntityModelRepository extends BaseRepository<EntityModel> {
   async updateEntityById(
     id: string,
     role: UpdateEntityInput,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     const updatedEntity = await this.update(id, role);
     return updatedEntity.affected !== 0;
   }

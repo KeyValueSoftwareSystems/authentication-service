@@ -39,16 +39,16 @@ describe('test RolePermission repository', () => {
   });
 
   describe('findByRoleId', () => {
-    it('should get role permision by role id', () => {
+    it('should get role permision by role id', async () => {
       findMock.mockResolvedValue(rolePermissions);
 
-      const result = rolePermissionRepository.findByRoleId(VALID_ROLE_ID);
+      const result = await rolePermissionRepository.findByRoleId(VALID_ROLE_ID);
 
       expect(findMock).toHaveBeenCalledWith({
         where: { roleId: VALID_ROLE_ID },
       });
 
-      expect(result).resolves.toEqual(rolePermissions);
+      expect(result).toEqual(rolePermissions);
     });
   });
 });

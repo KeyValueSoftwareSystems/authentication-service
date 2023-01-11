@@ -28,7 +28,7 @@ export class UserRepository extends BaseRepository<User> {
   async updateUserById(
     id: string,
     updateUserInput: UpdateUserInput,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     const result = await this.update(id, updateUserInput);
     return result.affected !== 0;
   }

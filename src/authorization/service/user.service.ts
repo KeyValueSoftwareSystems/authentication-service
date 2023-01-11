@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, SelectQueryBuilder } from 'typeorm';
-
 import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
 import { FilterBuilder } from '../../common/filter.builder';
 import { SearchEntity } from '../../constants/search.entity.enum';
@@ -37,7 +36,7 @@ import UserCacheService from './usercache.service';
 export default class UserService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: UserRepository,
+    private userRepository: UserRepository,
     @InjectRepository(UserGroup)
     private userGroupRepository: UserGroupRepository,
     @InjectRepository(Group)
@@ -71,7 +70,7 @@ export default class UserService {
         );
       }
     };
-    const qb = this.usersRepository.createQueryBuilder();
+    const qb = this.userRepository.createQueryBuilder();
     if (input?.search) {
       this.searchService.generateSearchTermForEntity(
         qb,
@@ -97,7 +96,7 @@ export default class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.getUserById(id);
+    const user = await this.userRepository.getUserById(id);
     if (user) {
       return user;
     }
@@ -105,7 +104,7 @@ export default class UserService {
   }
 
   async createUser(user: User): Promise<User> {
-    const savedUser = await this.usersRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
     if (savedUser) {
       return savedUser;
     }
@@ -113,7 +112,7 @@ export default class UserService {
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
-    const updatedUser = await this.usersRepository.updateUserById(id, user);
+    const updatedUser = await this.userRepository.updateUserById(id, user);
 
     if (!updatedUser) {
       throw new UserNotFoundException(id);
@@ -214,7 +213,7 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id,
       },
@@ -331,11 +330,11 @@ export default class UserService {
   ): Promise<{ existingUserDetails?: User | null; duplicate: string }> {
     let user;
     if (email) {
-      user = await this.usersRepository.getUserByEmail(email);
+      user = await this.userRepository.getUserByEmail(email);
     }
 
     if (phone && !user) {
-      user = await this.usersRepository.getUserByPhone(phone);
+      user = await this.userRepository.getUserByPhone(phone);
       return { existingUserDetails: user, duplicate: 'phone number' };
     }
 
@@ -348,11 +347,11 @@ export default class UserService {
   ): Promise<any> {
     let user;
     if (email) {
-      user = await this.usersRepository.getUserByEmail(email);
+      user = await this.userRepository.getUserByEmail(email);
     }
 
     if (phone && !user) {
-      user = await this.usersRepository.getUserByPhone(phone);
+      user = await this.userRepository.getUserByPhone(phone);
     }
 
     return user;
@@ -366,7 +365,7 @@ export default class UserService {
         'Username should be provided with email or phone',
       );
     }
-    let query = this.usersRepository.createQueryBuilder('user');
+    let query = this.userRepository.createQueryBuilder('user');
     if (email) {
       query = query.orWhere('lower(user.email) = lower(:email)', {
         email: nullCheckedEmail,
@@ -379,8 +378,8 @@ export default class UserService {
   }
 
   async updateField(id: string, field: string, value: any): Promise<User> {
-    await this.usersRepository.update(id, { [field]: value });
-    const updatedUser = await this.usersRepository.getUserById(id);
+    await this.userRepository.update(id, { [field]: value });
+    const updatedUser = await this.userRepository.getUserById(id);
     if (updatedUser) {
       return updatedUser;
     }
@@ -388,10 +387,10 @@ export default class UserService {
   }
 
   async getActiveUserByPhoneNumber(phone: string) {
-    return this.usersRepository.getUserByPhone(phone);
+    return this.userRepository.getUserByPhone(phone);
   }
 
   async setOtpSecret(user: User, twoFASecret: string) {
-    await this.usersRepository.update(user.id, { twoFASecret });
+    await this.userRepository.update(user.id, { twoFASecret });
   }
 }

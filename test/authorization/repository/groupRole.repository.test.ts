@@ -1,7 +1,9 @@
 import { Test } from '@nestjs/testing';
-import { GroupRoleRepository } from '../../../src/authorization/repository/groupRole.repository';
 import { DataSource } from 'typeorm';
 import Group from '../../../src/authorization/entity/group.entity';
+import { GroupRoleRepository } from '../../../src/authorization/repository/groupRole.repository';
+
+const VALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
 
 describe('test GroupRole repository', () => {
   let groupRoleRepository: GroupRoleRepository;
@@ -10,8 +12,6 @@ describe('test GroupRole repository', () => {
   let getCountMock: jest.Mock;
 
   const mockDataSource = { createEntityManager: jest.fn() };
-
-  const VALID_ROLE_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({

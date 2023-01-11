@@ -18,8 +18,8 @@ export class GroupRepository extends BaseRepository<Group> {
   async updateGroupById(
     id: string,
     updateGroupInput: UpdateGroupInput,
-  ): Promise<Boolean> {
-    const result = await this.update({ id }, updateGroupInput);
+  ): Promise<boolean> {
+    const result = await this.update(id, updateGroupInput);
 
     return result.affected === 1;
   }
