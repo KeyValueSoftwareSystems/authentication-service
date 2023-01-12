@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
-import User from '../entity/user.entity';
-import UserGroup from '../entity/userGroup.entity';
-import UserPermission from '../entity/userPermission.entity';
 import { UserRepository } from '../repository/user.repository';
 import { UserGroupRepository } from '../repository/userGroup.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
@@ -12,11 +8,8 @@ import { UserPermissionRepository } from '../repository/userPermission.repositor
 export default class UserCacheService {
   constructor(
     private cacheManager: RedisCacheService,
-    @InjectRepository(UserGroup)
     private userGroupRepository: UserGroupRepository,
-    @InjectRepository(UserPermission)
     private userPermissionRepository: UserPermissionRepository,
-    @InjectRepository(User)
     private userRepository: UserRepository,
   ) {}
 

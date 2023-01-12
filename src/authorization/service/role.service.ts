@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
@@ -8,7 +7,6 @@ import {
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import GroupRole from '../entity/groupRole.entity';
 import Permission from '../entity/permission.entity';
 import Role from '../entity/role.entity';
 import RolePermission from '../entity/rolePermission.entity';
@@ -27,13 +25,9 @@ import SearchService from './search.service';
 @Injectable()
 export class RoleService {
   constructor(
-    @InjectRepository(Role)
     private rolesRepository: RoleRepository,
-    @InjectRepository(GroupRole)
     private groupRoleRepository: GroupRoleRepository,
-    @InjectRepository(RolePermission)
     private rolePermissionRepository: RolePermissionRepository,
-    @InjectRepository(Permission)
     private permissionRepository: PermissionRepository,
     private roleCacheService: RoleCacheService,
     private dataSource: DataSource,

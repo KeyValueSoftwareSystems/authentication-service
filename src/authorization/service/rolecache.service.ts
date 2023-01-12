@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
-import Role from '../entity/role.entity';
-import RolePermission from '../entity/rolePermission.entity';
 import { RoleRepository } from '../repository/role.repository';
 import { RolePermissionRepository } from '../repository/rolePermission.repository';
 
@@ -10,9 +7,7 @@ import { RolePermissionRepository } from '../repository/rolePermission.repositor
 export default class RoleCacheService {
   constructor(
     private cacheManager: RedisCacheService,
-    @InjectRepository(RolePermission)
     private rolePermissionRepository: RolePermissionRepository,
-    @InjectRepository(Role)
     private roleRepository: RoleRepository,
   ) {}
 

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
   NewEntityInput,
@@ -18,11 +17,8 @@ import { PermissionRepository } from '../repository/permission.repository';
 @Injectable()
 export class EntityService {
   constructor(
-    @InjectRepository(EntityModel)
     private entityRepository: EntityModelRepository,
-    @InjectRepository(EntityPermission)
     private entityPermissionRepository: EntityPermissionRepository,
-    @InjectRepository(Permission)
     private permissionRepository: PermissionRepository,
     private dataSource: DataSource,
   ) {}
