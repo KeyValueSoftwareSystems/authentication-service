@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import PermissionCacheService from './permissioncache.service';
-import { PermissionRepository } from '../repository/permission.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';
-import { UserPermissionRepository } from '../repository/userPermission.repository';
-import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import Permission from '../entity/permission.entity';
 import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
 } from '../exception/permission.exception';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
+import PermissionCacheService from './permissioncache.service';
 
 @Injectable()
 export class PermissionService {
@@ -22,7 +22,7 @@ export class PermissionService {
     private permissionCacheService: PermissionCacheService,
   ) {}
 
-  getAllPermissions(): Promise<Permission[]> {
+  async getAllPermissions(): Promise<Permission[]> {
     return this.permissionRepository.getAllPermissions();
   }
 
@@ -36,7 +36,7 @@ export class PermissionService {
     throw new PermissionNotFoundException(id);
   }
 
-  createPermission(
+  async createPermission(
     newPermissionInput: NewPermissionInput,
   ): Promise<Permission> {
     return this.permissionRepository.createPermission(newPermissionInput);
@@ -52,7 +52,7 @@ export class PermissionService {
     );
 
     if (updateSucceeded) {
-      return await this.getPermissionById(id);
+      return this.getPermissionById(id);
     }
 
     throw new PermissionNotFoundException(id);
@@ -74,7 +74,7 @@ export class PermissionService {
     return permissionToDelete;
   }
 
-  async isPermissionBeingUsed(id: string): Promise<boolean> {
+  private async isPermissionBeingUsed(id: string): Promise<boolean> {
     const userPermissionCount = await this.userPermissionRepository.getUserPermissionCount(
       id,
     );

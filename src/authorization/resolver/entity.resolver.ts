@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
+import { Args, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import {
   Entity,
   NewEntityInput,
