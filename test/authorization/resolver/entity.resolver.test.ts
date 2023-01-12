@@ -10,12 +10,13 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../../src/schema/graphql.schema';
-import { EntityService } from '../../../src/authorization/service/entity.service';
 import { EntityResolver } from '../../../src/authorization/resolver/entity.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import UserService from '../../../src/authorization/service/user.service';
 import User from '../../../src/authorization/entity/user.entity';
 import { mockedConfigService } from '../../utils/mocks/config.service';
+import { EntityServiceInterface } from '../../../src/authorization/service/entity.service.interface';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -54,7 +55,7 @@ const entities: Entity[] = [
   },
 ];
 
-const entityService = Substitute.for<EntityService>();
+const entityService = Substitute.for<EntityServiceInterface>();
 const userService = Substitute.for<UserService>();
 describe('Entity Module', () => {
   let app: INestApplication;
@@ -68,9 +69,9 @@ describe('Entity Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         EntityResolver,
-        { provide: 'EntityService', useValue: entityService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: EntityServiceInterface, useValue: entityService },
+        { provide: UserService, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
         AuthenticationHelper,
       ],
     }).compile();
