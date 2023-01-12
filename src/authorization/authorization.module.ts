@@ -126,5 +126,11 @@ import { UserCacheServiceInterface } from './service/usercache.service.interface
       useClass: UserCacheService,
     },
   ],
+  exports: [
+    {
+      provide: UserServiceInterface,
+      useClass: UserService,
+    },
+  ],
 })
 export class AuthorizationModule {}
