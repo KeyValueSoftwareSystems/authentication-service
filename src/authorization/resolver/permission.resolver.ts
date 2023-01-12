@@ -1,4 +1,4 @@
-import { ParseUUIDPipe } from '@nestjs/common';
+import { Inject, ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   NewPermissionInput,
@@ -7,11 +7,14 @@ import {
 import { PermissionsType } from '../constants/authorization.constants';
 import Permission from '../entity/permission.entity';
 import { Permissions } from '../permissions.decorator';
-import { PermissionService } from '../service/permission.service';
+import { PermissionServiceInterface } from '../service/permission.service.interface';
 
 @Resolver('Permission')
 export class PermissionResolver {
-  constructor(private permissionService: PermissionService) {}
+  constructor(
+    @Inject(PermissionServiceInterface)
+    private permissionService: PermissionServiceInterface,
+  ) {}
 
   @Permissions(PermissionsType.ViewPermissions)
   @Query()

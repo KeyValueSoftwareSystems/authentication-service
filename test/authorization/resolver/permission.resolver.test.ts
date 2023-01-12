@@ -1,5 +1,6 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
@@ -8,13 +9,13 @@ import {
   Status,
   UpdatePermissionInput,
 } from '../../../src/schema/graphql.schema';
-import { PermissionService } from '../../../src/authorization/service/permission.service';
 import Permission from '../../../src/authorization/entity/permission.entity';
 import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
 import UserService from '../../../src/authorization/service/user.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import User from '../../../src/authorization/entity/user.entity';
+import { PermissionServiceInterface } from '../../../src/authorization/service/permission.service.interface';
 
 const gql = '/graphql';
 const users: User[] = [
@@ -35,7 +36,7 @@ const permissions: Permission[] = [
     name: 'Customers',
   },
 ];
-const permissionService = Substitute.for<PermissionService>();
+const permissionService = Substitute.for<PermissionServiceInterface>();
 const userService = Substitute.for<UserService>();
 describe('Permission Module', () => {
   let app: INestApplication;
@@ -45,9 +46,9 @@ describe('Permission Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         PermissionResolver,
-        { provide: 'PermissionService', useValue: permissionService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: PermissionServiceInterface, useValue: permissionService },
+        { provide: UserService, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
         AuthenticationHelper,
       ],
     }).compile();

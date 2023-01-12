@@ -9,7 +9,8 @@ import { GroupPermissionRepository } from '../../../src/authorization/repository
 import { PermissionRepository } from '../../../src/authorization/repository/permission.repository';
 import { UserPermissionRepository } from '../../../src/authorization/repository/userPermission.repository';
 import { PermissionService } from '../../../src/authorization/service/permission.service';
-import PermissionCacheService from '../../../src/authorization/service/permissioncache.service';
+import { PermissionServiceInterface } from '../../../src/authorization/service/permission.service.interface';
+import { PermissionCacheServiceInterface } from '../../../src/authorization/service/permissioncache.service.interface';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
@@ -27,7 +28,7 @@ const permissions: Permission[] = [
 ];
 
 describe('test Permission service', () => {
-  let permissionService: PermissionService;
+  let permissionService: PermissionServiceInterface;
   let permissionRepository: PermissionRepository;
   let userPermissionRepository: UserPermissionRepository;
   let groupPermissionRepository: GroupPermissionRepository;
@@ -55,16 +56,24 @@ describe('test Permission service', () => {
           useValue: mockDataSource,
         },
         {
-          provide: PermissionCacheService,
+          provide: PermissionCacheServiceInterface,
           useValue: mockPermissionCacheService,
         },
       ],
     }).compile();
 
-    permissionService = moduleRef.get(PermissionService);
-    permissionRepository = moduleRef.get(PermissionRepository);
-    userPermissionRepository = moduleRef.get(UserPermissionRepository);
-    groupPermissionRepository = moduleRef.get(GroupPermissionRepository);
+    permissionService = moduleRef.get<PermissionServiceInterface>(
+      PermissionService,
+    );
+    permissionRepository = moduleRef.get<PermissionRepository>(
+      PermissionRepository,
+    );
+    userPermissionRepository = moduleRef.get<UserPermissionRepository>(
+      UserPermissionRepository,
+    );
+    groupPermissionRepository = moduleRef.get<GroupPermissionRepository>(
+      GroupPermissionRepository,
+    );
 
     getAllPermissionsMock = permissionRepository.getAllPermissions = jest.fn();
     getPermissionByIdMock = permissionRepository.getPermissionById = jest.fn();

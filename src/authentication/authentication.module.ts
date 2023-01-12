@@ -1,4 +1,4 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { HttpModule, Module, Provider } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import GroupRole from 'src/authorization/entity/groupRole.entity';
@@ -34,11 +34,9 @@ import { RecaptchaService } from './service/recaptcha.service';
 import { TokenService } from './service/token.service';
 import TwilioOTPService from './service/twilio.otp.service';
 
-const providers = [
+const providers: Provider[] = [
   UserAuthResolver,
   GoogleAuthService,
-  AuthenticationHelper,
-  ConfigService,
   AuthenticationHelper,
   ConfigService,
   LoggerService,
@@ -53,7 +51,6 @@ const providers = [
   ProviderFactory.getSMSFactory(),
   TwilioSmsService,
   AWSSMSService,
-  LoggerService,
   RecaptchaService,
   GoogleStrategy,
 ];

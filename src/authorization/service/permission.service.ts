@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
@@ -11,15 +11,17 @@ import {
 import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import { PermissionRepository } from '../repository/permission.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
-import PermissionCacheService from './permissioncache.service';
+import { PermissionServiceInterface } from './permission.service.interface';
+import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 
 @Injectable()
-export class PermissionService {
+export class PermissionService implements PermissionServiceInterface {
   constructor(
     private permissionRepository: PermissionRepository,
     private userPermissionRepository: UserPermissionRepository,
     private groupPermissionRepository: GroupPermissionRepository,
-    private permissionCacheService: PermissionCacheService,
+    @Inject(PermissionCacheServiceInterface)
+    private permissionCacheService: PermissionCacheServiceInterface,
   ) {}
 
   async getAllPermissions(): Promise<Permission[]> {
