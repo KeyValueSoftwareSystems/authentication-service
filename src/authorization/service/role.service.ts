@@ -82,6 +82,13 @@ export class RoleService {
     return this.getRoleById(id);
   }
 
+  /**
+   * Function to delete role and it's associated relations.
+   * Role and it's relations are soft deleted and cache is invalidated.
+   * The usage of the role in Groups are validated before deleting a role.
+   * @param id
+   * @returns
+   */
   async deleteRole(id: string): Promise<Role> {
     const existingRole = await this.rolesRepository.getRoleById(id);
     if (!existingRole) {

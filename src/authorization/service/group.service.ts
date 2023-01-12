@@ -57,9 +57,16 @@ export class GroupService {
     private searchService: SearchService,
   ) {}
 
+  /**
+   * Returns all groups that satisfy the search criteria
+   * with the specified pagination and sort order
+   *
+   * @param input
+   * @returns
+   */
   async getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
     const SortFieldMapping = new Map([['name', 'Group.name']]);
-    let queryBuilder = this.groupRepository.createQueryBuilder();
+    let queryBuilder = this.groupRepository.createQueryBuilder('group');
 
     if (input?.search) {
       queryBuilder = this.searchService.generateSearchTermForEntity(
@@ -80,6 +87,12 @@ export class GroupService {
     return queryBuilder.getManyAndCount();
   }
 
+  /**
+   * Returns group details for the specified id
+   *
+   * @param id
+   * @returns
+   */
   async getGroupById(id: string): Promise<Group> {
     const group = await this.groupRepository.getGroupById(id);
     if (!group) {
@@ -88,23 +101,36 @@ export class GroupService {
     return group;
   }
 
+  /**
+   * Returns newly created group
+   *
+   * @param group
+   * @returns
+   */
   async createGroup(group: NewGroupInput): Promise<Group> {
     return this.groupRepository.save(group);
   }
 
+  /**
+   * Updates existing group, its related users and returns the updated
+   * result or throws exception
+   *
+   * @param id
+   * @param group
+   * @returns
+   */
   async updateGroup(id: string, group: UpdateGroupInput): Promise<Group> {
-    const existingGroup = await this.groupRepository.getGroupById(id);
-    if (!existingGroup) {
+    const updatedGroup = await this.groupRepository.updateGroupById(id, group);
+
+    if (!updatedGroup) {
       throw new GroupNotFoundException(id);
     }
+
     if (group.users) {
       await this.updateGroupUsers(id, group.users);
     }
-    await this.groupRepository.updateGroupById(id, group);
-    return {
-      ...existingGroup,
-      ...group,
-    };
+
+    return this.getGroupById(id);
   }
 
   async deleteGroup(id: string): Promise<Group> {

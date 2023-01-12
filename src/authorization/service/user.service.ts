@@ -70,7 +70,7 @@ export default class UserService {
         );
       }
     };
-    const qb = this.userRepository.createQueryBuilder();
+    const qb = this.userRepository.createQueryBuilder('user');
     if (input?.search) {
       this.searchService.generateSearchTermForEntity(
         qb,
@@ -213,11 +213,7 @@ export default class UserService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-    });
+    const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new UserNotFoundException(id);
     }

@@ -22,7 +22,7 @@ export class PermissionService {
     private permissionCacheService: PermissionCacheService,
   ) {}
 
-  getAllPermissions(): Promise<Permission[]> {
+  async getAllPermissions(): Promise<Permission[]> {
     return this.permissionRepository.getAllPermissions();
   }
 
@@ -36,7 +36,7 @@ export class PermissionService {
     throw new PermissionNotFoundException(id);
   }
 
-  createPermission(
+  async createPermission(
     newPermissionInput: NewPermissionInput,
   ): Promise<Permission> {
     return this.permissionRepository.createPermission(newPermissionInput);
@@ -52,7 +52,7 @@ export class PermissionService {
     );
 
     if (updateSucceeded) {
-      return await this.getPermissionById(id);
+      return this.getPermissionById(id);
     }
 
     throw new PermissionNotFoundException(id);
@@ -74,7 +74,7 @@ export class PermissionService {
     return permissionToDelete;
   }
 
-  async isPermissionBeingUsed(id: string): Promise<boolean> {
+  private async isPermissionBeingUsed(id: string): Promise<boolean> {
     const userPermissionCount = await this.userPermissionRepository.getUserPermissionCount(
       id,
     );
