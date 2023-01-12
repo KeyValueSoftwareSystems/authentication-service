@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PermissionRepository } from '../repository/permission.repository';
 import {
   NewPermissionInput,
   UpdatePermissionInput,
 } from '../../schema/graphql.schema';
-import { UserPermissionRepository } from '../repository/userPermission.repository';
-import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import Permission from '../entity/permission.entity';
 import {
   PermissionDeleteNotAllowedException,
   PermissionNotFoundException,
 } from '../exception/permission.exception';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
 import { PermissionServiceInterface } from './permission.service.interface';
 import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 
@@ -24,7 +24,7 @@ export class PermissionService implements PermissionServiceInterface {
     private permissionCacheService: PermissionCacheServiceInterface,
   ) {}
 
-  getAllPermissions(): Promise<Permission[]> {
+  async getAllPermissions(): Promise<Permission[]> {
     return this.permissionRepository.getAllPermissions();
   }
 
@@ -38,7 +38,7 @@ export class PermissionService implements PermissionServiceInterface {
     throw new PermissionNotFoundException(id);
   }
 
-  createPermission(
+  async createPermission(
     newPermissionInput: NewPermissionInput,
   ): Promise<Permission> {
     return this.permissionRepository.createPermission(newPermissionInput);
@@ -54,7 +54,7 @@ export class PermissionService implements PermissionServiceInterface {
     );
 
     if (updateSucceeded) {
-      return await this.getPermissionById(id);
+      return this.getPermissionById(id);
     }
 
     throw new PermissionNotFoundException(id);

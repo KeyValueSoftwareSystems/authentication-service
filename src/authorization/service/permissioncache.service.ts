@@ -1,5 +1,5 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import Permission from '../entity/permission.entity';
 import { PermissionRepository } from '../repository/permission.repository';
 import { PermissionCacheServiceInterface } from './permissioncache.service.interface';

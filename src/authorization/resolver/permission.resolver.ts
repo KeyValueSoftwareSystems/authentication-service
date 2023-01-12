@@ -1,5 +1,5 @@
 import { Inject, ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   NewPermissionInput,
   UpdatePermissionInput,

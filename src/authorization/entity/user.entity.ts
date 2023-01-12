@@ -1,5 +1,5 @@
-import { Status } from '../../schema/graphql.schema';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Status } from '../../schema/graphql.schema';
 import BaseEntity from './base.entity';
 
 @Entity()
