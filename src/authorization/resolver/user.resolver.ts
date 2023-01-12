@@ -1,3 +1,4 @@
+import { Inject, UseGuards } from '@nestjs/common';
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
 import {
   Args,
@@ -7,25 +8,24 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { AuthGuard } from '../../authentication/authentication.guard';
 import {
+  Group,
+  OperationType,
+  Permission,
   UpdateUserGroupInput,
   UpdateUserInput,
   UpdateUserPermissionInput,
   User,
-  Group,
-  Permission,
-  UserPermissionsVerification,
-  OperationType,
   UserInputFilter,
   UserPaginated,
+  UserPermissionsVerification,
 } from '../../schema/graphql.schema';
-import { UserServiceInterface } from '../service/user.service.interface';
 import ValidationPipe from '../../validation/validation.pipe';
-import * as UserSchema from '../validation/user.validation.schema';
-import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
-import { Inject, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../../authentication/authentication.guard';
+import { Permissions } from '../permissions.decorator';
+import { UserServiceInterface } from '../service/user.service.interface';
+import * as UserSchema from '../validation/user.validation.schema';
 
 @Resolver('User')
 export class UserResolver {

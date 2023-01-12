@@ -1,11 +1,11 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
   Inject,
+  Injectable,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { UserServiceInterface } from './service/user.service.interface';
 
 @Injectable()

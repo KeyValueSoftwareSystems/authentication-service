@@ -1,22 +1,17 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import UserGroup from '../entity/userGroup.entity';
-import UserPermission from '../entity/userPermission.entity';
-import User from '../entity/user.entity';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
+import { UserRepository } from '../repository/user.repository';
+import { UserGroupRepository } from '../repository/userGroup.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
 import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
 export class UserCacheService implements UserCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
-    @InjectRepository(UserGroup)
-    private userGroupRepository: Repository<UserGroup>,
-    @InjectRepository(UserPermission)
-    private userPermissionRepository: Repository<UserPermission>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private userGroupRepository: UserGroupRepository,
+    private userPermissionRepository: UserPermissionRepository,
+    private userRepository: UserRepository,
   ) {}
 
   async getUserGroupsByUserId(userId: string): Promise<string[]> {
@@ -28,9 +23,7 @@ export class UserCacheService implements UserCacheServiceInterface {
       (
         await this.userRepository
           .findOneOrFail({ where: { id: userId } })
-          .then(() =>
-            this.userGroupRepository.find({ where: { userId: userId } }),
-          )
+          .then(() => this.userGroupRepository.getUserGroupsByUserId(userId))
       ).map((x) => x.groupId);
     groupsFromCache ||
       (await this.cacheManager.set(`USER:${userId}:GROUPS`, groups));
@@ -47,7 +40,7 @@ export class UserCacheService implements UserCacheServiceInterface {
         await this.userRepository
           .findOneOrFail({ where: { id: userId } })
           .then(() =>
-            this.userPermissionRepository.find({ where: { userId: userId } }),
+            this.userPermissionRepository.getUserPermissionsByUserId(userId),
           )
       ).map((x) => x.permissionId);
     permissionsFromCache ||

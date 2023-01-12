@@ -1,10 +1,10 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  PasswordAlreadySetException,
-  InviteTokenAlreadyRevokedException,
-} from '../../authorization/exception/user.exception';
 import User from '../../authorization/entity/user.entity';
+import {
+  InviteTokenAlreadyRevokedException,
+  PasswordAlreadySetException,
+} from '../../authorization/exception/user.exception';
 import { UserServiceInterface } from '../../authorization/service/user.service.interface';
 import {
   InviteTokenResponse,
@@ -22,9 +22,7 @@ export class TokenService {
 
   async refresh(refreshToken: string): Promise<TokenResponse> {
     const response = this.authenticationHelper.validateAuthToken(refreshToken);
-    const userRecord: User | undefined = await this.userService.getUserById(
-      response.sub,
-    );
+    const userRecord: User = await this.userService.getUserById(response.sub);
     if (userRecord.refreshToken !== refreshToken) {
       throw new UnauthorizedException();
     }

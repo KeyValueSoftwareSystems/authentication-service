@@ -1,8 +1,14 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import User from '../../../src/authorization/entity/user.entity';
+import { EntityResolver } from '../../../src/authorization/resolver/entity.resolver';
+import { EntityServiceInterface } from '../../../src/authorization/service/entity.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
   Entity,
   NewEntityInput,
@@ -10,13 +16,7 @@ import {
   UpdateEntityInput,
   UpdateEntityPermissionInput,
 } from '../../../src/schema/graphql.schema';
-import { EntityService } from '../../../src/authorization/service/entity.service';
-import { EntityResolver } from '../../../src/authorization/resolver/entity.resolver';
-import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
-import User from '../../../src/authorization/entity/user.entity';
 import { mockedConfigService } from '../../utils/mocks/config.service';
-import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -55,8 +55,9 @@ const entities: Entity[] = [
   },
 ];
 
-const entityService = Substitute.for<EntityService>();
+const entityService = Substitute.for<EntityServiceInterface>();
 const userService = Substitute.for<UserServiceInterface>();
+
 describe('Entity Module', () => {
   let app: INestApplication;
   userService
@@ -69,7 +70,7 @@ describe('Entity Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         EntityResolver,
-        { provide: EntityService, useValue: entityService },
+        { provide: EntityServiceInterface, useValue: entityService },
         { provide: UserServiceInterface, useValue: userService },
         { provide: ConfigService, useValue: mockedConfigService },
         AuthenticationHelper,

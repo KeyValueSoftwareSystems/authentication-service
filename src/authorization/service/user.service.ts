@@ -1,8 +1,8 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
-
-import User from '../entity/user.entity';
+import { DataSource, SelectQueryBuilder } from 'typeorm';
+import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
+import { FilterBuilder } from '../../common/filter.builder';
+import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   FilterField,
   OperationType,
@@ -12,43 +12,44 @@ import {
   UpdateUserPermissionInput,
   UserInputFilter,
 } from '../../schema/graphql.schema';
-import { UserNotFoundException } from '../exception/user.exception';
 import Group from '../entity/group.entity';
 import Permission from '../entity/permission.entity';
+import User from '../entity/user.entity';
 import UserGroup from '../entity/userGroup.entity';
 import UserPermission from '../entity/userPermission.entity';
 import { GroupNotFoundException } from '../exception/group.exception';
 import { PermissionNotFoundException } from '../exception/permission.exception';
-import GroupCacheService from './groupcache.service';
-import PermissionCacheService from './permissioncache.service';
-import RoleCacheService from './rolecache.service';
+import { UserNotFoundException } from '../exception/user.exception';
+import { GroupRepository } from '../repository/group.repository';
+import { PermissionRepository } from '../repository/permission.repository';
+import { UserRepository } from '../repository/user.repository';
+import { UserGroupRepository } from '../repository/userGroup.repository';
+import { UserPermissionRepository } from '../repository/userPermission.repository';
+import { GroupCacheServiceInterface } from './groupcache.service.interface';
+import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
+import { RoleCacheServiceInterface } from './rolecache.service.interface';
 import SearchService from './search.service';
-import { SearchEntity } from '../../constants/search.entity.enum';
-import { FilterBuilder } from '../../common/filter.builder';
-import { UserNotAuthorized } from '../../authentication/exception/userauth.exception';
 import { UserServiceInterface } from './user.service.interface';
 import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
 export class UserService implements UserServiceInterface {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    @InjectRepository(UserGroup)
-    private userGroupRepository: Repository<UserGroup>,
-    @InjectRepository(Group)
-    private groupRepository: Repository<Group>,
-    @InjectRepository(UserPermission)
-    private userPermissionRepository: Repository<UserPermission>,
-    @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>,
+    private userRepository: UserRepository,
+    private userGroupRepository: UserGroupRepository,
+    private groupRepository: GroupRepository,
+    private userPermissionRepository: UserPermissionRepository,
+    private permissionRepository: PermissionRepository,
     @Inject(UserCacheServiceInterface)
     private userCacheService: UserCacheServiceInterface,
-    private groupCacheService: GroupCacheService,
-    private permissionCacheService: PermissionCacheService,
-    private connection: Connection,
+    @Inject(GroupCacheServiceInterface)
+    private groupCacheService: GroupCacheServiceInterface,
+    @Inject(PermissionCacheServiceInterface)
+    private permissionCacheService: PermissionCacheServiceInterface,
+    private dataSource: DataSource,
     private searchService: SearchService,
-    private roleCacheService: RoleCacheService,
+    @Inject(RoleCacheServiceInterface)
+    private roleCacheService: RoleCacheServiceInterface,
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {
@@ -68,7 +69,7 @@ export class UserService implements UserServiceInterface {
         );
       }
     };
-    const qb = this.usersRepository.createQueryBuilder();
+    const qb = this.userRepository.createQueryBuilder('user');
     if (input?.search) {
       this.searchService.generateSearchTermForEntity(
         qb,
@@ -94,7 +95,7 @@ export class UserService implements UserServiceInterface {
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.userRepository.getUserById(id);
     if (user) {
       return user;
     }
@@ -102,11 +103,7 @@ export class UserService implements UserServiceInterface {
   }
 
   async createUser(user: User): Promise<User> {
-    const newUser = this.usersRepository.create(user);
-    const result = await this.usersRepository.insert(newUser);
-    const savedUser = await this.usersRepository.findOneBy({
-      id: result.raw[0].id,
-    });
+    const savedUser = await this.userRepository.save(user);
     if (savedUser) {
       return savedUser;
     }
@@ -114,13 +111,13 @@ export class UserService implements UserServiceInterface {
   }
 
   async updateUser(id: string, user: UpdateUserInput): Promise<User> {
-    const existingUser = await this.usersRepository.findOneBy({ id });
-    if (!existingUser) {
+    const updatedUser = await this.userRepository.updateUserById(id, user);
+
+    if (!updatedUser) {
       throw new UserNotFoundException(id);
     }
-    const newUser = this.usersRepository.create(user);
-    await this.usersRepository.update(id, newUser);
-    return { ...existingUser, ...newUser };
+
+    return this.getUserById(id);
   }
 
   async updateUserGroups(
@@ -128,7 +125,9 @@ export class UserService implements UserServiceInterface {
     user: UpdateUserGroupInput,
   ): Promise<Group[]> {
     await this.getUserById(id);
-    const groupsInRequest = await this.groupRepository.findByIds(user.groups);
+    const groupsInRequest = await this.groupRepository.getGroupsByIds(
+      user.groups,
+    );
     const existingGroupsOfUser = await this.getUserGroups(id);
 
     const validGroupsInRequest: Set<string> = new Set(
@@ -147,7 +146,7 @@ export class UserService implements UserServiceInterface {
       user.groups.map((group) => ({ userId: id, groupId: group })),
     );
 
-    await this.connection.manager.transaction(async (entityManager) => {
+    await this.dataSource.manager.transaction(async (entityManager) => {
       const userGroupsRepo = entityManager.getRepository(UserGroup);
       await userGroupsRepo.remove(groupsToBeRemovedFromUser);
       await userGroupsRepo.save(userGroups);
@@ -159,12 +158,7 @@ export class UserService implements UserServiceInterface {
   }
 
   async getUserGroups(id: string): Promise<Group[]> {
-    const groups = await this.groupRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect(UserGroup, 'userGroup', 'Group.id = userGroup.groupId')
-      .where('userGroup.userId = :userId', { userId: id })
-      .getMany();
-    return groups;
+    return this.groupRepository.getGroupsForUserId(id);
   }
 
   async updateUserPermissions(
@@ -175,7 +169,7 @@ export class UserService implements UserServiceInterface {
     const existingUserPermissions: Permission[] = await this.getUserPermissions(
       id,
     );
-    const permissionsInRequest: Permission[] = await this.permissionRepository.findByIds(
+    const permissionsInRequest: Permission[] = await this.permissionRepository.getPermissionsByIds(
       request.permissions,
     );
     const validPermissions = new Set(permissionsInRequest.map((p) => p.id));
@@ -197,7 +191,7 @@ export class UserService implements UserServiceInterface {
       })),
     );
 
-    const userPermissionsUpdated = await this.connection.transaction(
+    const userPermissionsUpdated = await this.dataSource.transaction(
       async (entityManager) => {
         const userPermissionsRepo = entityManager.getRepository(UserPermission);
         await userPermissionsRepo.remove(userPermissionsToBeRemoved);
@@ -205,7 +199,7 @@ export class UserService implements UserServiceInterface {
       },
     );
 
-    const userPermissions = await this.permissionRepository.findByIds(
+    const userPermissions = await this.permissionRepository.getPermissionsByIds(
       userPermissionsUpdated.map((u) => u.permissionId),
     );
 
@@ -214,32 +208,23 @@ export class UserService implements UserServiceInterface {
   }
 
   async getUserPermissions(id: string): Promise<Permission[]> {
-    const permissions = await this.permissionRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect(
-        UserPermission,
-        'userPermission',
-        'Permission.id = userPermission.permissionId',
-      )
-      .where('userPermission.userId = :userId', { userId: id })
-      .getMany();
-    return permissions;
+    return this.permissionRepository.getPermissionsByUserId(id);
   }
 
   async deleteUser(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({
-      where: {
-        id,
-      },
-    });
+    const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new UserNotFoundException(id);
     }
 
-    await this.connection.manager.transaction(async (entityManager) => {
-      const usersRepo = entityManager.getRepository(User);
-      await usersRepo.update(id, { status: Status.INACTIVE });
-      await usersRepo.softDelete(id);
+    await this.dataSource.manager.transaction(async (entityManager) => {
+      const userRepo = entityManager.getRepository(User);
+      const userGroupRepo = entityManager.getRepository(UserGroup);
+      const userPermissionRepo = entityManager.getRepository(UserPermission);
+      await userPermissionRepo.softDelete({ userId: id });
+      await userGroupRepo.softDelete({ userId: id });
+      await userRepo.update(id, { status: Status.INACTIVE });
+      await userRepo.softDelete(id);
     });
 
     await this.userCacheService.invalidateUserPermissionsCache(id);
@@ -285,7 +270,7 @@ export class UserService implements UserServiceInterface {
       id,
     );
     const arrOfPermissions = Array.from(setOfPermissions);
-    const allPermissions = await this.permissionRepository.findByIds(
+    const allPermissions = await this.permissionRepository.getPermissionsByIds(
       arrOfPermissions,
     );
     return allPermissions;
@@ -335,21 +320,16 @@ export class UserService implements UserServiceInterface {
   }
 
   async verifyDuplicateUser(
-    email?: string | undefined,
-    phone?: string | undefined,
+    email?: string,
+    phone?: string,
   ): Promise<{ existingUserDetails?: User | null; duplicate: string }> {
     let user;
     if (email) {
-      user = await this.usersRepository
-        .createQueryBuilder('user')
-        .where('lower(user.email) = lower(:email)', { email })
-        .getOne();
+      user = await this.userRepository.getUserByEmail(email);
     }
 
     if (phone && !user) {
-      user = await this.usersRepository.findOne({
-        where: { phone: phone },
-      });
+      user = await this.userRepository.getUserByPhone(phone);
       return { existingUserDetails: user, duplicate: 'phone number' };
     }
 
@@ -357,30 +337,22 @@ export class UserService implements UserServiceInterface {
   }
 
   async getUserDetailsByEmailOrPhone(
-    email?: string | undefined,
-    phone?: string | undefined,
+    email?: string,
+    phone?: string,
   ): Promise<any> {
     let user;
     if (email) {
-      user = await this.usersRepository
-        .createQueryBuilder('user')
-        .where('lower(user.email) = lower(:email)', { email })
-        .getOne();
+      user = await this.userRepository.getUserByEmail(email);
     }
 
     if (phone && !user) {
-      user = await this.usersRepository.findOne({
-        where: { phone: phone },
-      });
+      user = await this.userRepository.getUserByPhone(phone);
     }
 
     return user;
   }
 
-  async getUserDetailsByUsername(
-    email?: string | undefined,
-    phone?: string | undefined,
-  ) {
+  async getUserDetailsByUsername(email?: string, phone?: string) {
     const nullCheckedEmail = email ? email : null;
     const nullCheckedPhone = phone ? phone : null;
     if (!nullCheckedEmail && !nullCheckedPhone) {
@@ -388,7 +360,7 @@ export class UserService implements UserServiceInterface {
         'Username should be provided with email or phone',
       );
     }
-    let query = this.usersRepository.createQueryBuilder('user');
+    let query = this.userRepository.createQueryBuilder('user');
     if (email) {
       query = query.orWhere('lower(user.email) = lower(:email)', {
         email: nullCheckedEmail,
@@ -401,8 +373,8 @@ export class UserService implements UserServiceInterface {
   }
 
   async updateField(id: string, field: string, value: any): Promise<User> {
-    await this.usersRepository.update(id, { [field]: value });
-    const updatedUser = await this.usersRepository.findOneBy({ id });
+    await this.userRepository.update(id, { [field]: value });
+    const updatedUser = await this.userRepository.getUserById(id);
     if (updatedUser) {
       return updatedUser;
     }
@@ -410,12 +382,10 @@ export class UserService implements UserServiceInterface {
   }
 
   async getActiveUserByPhoneNumber(phone: string) {
-    return await this.usersRepository.findOne({
-      where: { phone },
-    });
+    return this.userRepository.getUserByPhone(phone);
   }
 
   async setOtpSecret(user: User, twoFASecret: string) {
-    await this.usersRepository.update(user.id, { twoFASecret });
+    await this.userRepository.update(user.id, { twoFASecret });
   }
 }

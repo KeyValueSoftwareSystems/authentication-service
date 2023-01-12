@@ -1,23 +1,23 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import Permission from 'src/authorization/entity/permission.entity';
 import * as request from 'supertest';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import Role from '../../../src/authorization/entity/role.entity';
+import User from '../../../src/authorization/entity/user.entity';
+import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
+import { RoleServiceInterface } from '../../../src/authorization/service/role.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
+import * as GqlSchema from '../../../src/schema/graphql.schema';
 import {
   NewRoleInput,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../../src/schema/graphql.schema';
-import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import User from '../../../src/authorization/entity/user.entity';
-import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
-import { RoleService } from '../../../src/authorization/service/role.service';
-import { RoleResolver } from '../../../src/authorization/resolver/role.resolver';
-import Role from '../../../src/authorization/entity/role.entity';
-import * as GqlSchema from '../../../src/schema/graphql.schema';
-import Permission from 'src/authorization/entity/permission.entity';
-import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -47,7 +47,7 @@ const permissions = [
     name: 'Customers',
   },
 ];
-const roleService = Substitute.for<RoleService>();
+const roleService = Substitute.for<RoleServiceInterface>();
 describe('Role Module', () => {
   let app: INestApplication;
 
@@ -62,7 +62,7 @@ describe('Role Module', () => {
       providers: [
         AuthenticationHelper,
         RoleResolver,
-        { provide: RoleService, useValue: roleService },
+        { provide: RoleServiceInterface, useValue: roleService },
         { provide: UserServiceInterface, useValue: userService },
         { provide: ConfigService, useValue: mockedConfigService },
       ],

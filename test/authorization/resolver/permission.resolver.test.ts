@@ -1,21 +1,21 @@
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import * as request from 'supertest';
+import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
+import Permission from '../../../src/authorization/entity/permission.entity';
+import User from '../../../src/authorization/entity/user.entity';
+import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
+import { PermissionServiceInterface } from '../../../src/authorization/service/permission.service.interface';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
+import { AppGraphQLModule } from '../../../src/graphql/graphql.module';
 import {
   NewPermissionInput,
   Status,
   UpdatePermissionInput,
 } from '../../../src/schema/graphql.schema';
-import { PermissionService } from '../../../src/authorization/service/permission.service';
-import Permission from '../../../src/authorization/entity/permission.entity';
-import { PermissionResolver } from '../../../src/authorization/resolver/permission.resolver';
-import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import { mockedConfigService } from '../../utils/mocks/config.service';
-import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import User from '../../../src/authorization/entity/user.entity';
-import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 const users: User[] = [
@@ -36,8 +36,9 @@ const permissions: Permission[] = [
     name: 'Customers',
   },
 ];
-const permissionService = Substitute.for<PermissionService>();
+const permissionService = Substitute.for<PermissionServiceInterface>();
 const userService = Substitute.for<UserServiceInterface>();
+
 describe('Permission Module', () => {
   let app: INestApplication;
   let token: string;
@@ -46,7 +47,7 @@ describe('Permission Module', () => {
       imports: [AppGraphQLModule],
       providers: [
         PermissionResolver,
-        { provide: PermissionService, useValue: permissionService },
+        { provide: PermissionServiceInterface, useValue: permissionService },
         { provide: UserServiceInterface, useValue: userService },
         { provide: ConfigService, useValue: mockedConfigService },
         AuthenticationHelper,
