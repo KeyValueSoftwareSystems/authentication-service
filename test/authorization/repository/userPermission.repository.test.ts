@@ -1,12 +1,24 @@
 import { Test } from '@nestjs/testing';
-import { UserPermissionRepository } from '../../../src/authorization/repository/userPermission.repository';
+import UserPermission from 'src/authorization/entity/userPermission.entity';
 import { DataSource } from 'typeorm';
+import { UserPermissionRepository } from '../../../src/authorization/repository/userPermission.repository';
+
+const VALID_PERMISSION_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
+
+const userPermissions: UserPermission[] = [
+  {
+    permissionId: VALID_PERMISSION_ID,
+    userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+  },
+];
 
 describe('test UserPermission repository', () => {
   let userPermissionRepository: UserPermissionRepository;
-  const mockDataSource = { createEntityManager: jest.fn() };
 
-  const VALID_PERMISSION_ID = 'ae032b1b-cc3c-4e44-9197-276ca877a7f8';
+  let countMock: jest.Mock;
+  let findMock: jest.Mock;
+
+  const mockDataSource = { createEntityManager: jest.fn() };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -19,21 +31,41 @@ describe('test UserPermission repository', () => {
       ],
     }).compile();
 
-    userPermissionRepository = moduleRef.get<UserPermissionRepository>(
-      UserPermissionRepository,
-    );
+    userPermissionRepository = moduleRef.get(UserPermissionRepository);
 
-    jest.spyOn(userPermissionRepository, 'count').mockResolvedValue(0);
+    countMock = userPermissionRepository.count = jest.fn();
+    findMock = userPermissionRepository.find = jest.fn();
   });
 
-  it('should get UserPermision count by permissionId', () => {
-    const result = userPermissionRepository.getUserPermissionCount(
-      VALID_PERMISSION_ID,
-    );
+  describe('getUserPermissionCount', () => {
+    it('should get user permision count by permission id', async () => {
+      countMock.mockResolvedValue(1);
 
-    expect(userPermissionRepository.count).toBeCalledWith({
-      where: { permissionId: VALID_PERMISSION_ID },
+      const result = await userPermissionRepository.getUserPermissionCount(
+        VALID_PERMISSION_ID,
+      );
+
+      expect(countMock).toBeCalledWith({
+        where: { permissionId: VALID_PERMISSION_ID },
+      });
+
+      expect(result).toEqual(1);
     });
-    expect(result).resolves.toEqual(0);
+  });
+
+  describe('getUserPermissionsByUserId', () => {
+    it('should get user permisions by user id', async () => {
+      findMock.mockResolvedValue(userPermissions);
+
+      const result = await userPermissionRepository.getUserPermissionsByUserId(
+        'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+      );
+
+      expect(findMock).toBeCalledWith({
+        where: { userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d' },
+      });
+
+      expect(result).toEqual(userPermissions);
+    });
   });
 });

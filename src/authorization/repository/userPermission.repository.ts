@@ -9,7 +9,11 @@ export class UserPermissionRepository extends BaseRepository<UserPermission> {
     super(UserPermission, dataSource);
   }
 
-  getUserPermissionCount(permissionId: string): Promise<number> {
+  async getUserPermissionCount(permissionId: string): Promise<number> {
     return this.count({ where: { permissionId } });
+  }
+
+  async getUserPermissionsByUserId(userId: string): Promise<UserPermission[]> {
+    return this.find({ where: { userId } });
   }
 }

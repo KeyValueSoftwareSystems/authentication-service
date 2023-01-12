@@ -1,22 +1,17 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
-import GroupPermission from '../entity/groupPermission.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import Group from '../entity/group.entity';
-import GroupRole from '../entity/groupRole.entity';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
+import { GroupRepository } from '../repository/group.repository';
+import { GroupPermissionRepository } from '../repository/groupPermission.repository';
+import { GroupRoleRepository } from '../repository/groupRole.repository';
 import { GroupCacheServiceInterface } from './groupcache.service.interface';
 
 @Injectable()
 export class GroupCacheService implements GroupCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
-    @InjectRepository(GroupPermission)
-    private groupPermissionRepository: Repository<GroupPermission>,
-    @InjectRepository(GroupRole)
-    private groupRoleRepository: Repository<GroupRole>,
-    @InjectRepository(Group)
-    private groupRepository: Repository<Group>,
+    private groupPermissionRepository: GroupPermissionRepository,
+    private groupRoleRepository: GroupRoleRepository,
+    private groupRepository: GroupRepository,
   ) {}
 
   async getGroupPermissionsFromGroupId(groupId: string): Promise<string[]> {
@@ -29,9 +24,9 @@ export class GroupCacheService implements GroupCacheServiceInterface {
         await this.groupRepository
           .findOneOrFail({ where: { id: groupId } })
           .then(() =>
-            this.groupPermissionRepository.find({
-              where: { groupId: groupId },
-            }),
+            this.groupPermissionRepository.getGroupPermissionsForGroupId(
+              groupId,
+            ),
           )
       ).map((x) => x.permissionId);
     permissionsFromCache ||
@@ -55,11 +50,7 @@ export class GroupCacheService implements GroupCacheServiceInterface {
       (
         await this.groupRepository
           .findOneOrFail({ where: { id: groupId } })
-          .then(() =>
-            this.groupRoleRepository.find({
-              where: { groupId: groupId },
-            }),
-          )
+          .then(() => this.groupRoleRepository.getGroupRolesForGroupId(groupId))
       ).map((groupRole) => groupRole.roleId);
     rolesFromCache ||
       (await this.cacheManager.set(`GROUP:${groupId}:ROLES`, roles));
