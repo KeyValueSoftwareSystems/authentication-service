@@ -1,11 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import User from '../../authorization/entity/user.entity';
 import {
   InviteTokenAlreadyRevokedException,
   PasswordAlreadySetException,
 } from '../../authorization/exception/user.exception';
-import UserService from '../../authorization/service/user.service';
+import { UserServiceInterface } from '../../authorization/service/user.service.interface';
 import {
   InviteTokenResponse,
   TokenResponse,
@@ -15,7 +15,7 @@ import { AuthenticationHelper } from '../authentication.helper';
 @Injectable()
 export class TokenService {
   constructor(
-    private userService: UserService,
+    @Inject(UserServiceInterface) private userService: UserServiceInterface,
     private authenticationHelper: AuthenticationHelper,
     private configService: ConfigService,
   ) {}

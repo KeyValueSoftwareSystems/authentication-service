@@ -3,9 +3,10 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { UserRepository } from '../repository/user.repository';
 import { UserGroupRepository } from '../repository/userGroup.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
+import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
-export default class UserCacheService {
+export class UserCacheService implements UserCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
     private userGroupRepository: UserGroupRepository,

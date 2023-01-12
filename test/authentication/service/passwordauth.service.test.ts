@@ -6,7 +6,7 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
-import UserService from '../../../src/authorization/service/user.service';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import { Status } from '../../../src/schema/graphql.schema';
 
 let users: User[] = [
@@ -25,7 +25,7 @@ let users: User[] = [
 describe('test PasswordAuthService', () => {
   let passwordAuthService: PasswordAuthService;
   let authenticationHelper: AuthenticationHelper;
-  const userService = Substitute.for<UserService>();
+  const userService = Substitute.for<UserServiceInterface>();
   const configService = Substitute.for<ConfigService>();
   const tokenService = Substitute.for<TokenService>();
   configService.get('ENV').returns('local');
@@ -43,9 +43,9 @@ describe('test PasswordAuthService', () => {
       imports: [ConfigModule],
       controllers: [],
       providers: [
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: configService },
-        { provide: 'TokenService', useValue: tokenService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: ConfigService, useValue: configService },
+        { provide: TokenService, useValue: tokenService },
         {
           provide: DataSource,
           useValue: mockDataSource,

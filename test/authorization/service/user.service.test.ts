@@ -18,8 +18,9 @@ import { GroupCacheServiceInterface } from '../../../src/authorization/service/g
 import { PermissionCacheServiceInterface } from '../../../src/authorization/service/permissioncache.service.interface';
 import { RoleCacheServiceInterface } from '../../../src/authorization/service/rolecache.service.interface';
 import SearchService from '../../../src/authorization/service/search.service';
-import UserService from '../../../src/authorization/service/user.service';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { UserService } from '../../../src/authorization/service/user.service';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
+import { UserCacheServiceInterface } from '../../../src/authorization/service/usercache.service.interface';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import { Status } from '../../../src/schema/graphql.schema';
 
@@ -52,7 +53,7 @@ const groups: Group[] = [
 ];
 
 describe('test UserService', () => {
-  let userService: UserService;
+  let userService: UserServiceInterface;
   let userRepository: UserRepository;
 
   let createQueryBuilderMock: jest.Mock;
@@ -72,7 +73,7 @@ describe('test UserService', () => {
   >();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
-  const userCacheService = Substitute.for<UserCacheService>();
+  const userCacheService = Substitute.for<UserCacheServiceInterface>();
   const groupCacheService = Substitute.for<GroupCacheServiceInterface>();
   const permissionCacheService = Substitute.for<PermissionCacheServiceInterface>();
   const redisCacheService = Substitute.for<RedisCacheService>();
@@ -125,7 +126,7 @@ describe('test UserService', () => {
           provide: getRepositoryToken(RolePermission),
           useValue: rolePermissionRepository,
         },
-        { provide: UserCacheService, useValue: userCacheService },
+        { provide: UserCacheServiceInterface, useValue: userCacheService },
         { provide: GroupCacheServiceInterface, useValue: groupCacheService },
         { provide: RedisCacheService, useValue: redisCacheService },
         { provide: SearchService, useValue: searchService },
@@ -141,7 +142,7 @@ describe('test UserService', () => {
         },
       ],
     }).compile();
-    userService = moduleRef.get(UserService);
+    userService = moduleRef.get<UserServiceInterface>(UserService);
     userRepository = moduleRef.get(UserRepository);
 
     getUserByIdMock = userRepository.getUserById = jest.fn();

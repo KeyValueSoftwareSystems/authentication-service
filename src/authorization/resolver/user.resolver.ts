@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
 import {
   Args,
@@ -24,12 +24,14 @@ import {
 import ValidationPipe from '../../validation/validation.pipe';
 import { PermissionsType } from '../constants/authorization.constants';
 import { Permissions } from '../permissions.decorator';
-import UserService from '../service/user.service';
+import { UserServiceInterface } from '../service/user.service.interface';
 import * as UserSchema from '../validation/user.validation.schema';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private userService: UserService) {}
+  constructor(
+    @Inject(UserServiceInterface) private userService: UserServiceInterface,
+  ) {}
 
   @Permissions(PermissionsType.ViewUser)
   @Query()

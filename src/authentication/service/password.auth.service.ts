@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import User from '../../authorization/entity/user.entity';
@@ -6,7 +6,7 @@ import {
   PasswordAlreadySetException,
   UserNotFoundException,
 } from '../../authorization/exception/user.exception';
-import UserService from '../../authorization/service/user.service';
+import { UserServiceInterface } from '../../authorization/service/user.service.interface';
 import {
   InviteTokenResponse,
   Status,
@@ -29,7 +29,7 @@ import { TokenService } from './token.service';
 @Injectable()
 export default class PasswordAuthService implements Authenticatable {
   constructor(
-    private userService: UserService,
+    @Inject(UserServiceInterface) private userService: UserServiceInterface,
     private tokenService: TokenService,
     private authenticationHelper: AuthenticationHelper,
     private dataSource: DataSource,

@@ -46,8 +46,10 @@ import { RoleServiceInterface } from './service/role.service.interface';
 import RoleCacheService from './service/rolecache.service';
 import { RoleCacheServiceInterface } from './service/rolecache.service.interface';
 import SearchService from './service/search.service';
-import UserService from './service/user.service';
-import UserCacheService from './service/usercache.service';
+import { UserService } from './service/user.service';
+import { UserServiceInterface } from './service/user.service.interface';
+import { UserCacheService } from './service/usercache.service';
+import { UserCacheServiceInterface } from './service/usercache.service.interface';
 
 @Module({
   imports: [
@@ -69,11 +71,9 @@ import UserCacheService from './service/usercache.service';
   providers: [
     GroupResolver,
     PermissionResolver,
-    UserService,
     UserResolver,
     EntityResolver,
     RedisCacheService,
-    UserCacheService,
     AuthenticationHelper,
     ConfigService,
     RoleResolver,
@@ -117,7 +117,20 @@ import UserCacheService from './service/usercache.service';
       provide: GroupCacheServiceInterface,
       useClass: GroupCacheService,
     },
+    {
+      provide: UserServiceInterface,
+      useClass: UserService,
+    },
+    {
+      provide: UserCacheServiceInterface,
+      useClass: UserCacheService,
+    },
   ],
-  exports: [UserService],
+  exports: [
+    {
+      provide: UserServiceInterface,
+      useClass: UserService,
+    },
+  ],
 })
 export class AuthorizationModule {}

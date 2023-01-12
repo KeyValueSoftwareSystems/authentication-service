@@ -32,7 +32,7 @@ import { UserGroupRepository } from '../repository/userGroup.repository';
 import { GroupServiceInterface } from './group.service.interface';
 import { GroupCacheServiceInterface } from './groupcache.service.interface';
 import SearchService from './search.service';
-import UserCacheService from './usercache.service';
+import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
 export class GroupService implements GroupServiceInterface {
@@ -47,7 +47,8 @@ export class GroupService implements GroupServiceInterface {
     private dataSource: DataSource,
     @Inject(GroupCacheServiceInterface)
     private groupCacheService: GroupCacheServiceInterface,
-    private userCacheService: UserCacheService,
+    @Inject(UserCacheServiceInterface)
+    private userCacheService: UserCacheServiceInterface,
     private searchService: SearchService,
   ) {}
 

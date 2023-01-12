@@ -29,17 +29,19 @@ import { GroupCacheServiceInterface } from './groupcache.service.interface';
 import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 import { RoleCacheServiceInterface } from './rolecache.service.interface';
 import SearchService from './search.service';
-import UserCacheService from './usercache.service';
+import { UserServiceInterface } from './user.service.interface';
+import { UserCacheServiceInterface } from './usercache.service.interface';
 
 @Injectable()
-export default class UserService {
+export class UserService implements UserServiceInterface {
   constructor(
     private userRepository: UserRepository,
     private userGroupRepository: UserGroupRepository,
     private groupRepository: GroupRepository,
     private userPermissionRepository: UserPermissionRepository,
     private permissionRepository: PermissionRepository,
-    private userCacheService: UserCacheService,
+    @Inject(UserCacheServiceInterface)
+    private userCacheService: UserCacheServiceInterface,
     @Inject(GroupCacheServiceInterface)
     private groupCacheService: GroupCacheServiceInterface,
     @Inject(PermissionCacheServiceInterface)
@@ -263,7 +265,7 @@ export default class UserService {
     return allPermissionsOfUser;
   }
 
-  public async permissionsOfUser(id: string) {
+  public async permissionsOfUser(id: string): Promise<Permission[]> {
     const setOfPermissions: Set<string> = await this.getAllUserpermissionIds(
       id,
     );

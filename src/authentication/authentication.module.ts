@@ -75,7 +75,7 @@ const providers: Provider[] = [
     TwilioImplModule,
     HttpModule,
   ],
-  providers: providers,
+  providers,
   controllers: [GoogleAuthController],
 })
 export class UserAuthModule {}

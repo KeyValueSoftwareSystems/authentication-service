@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import UserService from '../../../src/authorization/service/user.service';
+import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import Substitute, { Arg } from '@fluffy-spoon/substitute';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserResolver } from '../../../src/authorization/resolver/user.resolver';
@@ -18,12 +19,11 @@ import {
 } from '../../../src/schema/graphql.schema';
 import UserAuthResolver from '../../../src/authentication/resolver/user.auth.resolver';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
-import { ConfigService } from '@nestjs/config';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import PasswordAuthService from '../../../src/authentication/service/password.auth.service';
 import OTPAuthService from '../../../src/authentication/service/otp.auth.service';
 import { TokenService } from '../../../src/authentication/service/token.service';
+import { UserCacheServiceInterface } from '../../../src/authorization/service/usercache.service.interface';
 
 const users: User[] = [
   {
@@ -40,11 +40,11 @@ const users: User[] = [
 
 const gql = '/graphql';
 
-const userService = Substitute.for<UserService>();
+const userService = Substitute.for<UserServiceInterface>();
 const passwordAuthService = Substitute.for<PasswordAuthService>();
 const otpAuthService = Substitute.for<OTPAuthService>();
 const tokenService = Substitute.for<TokenService>();
-const userCacheService = Substitute.for<UserCacheService>();
+const userCacheService = Substitute.for<UserCacheServiceInterface>();
 const redisCacheService = Substitute.for<RedisCacheService>();
 
 describe('Userauth Module', () => {
@@ -60,13 +60,13 @@ describe('Userauth Module', () => {
         UserAuthResolver,
         ConfigService,
         AuthenticationHelper,
-        { provide: 'UserService', useValue: userService },
-        { provide: 'TokenService', useValue: tokenService },
-        { provide: 'PasswordAuthService', useValue: passwordAuthService },
-        { provide: 'OTPAuthService', useValue: otpAuthService },
-        { provide: 'ConfigService', useValue: configService },
-        { provide: 'UserCacheService', useValue: userCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
+        { provide: UserServiceInterface, useValue: userService },
+        { provide: TokenService, useValue: tokenService },
+        { provide: PasswordAuthService, useValue: passwordAuthService },
+        { provide: OTPAuthService, useValue: otpAuthService },
+        { provide: ConfigService, useValue: configService },
+        { provide: UserCacheServiceInterface, useValue: userCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

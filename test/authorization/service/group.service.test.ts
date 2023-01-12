@@ -18,7 +18,7 @@ import { GroupService } from '../../../src/authorization/service/group.service';
 import { GroupServiceInterface } from '../../../src/authorization/service/group.service.interface';
 import { GroupCacheServiceInterface } from '../../../src/authorization/service/groupcache.service.interface';
 import SearchService from '../../../src/authorization/service/search.service';
-import UserCacheService from '../../../src/authorization/service/usercache.service';
+import { UserCacheServiceInterface } from '../../../src/authorization/service/usercache.service.interface';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import {
   NewGroupInput,
@@ -72,7 +72,7 @@ describe('test Group Service', () => {
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const roleRepository = Substitute.for<Repository<Role>>();
-  const userCacheService = Substitute.for<UserCacheService>();
+  const userCacheService = Substitute.for<UserCacheServiceInterface>();
   const searchService = Substitute.for<SearchService>();
   const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
@@ -149,7 +149,7 @@ describe('test Group Service', () => {
           provide: getRepositoryToken(Role),
           useValue: roleRepository,
         },
-        { provide: UserCacheService, useValue: userCacheService },
+        { provide: UserCacheServiceInterface, useValue: userCacheService },
         { provide: GroupCacheServiceInterface, useValue: groupCacheService },
         { provide: RedisCacheService, useValue: redisCacheService },
         { provide: SearchService, useValue: searchService },
