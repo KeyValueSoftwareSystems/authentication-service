@@ -25,7 +25,7 @@ import { PermissionRepository } from '../repository/permission.repository';
 import { UserRepository } from '../repository/user.repository';
 import { UserGroupRepository } from '../repository/userGroup.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
-import GroupCacheService from './groupcache.service';
+import { GroupCacheServiceInterface } from './groupcache.service.interface';
 import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
 import { RoleCacheServiceInterface } from './rolecache.service.interface';
 import SearchService from './search.service';
@@ -40,7 +40,8 @@ export default class UserService {
     private userPermissionRepository: UserPermissionRepository,
     private permissionRepository: PermissionRepository,
     private userCacheService: UserCacheService,
-    private groupCacheService: GroupCacheService,
+    @Inject(GroupCacheServiceInterface)
+    private groupCacheService: GroupCacheServiceInterface,
     @Inject(PermissionCacheServiceInterface)
     private permissionCacheService: PermissionCacheServiceInterface,
     private dataSource: DataSource,

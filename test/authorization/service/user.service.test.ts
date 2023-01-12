@@ -14,7 +14,7 @@ import UserGroup from '../../../src/authorization/entity/userGroup.entity';
 import UserPermission from '../../../src/authorization/entity/userPermission.entity';
 import { UserNotFoundException } from '../../../src/authorization/exception/user.exception';
 import { UserRepository } from '../../../src/authorization/repository/user.repository';
-import GroupCacheService from '../../../src/authorization/service/groupcache.service';
+import { GroupCacheServiceInterface } from '../../../src/authorization/service/groupcache.service.interface';
 import { PermissionCacheServiceInterface } from '../../../src/authorization/service/permissioncache.service.interface';
 import { RoleCacheServiceInterface } from '../../../src/authorization/service/rolecache.service.interface';
 import SearchService from '../../../src/authorization/service/search.service';
@@ -73,7 +73,7 @@ describe('test UserService', () => {
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
   const userCacheService = Substitute.for<UserCacheService>();
-  const groupCacheService = Substitute.for<GroupCacheService>();
+  const groupCacheService = Substitute.for<GroupCacheServiceInterface>();
   const permissionCacheService = Substitute.for<PermissionCacheServiceInterface>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
@@ -126,8 +126,9 @@ describe('test UserService', () => {
           useValue: rolePermissionRepository,
         },
         { provide: UserCacheService, useValue: userCacheService },
-        { provide: GroupCacheService, useValue: groupCacheService },
+        { provide: GroupCacheServiceInterface, useValue: groupCacheService },
         { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: PermissionCacheServiceInterface,
           useValue: permissionCacheService,

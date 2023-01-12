@@ -18,6 +18,8 @@ import { mockedConfigService } from '../../utils/mocks/config.service';
 import Role from 'src/authorization/entity/role.entity';
 import * as GqlSchema from '../../../src/schema/graphql.schema';
 import Permission from 'src/authorization/entity/permission.entity';
+import { GroupServiceInterface } from '../../../src/authorization/service/group.service.interface';
+import { ConfigService } from '@nestjs/config';
 
 const gql = '/graphql';
 
@@ -47,7 +49,7 @@ const permissions = [
     name: 'Customers',
   },
 ];
-const groupService = Substitute.for<GroupService>();
+const groupService = Substitute.for<GroupServiceInterface>();
 describe('Group Module', () => {
   let app: INestApplication;
 
@@ -62,9 +64,9 @@ describe('Group Module', () => {
       providers: [
         AuthenticationHelper,
         GroupResolver,
-        { provide: 'GroupService', useValue: groupService },
-        { provide: 'UserService', useValue: userService },
-        { provide: 'ConfigService', useValue: mockedConfigService },
+        { provide: GroupServiceInterface, useValue: groupService },
+        { provide: UserService, useValue: userService },
+        { provide: ConfigService, useValue: mockedConfigService },
       ],
     }).compile();
     authenticationHelper = moduleFixture.get<AuthenticationHelper>(

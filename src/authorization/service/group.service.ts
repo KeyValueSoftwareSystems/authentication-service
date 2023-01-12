@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
@@ -29,22 +29,24 @@ import { PermissionRepository } from '../repository/permission.repository';
 import { RoleRepository } from '../repository/role.repository';
 import { UserRepository } from '../repository/user.repository';
 import { UserGroupRepository } from '../repository/userGroup.repository';
-import GroupCacheService from './groupcache.service';
+import { GroupServiceInterface } from './group.service.interface';
+import { GroupCacheServiceInterface } from './groupcache.service.interface';
 import SearchService from './search.service';
 import UserCacheService from './usercache.service';
 
 @Injectable()
-export class GroupService {
+export class GroupService implements GroupServiceInterface {
   constructor(
     private groupRepository: GroupRepository,
     private userGroupRepository: UserGroupRepository,
     private groupPermissionRepository: GroupPermissionRepository,
     private permissionRepository: PermissionRepository,
-    private groupCacheService: GroupCacheService,
     private groupRoleRepository: GroupRoleRepository,
     private rolesRepository: RoleRepository,
     private userRepository: UserRepository,
     private dataSource: DataSource,
+    @Inject(GroupCacheServiceInterface)
+    private groupCacheService: GroupCacheServiceInterface,
     private userCacheService: UserCacheService,
     private searchService: SearchService,
   ) {}

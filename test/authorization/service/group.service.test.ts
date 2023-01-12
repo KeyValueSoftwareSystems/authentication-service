@@ -15,7 +15,8 @@ import { GroupRepository } from '../../../src/authorization/repository/group.rep
 import { UserRepository } from '../../../src/authorization/repository/user.repository';
 import { UserGroupRepository } from '../../../src/authorization/repository/userGroup.repository';
 import { GroupService } from '../../../src/authorization/service/group.service';
-import GroupCacheService from '../../../src/authorization/service/groupcache.service';
+import { GroupServiceInterface } from '../../../src/authorization/service/group.service.interface';
+import { GroupCacheServiceInterface } from '../../../src/authorization/service/groupcache.service.interface';
 import SearchService from '../../../src/authorization/service/search.service';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
@@ -55,7 +56,7 @@ const users: User[] = [
 ];
 
 describe('test Group Service', () => {
-  let groupService: GroupService;
+  let groupService: GroupServiceInterface;
   let groupRepository: GroupRepository;
   let userRepository: UserRepository;
   let userGroupRepository: UserGroupRepository;
@@ -67,7 +68,7 @@ describe('test Group Service', () => {
     Repository<GroupPermission>
   >();
 
-  const groupCacheService = Substitute.for<GroupCacheService>();
+  const groupCacheService = Substitute.for<GroupCacheServiceInterface>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const roleRepository = Substitute.for<Repository<Role>>();
@@ -148,22 +149,22 @@ describe('test Group Service', () => {
           provide: getRepositoryToken(Role),
           useValue: roleRepository,
         },
-        { provide: 'UserCacheService', useValue: userCacheService },
-        { provide: 'GroupCacheService', useValue: groupCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'SearchService', useValue: searchService },
-        // {
-        //   provide: DataSource,
-        //   useFactory: dataSourceMockFactory,
-        // },
+        { provide: UserCacheService, useValue: userCacheService },
+        { provide: GroupCacheServiceInterface, useValue: groupCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: DataSource,
           useValue: mockDataSource,
         },
+        // {
+        //   provide: DataSource,
+        //   useFactory: dataSourceMockFactory,
+        // },
       ],
     }).compile();
 
-    groupService = moduleRef.get(GroupService);
+    groupService = moduleRef.get<GroupServiceInterface>(GroupService);
     groupRepository = moduleRef.get(GroupRepository);
     userRepository = moduleRef.get(UserRepository);
     userGroupRepository = moduleRef.get(UserGroupRepository);

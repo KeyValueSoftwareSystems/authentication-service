@@ -3,9 +3,10 @@ import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { GroupRepository } from '../repository/group.repository';
 import { GroupPermissionRepository } from '../repository/groupPermission.repository';
 import { GroupRoleRepository } from '../repository/groupRole.repository';
+import { GroupCacheServiceInterface } from './groupcache.service.interface';
 
 @Injectable()
-export default class GroupCacheService {
+export class GroupCacheService implements GroupCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
     private groupPermissionRepository: GroupPermissionRepository,
