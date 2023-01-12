@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query, ResolveField } from '@nestjs/graphql';
+import { Args, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import {
   NewRoleInput,
   Permission,
@@ -8,10 +8,10 @@ import {
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
-import Role from '../entity/role.entity';
-import { RoleService } from '../service/role.service';
-import { Permissions } from '../permissions.decorator';
 import { PermissionsType } from '../constants/authorization.constants';
+import Role from '../entity/role.entity';
+import { Permissions } from '../permissions.decorator';
+import { RoleService } from '../service/role.service';
 
 @Resolver('Role')
 export class RoleResolver {

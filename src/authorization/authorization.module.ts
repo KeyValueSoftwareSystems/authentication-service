@@ -15,8 +15,16 @@ import RolePermission from './entity/rolePermission.entity';
 import User from './entity/user.entity';
 import UserGroup from './entity/userGroup.entity';
 import UserPermission from './entity/userPermission.entity';
+import { EntityModelRepository } from './repository/entity.repository';
+import { EntityPermissionRepository } from './repository/entityPermission.repository';
+import { GroupRepository } from './repository/group.repository';
 import { GroupPermissionRepository } from './repository/groupPermission.repository';
+import { GroupRoleRepository } from './repository/groupRole.repository';
 import { PermissionRepository } from './repository/permission.repository';
+import { RoleRepository } from './repository/role.repository';
+import { RolePermissionRepository } from './repository/rolePermission.repository';
+import { UserRepository } from './repository/user.repository';
+import { UserGroupRepository } from './repository/userGroup.repository';
 import { UserPermissionRepository } from './repository/userPermission.repository';
 import { EntityResolver } from './resolver/entity.resolver';
 import { GroupResolver } from './resolver/group.resolver';
@@ -73,6 +81,14 @@ import UserCacheService from './service/usercache.service';
     PermissionRepository,
     UserPermissionRepository,
     GroupPermissionRepository,
+    RoleRepository,
+    RolePermissionRepository,
+    GroupRoleRepository,
+    EntityModelRepository,
+    GroupRepository,
+    UserRepository,
+    UserGroupRepository,
+    EntityPermissionRepository,
     {
       provide: EntityServiceInterface,
       useClass: EntityService,

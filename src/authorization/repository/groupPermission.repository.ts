@@ -9,7 +9,15 @@ export class GroupPermissionRepository extends BaseRepository<GroupPermission> {
     super(GroupPermission, dataSource);
   }
 
-  getGroupPermissionCount(permissionId: string): Promise<number> {
+  async getGroupPermissionCount(permissionId: string): Promise<number> {
     return this.count({ where: { permissionId } });
+  }
+
+  async getGroupPermissionsForGroupId(
+    groupId: string,
+  ): Promise<GroupPermission[]> {
+    return this.find({
+      where: { groupId },
+    });
   }
 }
