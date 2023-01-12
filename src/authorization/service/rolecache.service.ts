@@ -1,19 +1,15 @@
-import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import RolePermission from '../entity/rolePermission.entity';
-import Role from '../entity/role.entity';
+import { RedisCacheService } from '../../cache/redis-cache/redis-cache.service';
+import { RoleRepository } from '../repository/role.repository';
+import { RolePermissionRepository } from '../repository/rolePermission.repository';
 import { RoleCacheServiceInterface } from './rolecache.service.interface';
 
 @Injectable()
 export default class RoleCacheService implements RoleCacheServiceInterface {
   constructor(
     private cacheManager: RedisCacheService,
-    @InjectRepository(RolePermission)
-    private rolePermissionRepository: Repository<RolePermission>,
-    @InjectRepository(Role)
-    private roleRepository: Repository<Role>,
+    private rolePermissionRepository: RolePermissionRepository,
+    private roleRepository: RoleRepository,
   ) {}
 
   async getRolePermissionsFromRoleId(roleId: string): Promise<string[]> {
@@ -25,11 +21,7 @@ export default class RoleCacheService implements RoleCacheServiceInterface {
       (
         await this.roleRepository
           .findOneOrFail({ where: { id: roleId } })
-          .then(() =>
-            this.rolePermissionRepository.find({
-              where: { roleId: roleId },
-            }),
-          )
+          .then(() => this.rolePermissionRepository.findByRoleId(roleId))
       ).map((rolePermission) => rolePermission.permissionId);
     permissionsFromCache ||
       (await this.cacheManager.set(`ROLE:${roleId}:PERMISSIONS`, permissions));
