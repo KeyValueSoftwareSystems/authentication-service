@@ -27,7 +27,7 @@ import { UserGroupRepository } from '../repository/userGroup.repository';
 import { UserPermissionRepository } from '../repository/userPermission.repository';
 import GroupCacheService from './groupcache.service';
 import { PermissionCacheServiceInterface } from './permissioncache.service.interface';
-import RoleCacheService from './rolecache.service';
+import { RoleCacheServiceInterface } from './rolecache.service.interface';
 import SearchService from './search.service';
 import UserCacheService from './usercache.service';
 
@@ -45,7 +45,8 @@ export default class UserService {
     private permissionCacheService: PermissionCacheServiceInterface,
     private dataSource: DataSource,
     private searchService: SearchService,
-    private roleCacheService: RoleCacheService,
+    @Inject(RoleCacheServiceInterface)
+    private roleCacheService: RoleCacheServiceInterface,
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {

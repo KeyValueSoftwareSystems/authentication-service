@@ -17,7 +17,7 @@ import { RoleNotFoundException } from '../../../src/authorization/exception/role
 import { PermissionRepository } from '../../../src/authorization/repository/permission.repository';
 import { RoleRepository } from '../../../src/authorization/repository/role.repository';
 import { RoleService } from '../../../src/authorization/service/role.service';
-import RoleCacheService from '../../../src/authorization/service/rolecache.service';
+import { RoleCacheServiceInterface } from '../../../src/authorization/service/rolecache.service.interface';
 import SearchService from '../../../src/authorization/service/search.service';
 import { RedisCacheService } from '../../../src/cache/redis-cache/redis-cache.service';
 import {
@@ -52,7 +52,7 @@ describe('test Role Service', () => {
   let permissionRepository: PermissionRepository;
   const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
   const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
-  const roleCacheService = Substitute.for<RoleCacheService>();
+  const roleCacheService = Substitute.for<RoleCacheServiceInterface>();
   const redisCacheService = Substitute.for<RedisCacheService>();
   const searchService = Substitute.for<SearchService>();
   const groupRoleQueryBuilder = Substitute.for<SelectQueryBuilder<GroupRole>>();
@@ -88,9 +88,9 @@ describe('test Role Service', () => {
           provide: getRepositoryToken(RolePermission),
           useValue: rolePermissionRepository,
         },
-        { provide: 'RoleCacheService', useValue: roleCacheService },
-        { provide: 'RedisCacheService', useValue: redisCacheService },
-        { provide: 'SearchService', useValue: searchService },
+        { provide: RoleCacheServiceInterface, useValue: roleCacheService },
+        { provide: RedisCacheService, useValue: redisCacheService },
+        { provide: SearchService, useValue: searchService },
         {
           provide: DataSource,
           useValue: mockDataSource,

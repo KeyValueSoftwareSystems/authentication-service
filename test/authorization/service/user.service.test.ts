@@ -16,7 +16,7 @@ import { UserNotFoundException } from '../../../src/authorization/exception/user
 import { UserRepository } from '../../../src/authorization/repository/user.repository';
 import GroupCacheService from '../../../src/authorization/service/groupcache.service';
 import { PermissionCacheServiceInterface } from '../../../src/authorization/service/permissioncache.service.interface';
-import RoleCacheService from '../../../src/authorization/service/rolecache.service';
+import { RoleCacheServiceInterface } from '../../../src/authorization/service/rolecache.service.interface';
 import SearchService from '../../../src/authorization/service/search.service';
 import UserService from '../../../src/authorization/service/user.service';
 import UserCacheService from '../../../src/authorization/service/usercache.service';
@@ -80,7 +80,7 @@ describe('test UserService', () => {
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
   >();
-  const roleCacheService = Substitute.for<RoleCacheService>();
+  const roleCacheService = Substitute.for<RoleCacheServiceInterface>();
   const searchService = Substitute.for<SearchService>();
 
   const mockDataSource = {
@@ -132,7 +132,7 @@ describe('test UserService', () => {
           provide: PermissionCacheServiceInterface,
           useValue: permissionCacheService,
         },
-        { provide: RoleCacheService, useValue: roleCacheService },
+        { provide: RoleCacheServiceInterface, useValue: roleCacheService },
         { provide: SearchService, useValue: searchService },
         {
           provide: DataSource,
