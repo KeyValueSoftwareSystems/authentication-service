@@ -154,6 +154,7 @@ describe('test UserService', () => {
       .mockReturnValue({
         leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
         getManyAndCount: (getManyAndCountMock = jest.fn()),
       });
   });
@@ -165,6 +166,7 @@ describe('test UserService', () => {
       const result = await userService.getAllUsers();
 
       expect(createQueryBuilderMock.mock.calls[0][0]).toStrictEqual('user');
+
       expect(getManyAndCountMock).toBeCalledTimes(1);
 
       expect(result).toEqual([users, 1]);

@@ -4,6 +4,7 @@ import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   NewRoleInput,
   RoleInputFilter,
+  SortDirection,
   UpdateRoleInput,
   UpdateRolePermissionInput,
 } from '../../schema/graphql.schema';
@@ -37,7 +38,10 @@ export class RoleService implements RoleServiceInterface {
   ) {}
 
   async getAllRoles(input?: RoleInputFilter): Promise<[Role[], number]> {
-    const SortFieldMapping = new Map([['name', 'Role.name']]);
+    const SortFieldMapping = new Map([
+      ['name', 'role.name'],
+      ['updatedAt', 'role.updated_at'],
+    ]);
     let queryBuilder = this.rolesRepository.createQueryBuilder('role');
     if (input?.search) {
       queryBuilder = this.searchService.generateSearchTermForEntity(
@@ -46,10 +50,16 @@ export class RoleService implements RoleServiceInterface {
         input.search,
       );
     }
+
     if (input?.sort) {
       const field = SortFieldMapping.get(input.sort.field);
-      field && queryBuilder.orderBy(field, input.sort.direction);
+      field
+        ? queryBuilder.orderBy(field, input.sort.direction)
+        : queryBuilder.orderBy('role.updated_at', SortDirection.DESC);
+    } else {
+      queryBuilder.orderBy('role.updated_at', SortDirection.DESC);
     }
+
     if (input?.pagination) {
       queryBuilder
         .limit(input?.pagination?.limit ?? 10)
@@ -96,8 +106,8 @@ export class RoleService implements RoleServiceInterface {
     }
 
     await this.dataSource.manager.transaction(async (entityManager) => {
-      const roleRepo = entityManager.getRepository(Role);
       const rolePermissionsRepo = entityManager.getRepository(RolePermission);
+      const roleRepo = entityManager.getRepository(Role);
       await rolePermissionsRepo.softDelete({ roleId: id });
       await roleRepo.softDelete(id);
     });
