@@ -4,6 +4,7 @@ import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   GroupInputFilter,
   NewGroupInput,
+  SortDirection,
   UpdateGroupInput,
   UpdateGroupPermissionInput,
   UpdateGroupRoleInput,
@@ -60,7 +61,10 @@ export class GroupService implements GroupServiceInterface {
    * @returns
    */
   async getAllGroups(input?: GroupInputFilter): Promise<[Group[], number]> {
-    const SortFieldMapping = new Map([['name', 'Group.name']]);
+    const SortFieldMapping = new Map([
+      ['name', 'group.name'],
+      ['updatedAt', 'group.updated_at'],
+    ]);
     let queryBuilder = this.groupRepository.createQueryBuilder('group');
 
     if (input?.search) {
@@ -72,7 +76,11 @@ export class GroupService implements GroupServiceInterface {
     }
     if (input?.sort) {
       const field = SortFieldMapping.get(input.sort.field);
-      field && queryBuilder.orderBy(field, input.sort.direction);
+      field
+        ? queryBuilder.orderBy(field, input.sort.direction)
+        : queryBuilder.orderBy('group.updated_at', SortDirection.DESC);
+    } else {
+      queryBuilder.orderBy('group.updated_at', SortDirection.DESC);
     }
     if (input?.pagination) {
       queryBuilder

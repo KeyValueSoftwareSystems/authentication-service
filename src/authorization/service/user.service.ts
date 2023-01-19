@@ -6,6 +6,7 @@ import { SearchEntity } from '../../constants/search.entity.enum';
 import {
   FilterField,
   OperationType,
+  SortDirection,
   Status,
   UpdateUserGroupInput,
   UpdateUserInput,
@@ -53,8 +54,11 @@ export class UserService implements UserServiceInterface {
   ) {}
 
   getAllUsers(input?: UserInputFilter): Promise<[User[], number]> {
-    const SortFieldMapping = new Map([['firstName', 'User.firstName']]);
-    const filterFieldMapping = new Map([['status', 'User.status']]);
+    const SortFieldMapping = new Map([
+      ['firstName', 'user.firstName'],
+      ['updatedAt', 'user.updated_at'],
+    ]);
+    const filterFieldMapping = new Map([['status', 'user.status']]);
 
     const applyUserGroupFilter = (
       field: FilterField,
@@ -64,7 +68,7 @@ export class UserService implements UserServiceInterface {
         queryBuilder.innerJoin(
           UserGroup,
           'userGroup',
-          'userGroup.userId = User.id AND userGroup.groupId IN (:...groupIds)',
+          'userGroup.userId = user.id AND userGroup.groupId IN (:...groupIds)',
           { groupIds: field.value },
         );
       }
@@ -83,7 +87,11 @@ export class UserService implements UserServiceInterface {
     }
     if (input?.sort) {
       const sortField = SortFieldMapping.get(input.sort.field);
-      sortField && qb.orderBy(sortField, input.sort.direction);
+      sortField
+        ? qb.orderBy(sortField, input.sort.direction)
+        : qb.orderBy('user.updated_at', SortDirection.DESC);
+    } else {
+      qb.orderBy('user.updated_at', SortDirection.DESC);
     }
     if (input?.pagination) {
       qb.limit(input?.pagination?.limit ?? 10).offset(

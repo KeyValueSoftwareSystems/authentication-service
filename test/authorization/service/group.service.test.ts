@@ -175,6 +175,7 @@ describe('test Group Service', () => {
       .mockReturnValue({
         leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
         getManyAndCount: (getManyAndCountMock = jest.fn()),
       });
 
