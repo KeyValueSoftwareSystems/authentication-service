@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateGroupInput } from 'src/schema/graphql.schema';
 import { DataSource, In } from 'typeorm';
 import Group from '../entity/group.entity';
 import UserGroup from '../entity/userGroup.entity';
@@ -15,11 +14,8 @@ export class GroupRepository extends BaseRepository<Group> {
     return this.findOneBy({ id });
   }
 
-  async updateGroupById(
-    id: string,
-    updateGroupInput: UpdateGroupInput,
-  ): Promise<boolean> {
-    const result = await this.update(id, updateGroupInput);
+  async updateGroupById(id: string, name?: string): Promise<boolean> {
+    const result = await this.update(id, { name });
 
     return result.affected === 1;
   }
