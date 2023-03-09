@@ -1,4 +1,8 @@
-import { NotFoundException, PreconditionFailedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  PreconditionFailedException,
+} from '@nestjs/common';
 
 export class GroupNotFoundException extends NotFoundException {
   constructor(groupId: string) {
@@ -8,5 +12,11 @@ export class GroupNotFoundException extends NotFoundException {
 export class GroupDeleteNotAllowedException extends PreconditionFailedException {
   constructor() {
     super(`Group cannot be deleted as it is already in use`);
+  }
+}
+
+export class GroupExistsException extends BadRequestException {
+  constructor(name: string) {
+    super(`Group with name ${name} already exists. Cannot create this group.`);
   }
 }
