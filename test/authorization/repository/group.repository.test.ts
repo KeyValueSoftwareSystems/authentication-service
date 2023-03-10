@@ -80,7 +80,7 @@ describe('test Group repository', () => {
 
       const result = await groupRepository.updateGroupById(
         VALID_GROUP_ID,
-        updateGroupInput,
+        updateGroupInput.name,
       );
 
       expect(updateMock).toBeCalledWith(VALID_GROUP_ID, {

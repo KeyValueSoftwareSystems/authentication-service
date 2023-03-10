@@ -123,7 +123,10 @@ export class GroupService implements GroupServiceInterface {
    * @returns
    */
   async updateGroup(id: string, group: UpdateGroupInput): Promise<Group> {
-    const updatedGroup = await this.groupRepository.updateGroupById(id, group);
+    const updatedGroup = await this.groupRepository.updateGroupById(
+      id,
+      group?.name,
+    );
 
     if (!updatedGroup) {
       throw new GroupNotFoundException(id);

@@ -277,7 +277,7 @@ describe('test Group Service', () => {
 
       expect(updateGroupByIdMock).toBeCalledWith(
         'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-        input,
+        input.name,
       );
       expect(getGroupByIdMock).toBeCalledWith(
         'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -366,7 +366,7 @@ describe('test Group Service', () => {
       } catch (error) {
         expect(updateGroupByIdMock).toBeCalledWith(
           'ae032b1b-cc3c-4e44-9197-276ca877a7f9',
-          input,
+          input.name,
         );
         expect(getGroupByIdMock).not.toBeCalled();
 
