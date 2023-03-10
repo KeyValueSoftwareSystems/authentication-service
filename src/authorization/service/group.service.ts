@@ -1,4 +1,8 @@
-import { Inject, Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { SearchEntity } from '../../constants/search.entity.enum';
 import {
@@ -36,6 +40,7 @@ import { GroupCacheServiceInterface } from './groupcache.service.interface';
 import SearchService from './search.service';
 import { UserCacheServiceInterface } from './usercache.service.interface';
 import { DUPLICATE_ERROR_CODE } from '../../common/constants';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class GroupService implements GroupServiceInterface {
@@ -53,6 +58,7 @@ export class GroupService implements GroupServiceInterface {
     @Inject(UserCacheServiceInterface)
     private userCacheService: UserCacheServiceInterface,
     private searchService: SearchService,
+    private logger: LoggerService,
   ) {}
 
   /**
@@ -120,7 +126,8 @@ export class GroupService implements GroupServiceInterface {
       if (err.code === DUPLICATE_ERROR_CODE) {
         err = new GroupExistsException(group.name);
       } else {
-        err = new BadRequestException('Something Went Wrong');
+        this.logger.error(err);
+        err = new InternalServerErrorException('Something Went Wrong');
       }
       throw err;
     }
