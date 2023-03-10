@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LoggerService } from 'src/logger/logger.service';
 import { AuthenticationHelper } from '../authentication/authentication.helper';
 import { RedisCacheModule } from '../cache/redis-cache/redis-cache.module';
 import { RedisCacheService } from '../cache/redis-cache/redis-cache.service';
@@ -89,6 +90,7 @@ import { UserCacheServiceInterface } from './service/usercache.service.interface
     UserRepository,
     UserGroupRepository,
     EntityPermissionRepository,
+    LoggerService,
     {
       provide: EntityServiceInterface,
       useClass: EntityService,

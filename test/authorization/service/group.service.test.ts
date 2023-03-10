@@ -2,6 +2,7 @@ import { Substitute } from '@fluffy-spoon/substitute';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { LoggerService } from '../../../src/logger/logger.service';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import Group from '../../../src/authorization/entity/group.entity';
@@ -74,6 +75,7 @@ describe('test Group Service', () => {
   const roleRepository = Substitute.for<Repository<Role>>();
   const userCacheService = Substitute.for<UserCacheServiceInterface>();
   const searchService = Substitute.for<SearchService>();
+  const loggerService = Substitute.for<LoggerService>();
   const userQueryBuilder = Substitute.for<SelectQueryBuilder<User>>();
   const permissionQueryBuilder = Substitute.for<
     SelectQueryBuilder<Permission>
@@ -153,6 +155,7 @@ describe('test Group Service', () => {
         { provide: GroupCacheServiceInterface, useValue: groupCacheService },
         { provide: RedisCacheService, useValue: redisCacheService },
         { provide: SearchService, useValue: searchService },
+        { provide: LoggerService, useValue: loggerService },
         {
           provide: DataSource,
           useValue: mockDataSource,
