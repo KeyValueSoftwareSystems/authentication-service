@@ -37,7 +37,7 @@ export default class SearchService {
       if (input.and.email) {
         andConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.email',
+            'user.email',
             input.and.email,
           ),
         );
@@ -45,7 +45,7 @@ export default class SearchService {
       if (input.and.firstName) {
         andConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.firstName',
+            'user.firstName',
             input.and.firstName,
           ),
         );
@@ -53,7 +53,7 @@ export default class SearchService {
       if (input.and.middleName) {
         andConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.middleName',
+            'user.middleName',
             input.and.middleName,
           ),
         );
@@ -61,7 +61,7 @@ export default class SearchService {
       if (input.and.lastName) {
         andConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.lastName',
+            'user.lastName',
             input.and.lastName,
           ),
         );
@@ -71,13 +71,13 @@ export default class SearchService {
     if (input.or) {
       if (input.or.email) {
         orConditions.push(
-          this.generateWhereClauseForStringSearch('User.email', input.or.email),
+          this.generateWhereClauseForStringSearch('user.email', input.or.email),
         );
       }
       if (input.or.firstName) {
         orConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.firstName',
+            'user.firstName',
             input.or.firstName,
           ),
         );
@@ -85,7 +85,7 @@ export default class SearchService {
       if (input.or.middleName) {
         orConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.middleName',
+            'user.middleName',
             input.or.middleName,
           ),
         );
@@ -93,7 +93,7 @@ export default class SearchService {
       if (input.or.lastName) {
         orConditions.push(
           this.generateWhereClauseForStringSearch(
-            'User.lastName',
+            'user.lastName',
             input.or.lastName,
           ),
         );
