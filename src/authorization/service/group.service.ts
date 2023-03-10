@@ -39,7 +39,7 @@ import { GroupServiceInterface } from './group.service.interface';
 import { GroupCacheServiceInterface } from './groupcache.service.interface';
 import SearchService from './search.service';
 import { UserCacheServiceInterface } from './usercache.service.interface';
-import { DUPLICATE_ERROR_CODE } from '../../common/constants';
+import { DUPLICATE_ERROR_CODE } from '../../constants/db.error.constants';
 import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
