@@ -1,10 +1,10 @@
+import { ObjectSchema } from '@hapi/joi';
 import {
-  PipeTransform,
-  Injectable,
   ArgumentMetadata,
   BadRequestException,
+  Injectable,
+  PipeTransform,
 } from '@nestjs/common';
-import { ObjectSchema } from '@hapi/joi';
 
 @Injectable()
 export default class ValidationPipe implements PipeTransform {
@@ -17,10 +17,7 @@ export default class ValidationPipe implements PipeTransform {
 
     const { error } = this.schema.validate(value);
     if (error) {
-      throw new BadRequestException(
-        'Failed to validate the input payload',
-        error.message,
-      );
+      throw new BadRequestException(error.message);
     }
     return value;
   }

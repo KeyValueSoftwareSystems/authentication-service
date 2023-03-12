@@ -4,8 +4,8 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { GqlExceptionFilter } from '@nestjs/graphql';
+import { Response } from 'express';
 import { LoggerService } from '../logger/logger.service';
 
 @Catch()
