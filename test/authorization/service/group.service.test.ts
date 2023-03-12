@@ -60,7 +60,7 @@ describe('test Group Service', () => {
   let groupService: GroupServiceInterface;
   let groupRepository: GroupRepository;
   let userRepository: UserRepository;
-  let userGroupRepository: UserGroupRepository;
+  // let userGroupRepository: UserGroupRepository;
 
   let dataSource: DataSource;
 
@@ -89,40 +89,43 @@ describe('test Group Service', () => {
   let updateGroupByIdMock: jest.Mock;
   let getUsersByIdsMock: jest.Mock;
   let getUsersByGroupIdMock: jest.Mock;
+  let getUserCountForGroupIdMock: jest.Mock;
   let userGroupCreateMock: jest.Mock;
   let userGroupRemoveMock: jest.Mock;
   let userGroupSaveMock: jest.Mock;
 
   let getRepositoryMock: jest.Mock;
+  let entityManager: any;
+
+  const userGroupRepository: UserGroupRepository = ({
+    create: (userGroupCreateMock = jest.fn()),
+    remove: (userGroupRemoveMock = jest.fn()),
+    save: (userGroupSaveMock = jest.fn()),
+    getUserGroupsByUserId: jest.fn(),
+  } as unknown) as UserGroupRepository;
+
+  const repositoryMap = new Map<any, any>([
+    [UserGroupRepository, userGroupRepository],
+    // [GroupRepository, groupRepository],
+    // [GroupRoleRepository, groupRoleRepository],
+    // [GroupPermissionRepository, groupPermissionRepository],
+  ]);
+
+  getRepositoryMock = jest
+    .fn()
+    .mockImplementation((type) => repositoryMap.get(type));
+
+  entityManager = { getRepository: getRepositoryMock };
 
   const mockDataSource = {
     createEntityManager: jest.fn(),
     transaction: jest.fn(),
-    // manager: {
-    //   transaction: jest.fn().mockImplementation(() => {
-    //     entityManager: {
-    //       getRepository: jest.fn().mockImplementation(() => {
-    //         remove: userGroupRemoveMock = jest.fn();
-    //         save: userGroupSaveMock = jest.fn();
-    //       });
-    //     }
-    //   }),
-    // },
+    manager: {
+      transaction: jest.fn().mockImplementation((cb) => {
+        return cb(entityManager);
+      }),
+    },
   };
-
-  // let dataSourceMockFactory: jest.Mock;
-  // dataSourceMockFactory = jest.fn(() => ({
-  //   manager: {
-  //     transaction: jest.fn().mockImplementation((entityManager) => {
-  //       entityManager: jest.Mock  = {
-  //         getRepository: getRepositoryMock = jest.fn().mockImplementation(() => ({
-  //           remove: userGroupRemoveMock = jest.fn(),
-  //           save: userGroupSaveMock = jest.fn(),
-  //         })),
-  //       }
-  //     }),
-  //   }
-  // }));
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -170,8 +173,8 @@ describe('test Group Service', () => {
     groupService = moduleRef.get<GroupServiceInterface>(GroupService);
     groupRepository = moduleRef.get(GroupRepository);
     userRepository = moduleRef.get(UserRepository);
-    userGroupRepository = moduleRef.get(UserGroupRepository);
-    dataSource = moduleRef.get(DataSource);
+    // userGroupRepository = moduleRef.get(UserGroupRepository);
+    // dataSource = moduleRef.get(DataSource);
 
     createQueryBuilderMock = groupRepository.createQueryBuilder = jest
       .fn()
@@ -187,9 +190,10 @@ describe('test Group Service', () => {
     updateGroupByIdMock = groupRepository.updateGroupById = jest.fn();
     getUsersByIdsMock = userRepository.getUsersByIds = jest.fn();
     getUsersByGroupIdMock = userRepository.getUsersByGroupId = jest.fn();
-    userGroupCreateMock = userGroupRepository.create = jest.fn();
-    userGroupRemoveMock = userGroupRepository.remove = jest.fn();
-    userGroupSaveMock = userGroupRepository.save = jest.fn();
+    // userGroupCreateMock = userGroupRepository.create = jest.fn();
+    // userGroupRemoveMock = userGroupRepository.remove = jest.fn();
+    // userGroupSaveMock = userGroupRepository.save = jest.fn();
+    getUserCountForGroupIdMock = userRepository.getUserCountForGroupId = jest.fn();
 
     // const repositoryMap = new Map<any, any>([
     //   [UserGroupRepository, userGroupRepository],
@@ -289,70 +293,70 @@ describe('test Group Service', () => {
       expect(result).toEqual(groups[0]);
     });
 
-    // it('should update users in a group', async () => {
-    //   const input: UpdateGroupInput = {
-    //     users: ['ccecef4f-58d3-477b-87ee-847ee22efe4d'],
-    //   };
+    it('should update users in a group', async () => {
+      const input: UpdateGroupInput = {
+        users: ['ccecef4f-58d3-477b-87ee-847ee22efe4d'],
+      };
 
-    //   updateGroupByIdMock.mockResolvedValue(true);
-    //   getGroupByIdMock.mockResolvedValue(groups[0]);
-    //   getUsersByIdsMock.mockResolvedValue([
-    //     {
-    //       id: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
-    //       firstName: 'New1',
-    //       lastName: 'New2',
-    //       origin: 'simple',
-    //       status: Status.ACTIVE,
-    //     },
-    //   ]);
-    //   getUsersByGroupIdMock.mockResolvedValue(users);
-    //   userGroupCreateMock.mockResolvedValue({
-    //     userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
-    //     groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
-    //   });
-    //   // getRepositoryMock.mockResolvedValue(UserGroupRepository);
-    //   userGroupRemoveMock.mockResolvedValue({
-    //     userId: users[0].id,
-    //     groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
-    //   });
-    //   userGroupSaveMock.mockResolvedValue({
-    //     userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
-    //     groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
-    //   });
+      updateGroupByIdMock.mockResolvedValue(true);
+      getGroupByIdMock.mockResolvedValue(groups[0]);
+      getUsersByIdsMock.mockResolvedValue([
+        {
+          id: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+          firstName: 'New1',
+          lastName: 'New2',
+          origin: 'simple',
+          status: Status.ACTIVE,
+        },
+      ]);
+      getUsersByGroupIdMock.mockResolvedValue(users);
+      userGroupCreateMock.mockResolvedValue({
+        userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+        groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+      });
+      // getRepositoryMock.mockResolvedValue(UserGroupRepository);
+      userGroupRemoveMock.mockResolvedValue({
+        userId: users[0].id,
+        groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+      });
+      userGroupSaveMock.mockResolvedValue({
+        userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+        groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+      });
 
-    //   // dataSource.manager.transaction = jest.fn().mockImplementation();
+      // dataSource.manager.transaction = jest.fn().mockImplementation();
 
-    //   const result = await groupService.updateGroup(
-    //     '3282163d-fd5a-4026-b912-1a9cc5eefc98',
-    //     input,
-    //   );
+      const result = await groupService.updateGroup(
+        '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+        input,
+      );
 
-    //   expect(updateGroupByIdMock).toBeCalledWith(VALID_GROUP_ID, input);
-    //   expect(getGroupByIdMock).toBeCalledWith(VALID_GROUP_ID);
-    //   expect(getUsersByIdsMock).toBeCalledWith([
-    //     'ccecef4f-58d3-477b-87ee-847ee22efe4d',
-    //   ]);
-    //   expect(getUsersByGroupIdMock).toBeCalledWith(VALID_GROUP_ID);
-    //   expect(userGroupCreateMock).toBeCalledWith([
-    //     {
-    //       userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
-    //       groupId: VALID_GROUP_ID,
-    //     },
-    //   ]);
-    //   // expect(userGroupRemoveMock).toBeCalledWith([
-    //   //   {
-    //   //     userId: users[0].id,
-    //   //     groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
-    //   //   },
-    //   // ]);
-    //   // expect(userGroupSaveMock).toBeCalledWith([
-    //   //   {
-    //   //     userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
-    //   //     groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
-    //   //   },
-    //   // ]);
-    //   expect(result).toEqual(groups[0]);
-    // });
+      expect(updateGroupByIdMock).toBeCalledWith(VALID_GROUP_ID, input);
+      expect(getGroupByIdMock).toBeCalledWith(VALID_GROUP_ID);
+      expect(getUsersByIdsMock).toBeCalledWith([
+        'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+      ]);
+      expect(getUsersByGroupIdMock).toBeCalledWith(VALID_GROUP_ID);
+      expect(userGroupCreateMock).toBeCalledWith([
+        {
+          userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+          groupId: VALID_GROUP_ID,
+        },
+      ]);
+      expect(userGroupRemoveMock).toBeCalledWith([
+        {
+          userId: users[0].id,
+          groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+        },
+      ]);
+      expect(userGroupSaveMock).toBeCalledWith([
+        {
+          userId: 'ccecef4f-58d3-477b-87ee-847ee22efe4d',
+          groupId: '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+        },
+      ]);
+      expect(result).toEqual(groups[0]);
+    });
 
     it('should throw exception for invalid id', async () => {
       const input: UpdateGroupInput = {
@@ -378,94 +382,78 @@ describe('test Group Service', () => {
     });
   });
 
-  // describe('deleteGroup', () => {
-  //   it('should delete a group', async () => {
-  //     // groupRepository
-  //     //   .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-  //     //   .resolves(Arg.any());
-  //     // userRepository.createQueryBuilder().returns(userQueryBuilder);
-  //     userQueryBuilder
-  //       .innerJoinAndSelect(UserGroup, 'userGroup', 'userGroup.userId=User.id')
-  //       .returns(userQueryBuilder);
-  //     userQueryBuilder
-  //       .where('userGroup.groupId = :id', {
-  //         id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       })
-  //       .returns(userQueryBuilder);
-  //     userQueryBuilder.getCount().resolves(0);
-  //     const result = await groupService.deleteGroup(
-  //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //     );
-  //     expect(result).toEqual(groups[0]);
-  //   });
-  // });
+  describe('deleteGroup', () => {
+    it('should delete a group', async () => {
+      getGroupByIdMock.mockResolvedValue(groups[0]);
+      getUserCountForGroupIdMock.mockResolvedValue(0);
 
-  // describe('updateGroupPermissions', () => {
-  //   it('should add permissions to a group', async () => {
-  //     const request = [
-  //       {
-  //         groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //         permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-  //       },
-  //     ];
-  //     const input: UpdateGroupPermissionInput = {
-  //       permissions: ['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'],
-  //     };
+      const result = await groupService.deleteGroup(
+        '3282163d-fd5a-4026-b912-1a9cc5eefc98',
+      );
 
-  //     permissionRepository
-  //       .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
-  //       .resolves(permissions);
+      expect(getGroupByIdMock).toBeCalledWith(VALID_GROUP_ID);
+      expect(getUserCountForGroupIdMock).toBeCalledWith(VALID_GROUP_ID);
 
-  //     groupPermissionRepository.create(request).returns(request);
+      expect(result).toEqual(groups[0]);
+    });
+  });
 
-  //     permissionRepository
-  //       .createQueryBuilder('permission')
-  //       .returns(permissionQueryBuilder);
-  //     permissionQueryBuilder
-  //       .leftJoinAndSelect(
-  //         GroupPermission,
-  //         'groupPermission',
-  //         'permission.id = groupPermission.permissionId',
-  //       )
-  //       .returns(permissionQueryBuilder);
-
-  //     permissionQueryBuilder
-  //       .where('groupPermission.groupId = :groupId', {
-  //         groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       })
-  //       .returns(permissionQueryBuilder);
-
-  //     permissionQueryBuilder.getMany().resolves(permissions);
-
-  //     // mockDataSource.manager.transaction(Arg.any()).resolves(request);
-
-  //     const result = await groupService.updateGroupPermissions(
-  //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       input,
-  //     );
-  //     expect(result).toEqual(permissions);
-  //   });
-
-  //   it('should throw exception when adding invalid permissions to a group', async () => {
-  //     const input: UpdateGroupPermissionInput = {
-  //       permissions: ['3e9e78c9-3fcd-4eed-b027-62f794680b03'],
-  //     };
-
-  //     permissionRepository
-  //       .findByIds(['3e9e78c9-3fcd-4eed-b027-62f794680b03'])
-  //       .resolves([]);
-
-  //     const result = groupService.updateGroupPermissions(
-  //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       input,
-  //     );
-  //     await expect(result).rejects.toThrowError(
-  //       new PermissionNotFoundException(
-  //         ['3e9e78c9-3fcd-4eed-b027-62f794680b03'].toString(),
-  //       ),
-  //     );
-  //   });
-  // });
+  describe('updateGroupPermissions', () => {
+    // it('should add permissions to a group', async () => {
+    //   const request = [
+    //     {
+    //       groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    //       permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+    //     },
+    //   ];
+    //   const input: UpdateGroupPermissionInput = {
+    //     permissions: ['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'],
+    //   };
+    //   permissionRepository
+    //     .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
+    //     .resolves(permissions);
+    //   groupPermissionRepository.create(request).returns(request);
+    //   permissionRepository
+    //     .createQueryBuilder('permission')
+    //     .returns(permissionQueryBuilder);
+    //   permissionQueryBuilder
+    //     .leftJoinAndSelect(
+    //       GroupPermission,
+    //       'groupPermission',
+    //       'permission.id = groupPermission.permissionId',
+    //     )
+    //     .returns(permissionQueryBuilder);
+    //   permissionQueryBuilder
+    //     .where('groupPermission.groupId = :groupId', {
+    //       groupId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    //     })
+    //     .returns(permissionQueryBuilder);
+    //   permissionQueryBuilder.getMany().resolves(permissions);
+    //   // mockDataSource.manager.transaction(Arg.any()).resolves(request);
+    //   const result = await groupService.updateGroupPermissions(
+    //     'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    //     input,
+    //   );
+    //   expect(result).toEqual(permissions);
+    // });
+    // it('should throw exception when adding invalid permissions to a group', async () => {
+    //   const input: UpdateGroupPermissionInput = {
+    //     permissions: ['3e9e78c9-3fcd-4eed-b027-62f794680b03'],
+    //   };
+    //   permissionRepository
+    //     .findByIds(['3e9e78c9-3fcd-4eed-b027-62f794680b03'])
+    //     .resolves([]);
+    //   const result = groupService.updateGroupPermissions(
+    //     'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+    //     input,
+    //   );
+    //   await expect(result).rejects.toThrowError(
+    //     new PermissionNotFoundException(
+    //       ['3e9e78c9-3fcd-4eed-b027-62f794680b03'].toString(),
+    //     ),
+    //   );
+    // });
+  });
 
   // describe('getGroupRoles', () => {
   //   it('should get group roles', async () => {
