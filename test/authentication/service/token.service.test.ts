@@ -9,16 +9,13 @@ import { AuthenticationHelper } from '../../../src/authentication/authentication
 import { TokenService } from '../../../src/authentication/service/token.service';
 import User from '../../../src/authorization/entity/user.entity';
 import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('test TokenService', () => {
   let tokenService: TokenService;
   let authenticationHelper: AuthenticationHelper;
-  const userService = Substitute.for<UserServiceInterface>();
-  const configService = Substitute.for<ConfigService>();
-  configService.get('ENV').returns('local');
-  configService.get('JWT_SECRET').returns('s3cr3t1234567890');
-  configService.get('JWT_TOKEN_EXPTIME').returns(3600);
-  configService.get('INVITATION_TOKEN_EXPTIME').returns('7d');
+  const userService: UserServiceInterface = createMock<UserServiceInterface>();
+  const configService: ConfigService = createMock<ConfigService>();
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ConfigModule],
@@ -49,12 +46,16 @@ describe('test TokenService', () => {
         status: Status.ACTIVE,
       },
     ];
+
+    jest.mocked(userService).getUserById.mockResolvedValue(users[0]);
+    jest.mocked(userService).updateField.mockResolvedValue(users[0]);
+    jest
+      .mocked(configService)
+      .get.mockReturnValue(3600)
+      .mockReturnValue('s3cr3t');
+
     const token = authenticationHelper.generateTokenForUser(users[0]);
     users[0].refreshToken = token.refreshToken;
-    userService.getUserById(users[0].id).returns(Promise.resolve(users[0]));
-    userService
-      .updateField(users[0].id, 'refreshToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
     const resp = await tokenService.refresh(users[0].refreshToken as string);
 
     expect(resp).toHaveProperty('accessToken');
@@ -73,11 +74,18 @@ describe('test TokenService', () => {
         status: Status.ACTIVE,
       },
     ];
+    jest.mocked(userService).getUserById.mockResolvedValue(users[0]);
+    jest.mocked(userService).updateField.mockResolvedValue(users[0]);
+    jest
+      .mocked(configService)
+      .get.mockReturnValue('s3cr3t')
+      .mockReturnValueOnce('s3cr3t')
+      .mockReturnValueOnce('7d');
+
     const refreshInviteToken = authenticationHelper.generateInvitationToken(
       { id: 'ee809c91-a9bf-4589-b9db-7a116dda3158' },
       '7d',
     );
-    userService.getUserById(users[0].id).returns(Promise.resolve(users[0]));
 
     users[0].inviteToken = refreshInviteToken.token;
     const inviteTokenRespnse: InviteTokenResponse = {
@@ -85,9 +93,6 @@ describe('test TokenService', () => {
       tokenExpiryTime: '7d',
       user: users[0],
     };
-    userService
-      .updateField(users[0].id, 'inviteToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
     const resp = await tokenService.refreshInviteToken(users[0].id);
     expect(resp).toEqual(inviteTokenRespnse);
   });
@@ -105,9 +110,8 @@ describe('test TokenService', () => {
         status: Status.ACTIVE,
       },
     ];
-    userService
-      .updateField(users[0].id, 'refreshToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
+    jest.mocked(configService).get.mockReturnValue('s3cr3t');
+    jest.mocked(userService).updateField.mockResolvedValue(users[0]);
     const resp = await tokenService.getNewToken(users[0]);
 
     expect(resp).toHaveProperty('accessToken');
@@ -127,9 +131,7 @@ describe('test TokenService', () => {
         status: Status.ACTIVE,
       },
     ];
-    userService
-      .updateField(users[0].id, 'refreshToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
+    jest.mocked(userService).updateField.mockResolvedValue(users[0]);
     await tokenService.resetToken(users[0].id);
   });
 
@@ -147,9 +149,7 @@ describe('test TokenService', () => {
       },
     ];
     users[0].inviteToken = '';
-    userService
-      .updateField(users[0].id, 'inviteToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
+    jest.mocked(userService).updateField.mockResolvedValue(users[0]);
     const resp = await tokenService.revokeInviteToken(users[0].id);
     expect(resp).toEqual(true);
   });

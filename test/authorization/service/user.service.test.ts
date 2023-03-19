@@ -1,7 +1,15 @@
 import { Substitute, SubstituteOf } from '@fluffy-spoon/substitute';
+import { createMock } from '@golevelup/ts-jest';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { GroupRepository } from 'src/authorization/repository/group.repository';
+import { GroupPermissionRepository } from 'src/authorization/repository/groupPermission.repository';
+import { GroupRoleRepository } from 'src/authorization/repository/groupRole.repository';
+import { PermissionRepository } from 'src/authorization/repository/permission.repository';
+import { RolePermissionRepository } from 'src/authorization/repository/rolePermission.repository';
+import { UserGroupRepository } from 'src/authorization/repository/userGroup.repository';
+import { UserPermissionRepository } from 'src/authorization/repository/userPermission.repository';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
 import Group from '../../../src/authorization/entity/group.entity';
@@ -61,32 +69,30 @@ describe('test UserService', () => {
   let getUserByIdMock: jest.Mock;
   let saveMock: jest.Mock;
   let updateUserByIdMock: jest.Mock;
+  let invalidateUserPermissionsCacheMock: jest.Mock;
+  let getPermissionsByUserIdMock: jest.Mock;
 
-  const groupRepository = Substitute.for<Repository<Group>>();
-  const permissionRepository = Substitute.for<Repository<Permission>>();
-  const userPermissionRepository: SubstituteOf<
-    Repository<UserPermission>
-  > = Substitute.for<Repository<UserPermission>>();
-  const userGroupRepository = Substitute.for<Repository<UserGroup>>();
-  const groupPermissionRepository = Substitute.for<
-    Repository<GroupPermission>
-  >();
-  const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
-  const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
-  const userCacheService = Substitute.for<UserCacheServiceInterface>();
-  const groupCacheService = Substitute.for<GroupCacheServiceInterface>();
-  const permissionCacheService = Substitute.for<PermissionCacheServiceInterface>();
-  const redisCacheService = Substitute.for<RedisCacheService>();
-  const groupQueryBuilder = Substitute.for<SelectQueryBuilder<Group>>();
-  const permissionQueryBuilder = Substitute.for<
-    SelectQueryBuilder<Permission>
-  >();
-  const roleCacheService = Substitute.for<RoleCacheServiceInterface>();
-  const searchService = Substitute.for<SearchService>();
+  const groupRepository: GroupRepository = createMock<GroupRepository>();
+  const permissionRepository: PermissionRepository = createMock<PermissionRepository>();
+  const userPermissionRepository: UserPermissionRepository = createMock<UserPermissionRepository>();
+  const userGroupRepository: UserGroupRepository = createMock<UserGroupRepository>();
+  const groupPermissionRepository: GroupPermissionRepository = createMock<GroupPermissionRepository>();
+
+  const groupRoleRepository: GroupRoleRepository = createMock<GroupRoleRepository>();
+  const rolePermissionRepository: RolePermissionRepository = createMock<RolePermissionRepository>();
+  const userCacheService: UserCacheServiceInterface = createMock<UserCacheServiceInterface>();
+  const groupCacheService: GroupCacheServiceInterface = createMock<GroupCacheServiceInterface>();
+  const permissionCacheService: PermissionCacheServiceInterface = createMock<PermissionCacheServiceInterface>();
+  const redisCacheService: RedisCacheService = createMock<RedisCacheService>();
+  const roleCacheService: RoleCacheServiceInterface = createMock<RoleCacheServiceInterface>();
+  const searchService: SearchService = createMock<SearchService>();
 
   const mockDataSource = {
     createEntityManager: jest.fn(),
     transaction: jest.fn(),
+    manager: {
+      transaction: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -148,6 +154,8 @@ describe('test UserService', () => {
     getUserByIdMock = userRepository.getUserById = jest.fn();
     saveMock = userRepository.save = jest.fn();
     updateUserByIdMock = userRepository.updateUserById = jest.fn();
+    invalidateUserPermissionsCacheMock = userCacheService.invalidateUserPermissionsCache = jest.fn();
+    getPermissionsByUserIdMock = permissionRepository.getPermissionsByUserId = jest.fn();
 
     createQueryBuilderMock = userRepository.createQueryBuilder = jest
       .fn()
@@ -253,25 +261,24 @@ describe('test UserService', () => {
     });
   });
 
-  // describe('deleteUser', () => {
-  //   it('should delete a user', async () => {
-  //     // userRepository
-  //     //   .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-  //     //   .resolves(Arg.any());
+  describe('deleteUser', () => {
+    it('should delete a user', async () => {
+      getUserByIdMock.mockResolvedValue(users[0]);
 
-  //     getUserByIdMock.mockResolvedValue(users[0]);
+      const result = await userService.deleteUser(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      );
 
-  //     const result = await userService.deleteUser(
-  //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //     );
+      expect(getUserByIdMock).toBeCalledWith(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      );
+      expect(invalidateUserPermissionsCacheMock).toBeCalledWith(
+        'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+      );
 
-  //     expect(getUserByIdMock).toBeCalledWith(
-  //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //     );
-
-  //     expect(result).toEqual(users[0]);
-  //   });
-  // });
+      expect(result).toEqual(users[0]);
+    });
+  });
 
   // describe('updateUserPermissions', () => {
   //   it('should update user permissions', async () => {
@@ -281,30 +288,8 @@ describe('test UserService', () => {
   //         permissionId: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
   //       },
   //     ];
-  //     userPermissionRepository.create(request).returns(request);
-  //     userPermissionRepository.insert(request).resolves(Arg.any());
-  //     userPermissionRepository.remove([]).resolves(Arg.any());
-  //     permissionRepository
-  //       .findByIds(['2b33268a-7ff5-4cac-a87a-6bfc4430d34c'])
-  //       .resolves(permissions);
-  //     permissionRepository.createQueryBuilder().returns(permissionQueryBuilder);
-  //     permissionQueryBuilder
-  //       .leftJoinAndSelect(
-  //         UserPermission,
-  //         'userPermission',
-  //         'Permission.id = userPermission.permissionId',
-  //       )
-  //       .returns(permissionQueryBuilder);
-
-  //     permissionQueryBuilder
-  //       .where('userPermission.userId = :userId', {
-  //         userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       })
-  //       .returns(permissionQueryBuilder);
-
-  //     permissionQueryBuilder.getMany().resolves([]);
-
-  //     mockDataSource.transaction(Arg.any()).resolves(request);
+  //     getUserByIdMock.mockResolvedValue(users[0]);
+  //     getPermissionsByUserIdMock.mockResolvedValue(permissions);
 
   //     userCacheService.invalidateUserPermissionsCache(
   //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -317,29 +302,29 @@ describe('test UserService', () => {
   //     expect(result).toEqual(permissions);
   //   });
 
-  //   it('should throw exception when user is updated with invalid permissions', async () => {
-  //     const request = [
-  //       {
-  //         userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //         permissionId: '23097816-39ef-4862-b557-dab6cc67d5c5',
-  //       },
-  //     ];
-  //     userPermissionRepository.create(request).returns(request);
-  //     userPermissionRepository.insert(request).resolves(Arg.any());
-  //     permissionRepository
-  //       .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'])
-  //       .resolves([]);
+  // it('should throw exception when user is updated with invalid permissions', async () => {
+  //   const request = [
+  //     {
+  //       userId: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+  //       permissionId: '23097816-39ef-4862-b557-dab6cc67d5c5',
+  //     },
+  //   ];
+  //   userPermissionRepository.create(request).returns(request);
+  //   userPermissionRepository.insert(request).resolves(Arg.any());
+  //   permissionRepository
+  //     .findByIds(['23097816-39ef-4862-b557-dab6cc67d5c5'])
+  //     .resolves([]);
 
-  //     const result = userService.updateUserPermissions(
-  //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       { permissions: ['23097816-39ef-4862-b557-dab6cc67d5c5'] },
-  //     );
-  //     await expect(result).rejects.toThrowError(
-  //       new PermissionNotFoundException(
-  //         ['23097816-39ef-4862-b557-dab6cc67d5c5'].toString(),
-  //       ),
-  //     );
-  //   });
+  //   const result = userService.updateUserPermissions(
+  //     'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
+  //     { permissions: ['23097816-39ef-4862-b557-dab6cc67d5c5'] },
+  //   );
+  //   await expect(result).rejects.toThrowError(
+  //     new PermissionNotFoundException(
+  //       ['23097816-39ef-4862-b557-dab6cc67d5c5'].toString(),
+  //     ),
+  //   );
+  // });
   // });
 
   // describe('updateUserGroups', () => {

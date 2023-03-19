@@ -1,8 +1,11 @@
 import { Substitute } from '@fluffy-spoon/substitute';
+import { createMock } from '@golevelup/ts-jest';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import Role from 'src/authorization/entity/role.entity';
+import { GroupRoleRepository } from 'src/authorization/repository/groupRole.repository';
+import { RolePermissionRepository } from 'src/authorization/repository/rolePermission.repository';
 import {
   DataSource,
   Repository,
@@ -50,22 +53,33 @@ describe('test Role Service', () => {
   let roleService: RoleService;
   let roleRepository: RoleRepository;
   let permissionRepository: PermissionRepository;
-  const groupRoleRepository = Substitute.for<Repository<GroupRole>>();
-  const rolePermissionRepository = Substitute.for<Repository<RolePermission>>();
-  const roleCacheService = Substitute.for<RoleCacheServiceInterface>();
-  const redisCacheService = Substitute.for<RedisCacheService>();
-  const searchService = Substitute.for<SearchService>();
-  const groupRoleQueryBuilder = Substitute.for<SelectQueryBuilder<GroupRole>>();
-  const permissionQueryBuilder = Substitute.for<
-    SelectQueryBuilder<Permission>
-  >();
+  const groupRoleRepository: GroupRoleRepository = createMock<GroupRoleRepository>();
+  const rolePermissionRepository: RolePermissionRepository = createMock<RolePermissionRepository>();
+  const roleCacheService: RoleCacheServiceInterface = createMock<RoleCacheServiceInterface>();
+  const redisCacheService: RedisCacheService = createMock<RedisCacheService>();
+  const searchService: SearchService = createMock<SearchService>();
 
   let createQueryBuilderMock: jest.Mock;
   let getManyAndCountMock: jest.Mock;
-  let findOneByMock: jest.Mock;
   let saveMock: jest.Mock;
   let updateMock: jest.Mock;
-  let getManyMock: jest.Mock;
+  let getRoleMock: jest.Mock;
+  let groupRoleCountMock: jest.Mock;
+  let getPermissionByRoleIdMock: jest.Mock;
+
+  let getRepositoryMock: jest.Mock;
+  let entityManager: any;
+
+  // const repositoryMap = new Map<any, any>([
+  //   [RoleRepository, roleRepository],
+  //   [RolePermissionRepository, rolePermissionRepository],
+  // ]);
+
+  // getRepositoryMock = jest
+  //   .fn()
+  //   .mockImplementation((type) => repositoryMap.get(type));
+
+  // entityManager = { getRepository: getRepositoryMock };
 
   const mockDataSource = {
     createEntityManager: jest.fn(),
@@ -111,9 +125,11 @@ describe('test Role Service', () => {
         getManyAndCount: (getManyAndCountMock = jest.fn()),
       });
 
-    findOneByMock = roleRepository.findOneBy = jest.fn();
     saveMock = roleRepository.save = jest.fn();
-    updateMock = roleRepository.update = jest.fn();
+    updateMock = roleRepository.updateRoleById = jest.fn();
+    getRoleMock = roleRepository.getRoleById = jest.fn();
+    groupRoleCountMock = groupRoleRepository.getGroupCountForRoleId = jest.fn();
+    getPermissionByRoleIdMock = permissionRepository.getPermissionsByRoleId = jest.fn();
   });
 
   describe('getAllRoles', () => {
@@ -134,27 +150,23 @@ describe('test Role Service', () => {
 
   describe('getRoleById', () => {
     it('should get a role for valid id', async () => {
-      findOneByMock.mockResolvedValue(roles[0]);
+      getRoleMock.mockResolvedValue(roles[0]);
 
       const result = await roleService.getRoleById(VALID_ROLE_ID);
 
-      expect(findOneByMock).toBeCalledWith({
-        id: VALID_ROLE_ID,
-      });
+      expect(getRoleMock).toBeCalledWith(VALID_ROLE_ID);
 
       expect(result).toEqual(roles[0]);
     });
 
     it('should throw exception for invalid id', async () => {
       let result;
-      findOneByMock.mockResolvedValue(null);
+      getRoleMock.mockResolvedValue(null);
 
       try {
         result = await roleService.getRoleById(INVALID_ROLE_ID);
       } catch (error) {
-        expect(findOneByMock).toBeCalledWith({
-          id: INVALID_ROLE_ID,
-        });
+        expect(getRoleMock).toBeCalledWith(INVALID_ROLE_ID);
 
         expect(error).toBeInstanceOf(RoleNotFoundException);
       }
@@ -184,7 +196,7 @@ describe('test Role Service', () => {
       };
 
       updateMock.mockResolvedValue(updateResult);
-      findOneByMock.mockResolvedValue(roles[0]);
+      getRoleMock.mockResolvedValue(roles[0]);
 
       const result = await roleService.updateRole(
         'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -192,9 +204,7 @@ describe('test Role Service', () => {
       );
 
       expect(updateMock).toBeCalledWith(VALID_ROLE_ID, input);
-      expect(findOneByMock).toBeCalledWith({
-        id: VALID_ROLE_ID,
-      });
+      expect(getRoleMock).toBeCalledWith(VALID_ROLE_ID);
 
       expect(result).toEqual({
         id: VALID_ROLE_ID,
@@ -205,19 +215,8 @@ describe('test Role Service', () => {
 
   // describe('deleteRole', () => {
   //   it('should delete a role', async () => {
-  //     // roleRepository
-  //     //   .softDelete('ae032b1b-cc3c-4e44-9197-276ca877a7f8')
-  //     //   .resolves(Arg.any());
-  //     groupRoleRepository.createQueryBuilder().returns(groupRoleQueryBuilder);
-  //     groupRoleQueryBuilder
-  //       .innerJoinAndSelect(Group, 'group', 'group.id = GroupRole.groupId')
-  //       .returns(groupRoleQueryBuilder);
-  //     groupRoleQueryBuilder
-  //       .where('GroupRole.roleId= :id', {
-  //         id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
-  //       })
-  //       .returns(groupRoleQueryBuilder);
-  //     groupRoleQueryBuilder.getCount().resolves(0);
+  //     getRoleMock.mockResolvedValue([roles]);
+  //     groupRoleCountMock.mockResolvedValue(0);
   //     const resp = await roleService.deleteRole(
   //       'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
   //     );
@@ -292,34 +291,20 @@ describe('test Role Service', () => {
   //   });
   // });
 
-  // describe('getRolePermissions', () => {
-  //   it('should return all permissions of the role', async () => {
-  //     const permissions: Permission[] = [
-  //       {
-  //         id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
-  //         name: 'Customers',
-  //         label: 'Customers',
-  //       },
-  //     ];
-  //     // permissionRepository
-  //     //   .createQueryBuilder('permission')
-  //     //   .returns(permissionQueryBuilder);
-  //     permissionQueryBuilder
-  //       .leftJoinAndSelect(
-  //         RolePermission,
-  //         'rolePermission',
-  //         'permission.id = rolePermission.permissionId',
-  //       )
-  //       .returns(permissionQueryBuilder);
-  //     permissionQueryBuilder
-  //       .where('rolePermission.roleId = :roleId', {
-  //         roleId: 'fcd858c6-26c5-462b-8c53-4b544830dca8',
-  //       })
-  //       .returns(permissionQueryBuilder);
-  //     const result = await roleService.getRolePermissions(
-  //       'fcd858c6-26c5-462b-8c53-4b544830dca8',
-  //     );
-  //     expect(result).toEqual(permissions);
-  //   });
-  // });
+  describe('getRolePermissions', () => {
+    it('should return all permissions of the role', async () => {
+      const permissions: Permission[] = [
+        {
+          id: '2b33268a-7ff5-4cac-a87a-6bfc4430d34c',
+          name: 'Customers',
+          label: 'Customers',
+        },
+      ];
+      getPermissionByRoleIdMock.mockResolvedValue(permissions);
+      const result = await roleService.getRolePermissions(
+        'fcd858c6-26c5-462b-8c53-4b544830dca8',
+      );
+      expect(result).toEqual(permissions);
+    });
+  });
 });

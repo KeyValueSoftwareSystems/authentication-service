@@ -1,4 +1,4 @@
-import { Arg, Substitute } from '@fluffy-spoon/substitute';
+import { createMock } from '@golevelup/ts-jest';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { AuthenticationHelper } from '../../../src/authentication/authentication.helper';
@@ -13,7 +13,6 @@ import User from '../../../src/authorization/entity/user.entity';
 import { UserServiceInterface } from '../../../src/authorization/service/user.service.interface';
 import {
   Status,
-  TokenResponse,
   UserOTPLoginInput,
   UserOTPSignupInput,
 } from '../../../src/schema/graphql.schema';
@@ -30,17 +29,15 @@ let users: User[] = [
     status: Status.ACTIVE,
   },
 ];
+let tokenResponse: { accessToken: string; refreshToken: string };
 
 describe('test OTPAuthService', () => {
   let otpAuthService: OTPAuthService;
   let authenticationHelper: AuthenticationHelper;
-  const userService = Substitute.for<UserServiceInterface>();
-  const configService = Substitute.for<ConfigService>();
-  const otpService = Substitute.for<TwilioOTPService>();
-  const tokenService = Substitute.for<TokenService>();
-  configService.get('ENV').returns('local');
-  configService.get('JWT_SECRET').returns('s3cr3t1234567890');
-  configService.get('JWT_TOKEN_EXPTIME').returns(3600);
+  const userService: UserServiceInterface = createMock<UserServiceInterface>();
+  const configService: ConfigService = createMock<ConfigService>();
+  const otpService: TwilioOTPService = createMock<TwilioOTPService>();
+  const tokenService: TokenService = createMock<TokenService>();
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ConfigModule],
@@ -59,8 +56,13 @@ describe('test OTPAuthService', () => {
       AuthenticationHelper,
     );
 
+    jest
+      .mocked(configService)
+      .get.mockReturnValue(3600)
+      .mockReturnValue('s3cr3t');
+
     const hashedPassword = authenticationHelper.generatePasswordHash('s3cr3t');
-    const token = authenticationHelper.generateTokenForUser(users[0]);
+    tokenResponse = authenticationHelper.generateTokenForUser(users[0]);
     users = [
       {
         id: 'ae032b1b-cc3c-4e44-9197-276ca877a7f8',
@@ -69,7 +71,7 @@ describe('test OTPAuthService', () => {
         password: hashedPassword,
         firstName: 'Test1',
         lastName: 'Test2',
-        refreshToken: token.refreshToken,
+        refreshToken: tokenResponse.refreshToken,
         origin: 'simple',
         status: Status.ACTIVE,
       },
@@ -95,22 +97,17 @@ describe('test OTPAuthService', () => {
       username: '9112345678910',
       otp: '123456',
     };
-    const token = authenticationHelper.generateTokenForUser(users[0]);
-    const tokenResponse: TokenResponse = {
-      refreshToken: token.refreshToken,
-      accessToken: token.accessToken,
-      user: users[0],
-    };
+    jest
+      .mocked(userService)
+      .getUserDetailsByUsername.mockResolvedValue(users[0]);
+    jest.mocked(otpService).validateOTP.mockResolvedValue(true);
+    jest.mocked(configService).get.mockReturnValue(3600);
+    jest
+      .mocked(tokenService)
+      .getNewToken.mockResolvedValue({ ...tokenResponse, user: users[0] });
 
-    userService
-      .getUserDetailsByUsername('9112345678910', '9112345678910')
-      .returns(Promise.resolve(users[0]));
-    userService
-      .updateField(users[0].id, 'refreshToken', Arg.any())
-      .returns(Promise.resolve(users[0]));
-    otpService.validateOTP(input.otp, users[0]).returns(Promise.resolve(true));
-    tokenService.getNewToken(users[0]).returns(Promise.resolve(tokenResponse));
     const resp = await otpAuthService.userLogin(input);
+
     expect(resp).toHaveProperty('accessToken');
     expect(resp).toHaveProperty('refreshToken');
     expect(resp.user).toEqual(users[0]);
@@ -132,7 +129,7 @@ describe('test OTPAuthService', () => {
       username: '9112345678910',
       otp: '999999',
     };
-    otpService.validateOTP('999999', Arg.any()).returns(Promise.resolve(false));
+    jest.mocked(otpService).validateOTP.mockResolvedValue(false);
     const resp = otpAuthService.userLogin(input);
     expect(resp).rejects.toThrowError(new InvalidCredentialsException());
   });
@@ -159,14 +156,12 @@ describe('test OTPAuthService', () => {
       firstName: users[0].firstName,
       lastName: users[0].lastName,
     };
-    userService
-      .verifyDuplicateUser(userSignup.email, userSignup.phone)
-      .resolves({
-        existingUserDetails: undefined,
-        duplicate: 'email',
-      });
+    jest.mocked(userService).verifyDuplicateUser.mockResolvedValue({
+      existingUserDetails: undefined,
+      duplicate: 'email',
+    });
 
-    userService.createUser(Arg.any()).returns(Promise.resolve(userResponse[0]));
+    jest.mocked(userService).createUser.mockResolvedValue(userResponse[0]);
 
     const resp = await otpAuthService.userSignup(userSignup);
 
@@ -202,13 +197,10 @@ describe('test OTPAuthService', () => {
       firstName: existUsers[0].firstName,
       lastName: existUsers[0].lastName,
     };
-
-    userService
-      .verifyDuplicateUser(existUsers[0].email, existUsers[0].phone)
-      .resolves({
-        existingUserDetails: existUsers[0],
-        duplicate: 'email',
-      });
+    jest.mocked(userService).verifyDuplicateUser.mockResolvedValue({
+      existingUserDetails: existUsers[0],
+      duplicate: 'email',
+    });
 
     const resp = otpAuthService.userSignup(userSignup);
 
@@ -224,9 +216,9 @@ describe('test OTPAuthService', () => {
       newPassword: 'n3ws3cr3t',
     };
 
-    userService
-      .getActiveUserByPhoneNumber('91234567980')
-      .returns(Promise.resolve(users[0]));
+    jest
+      .mocked(userService)
+      .getActiveUserByPhoneNumber.mockResolvedValue(users[0]);
 
     const resp = await otpAuthService.sendOTP('91234567980');
     expect(resp).toHaveReturned;
