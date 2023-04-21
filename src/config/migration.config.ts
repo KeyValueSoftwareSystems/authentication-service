@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import dotenv from 'dotenv';
-dotenv.config();
+
 /**
  * Uses env params to configure TypeORM database library
  */
